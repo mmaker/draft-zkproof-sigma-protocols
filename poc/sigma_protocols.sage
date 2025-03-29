@@ -4,31 +4,18 @@ from collections import namedtuple
 from sagelib.fiat_shamir import KeccakDuplexSpongeP384
 
 
-def prove(rng, label, statement, witness):
-    sp = SchnorrProof(statement)
-    (prover_state, commitment) = sp.prover_commit(rng, witness)
-    challenge, = KeccakDuplexSpongeP384(label).absorb_elements(commitment).squeeze_scalars(1)
-    response = sp.prover_response(prover_state, challenge)
-
-    assert sp.verifier(commitment, challenge, response)
-    return sp.serialize_batchable(commitment, challenge, response)
-
-def verify(label, statement, proof):
-    sp = SchnorrProof(statement)
-    commitment, response = sp.deserialize_batchable(proof)
-    challenge, = KeccakDuplexSpongeP384(label).absorb_elements(commitment).squeeze_scalars(1)
-    return sp.verifier(commitment, challenge, response)
-
-
-# Combiner for arbitrary statements
 class SigmaProtocol(ABC):
     """
     This is the abstract API of a Sigma protocol.
+    It can be extended for AND/OR composition, for OR proofs, for
 
     An (interactive) Sigma protocol is a 3-message protocol that is special sound and honest-verifier zero-knowledge.
+    Relations for sigma protocols are seen as ternary relations composed of:
+    - instance: the public part of the statement that can be pre-processed offline
+    - witness: the secret witness for the relation.
     """
     @abstractmethod
-    def __init__(self, statement):
+    def __init__(self, index):
         raise NotImplementedError
 
     @abstractmethod
@@ -56,14 +43,16 @@ Witness = list
 ScalarVar = int
 
 # A sparse linear combination
-LinearCombination = namedtuple("LinearCombination", ["scalar_indices", "elements"])
 ProverState = namedtuple("ProverState", ["witness", "nonces"])
 
 class Morphism:
+    LinearCombination = namedtuple("LinearCombination", ["scalar_indices", "elements"])
+    Group = None
+
     def __init__(self, group):
         self.linear_combinations = []
         self.num_scalars = 0
-        self.group = group
+        self.Group = group
 
     def append(self, linear_combination: LinearCombination):
         self.linear_combinations.append(linear_combination)
@@ -73,11 +62,14 @@ class Morphism:
         return len(self.linear_combinations)
 
     # def map(self, scalars):
-    def __call__(self, scalars: Witness):
+    def __call__(self, scalars):
+        """
+        This is the linear morphism of [Maurer09].
+        """
         image = []
         for linear_combination in self.linear_combinations:
             coefficients = [scalars[i] for i in linear_combination.scalar_indices]
-            image.append(self.group.msm(coefficients, linear_combination.elements))
+            image.append(self.Group.msm(coefficients, linear_combination.elements))
         return image
 
 class GroupMorphismPreimage:
@@ -93,14 +85,14 @@ class GroupMorphismPreimage:
         return self.morphism.num_statements * self.group.element_byte_length()
 
     def append_equation(self, lhs, rhs):
-        linear_combination = LinearCombination(
+        linear_combination = Morphism.LinearCombination(
             scalar_indices=[x[0] for x in rhs],
             elements=[x[1] for x in rhs]
         )
         self.morphism.append(linear_combination)
         self.image.append(lhs)
 
-    def allocate_scalars(self, n):
+    def allocate_scalars(self, n: int):
         indices = [ScalarVar(i)
                    for i in range(self.morphism.num_scalars, self.morphism.num_scalars + n)]
         self.morphism.num_scalars += n
@@ -108,10 +100,10 @@ class GroupMorphismPreimage:
 
 
 class SchnorrProof(SigmaProtocol):
-    def __init__(self, statement):
-        self.statement = statement
+    def __init__(self, index):
+        self.statement = index
 
-    def prover_commit(self, rng, witness):
+    def prover_commit(self, witness, rng):
         nonces = [
             self.statement.Domain.random(rng)
             for _ in range(self.statement.morphism.num_scalars)
@@ -155,3 +147,31 @@ class SchnorrProof(SigmaProtocol):
         response = self.statement.Domain.deserialize(response_bytes)
 
         return (commitment, response)
+
+
+
+class NISigmaProtocol:
+    """
+    Performs the Fiat-Shamir Transform for the Sigma protocol `protocol`
+    producing challenges using `codec`.
+    """
+    Protocol = SchnorrProof
+    Codec = KeccakDuplexSpongeP384
+
+    def __init__(self, iv, instance):
+        self.hash_state = self.Codec(iv)
+        self.sp = self.Protocol(instance)
+
+    def prove(self, witness, rng):
+        (prover_state, commitment) = self.sp.prover_commit(witness, rng)
+        challenge = self.hash_state.prover_message(commitment).verifier_challenge()
+        response = self.sp.prover_response(prover_state, challenge)
+
+        assert self.sp.verifier(commitment, challenge, response)
+        return self.sp.serialize_batchable(commitment, challenge, response)
+
+    def verify(self, proof):
+        commitment, response = self.sp.deserialize_batchable(proof)
+        challenge = self.hash_state.prover_message(commitment).verifier_challenge()
+        return self.sp.verifier(commitment, challenge, response)
+

@@ -6,6 +6,10 @@ from keccak import Keccak
 from sagelib.groups import GroupP384
 
 class DuplexSpongeInterface(ABC):
+    """
+    The duplex sponge interface defines the space (the `Unit`) where the hash function operates in,
+    plus a function for absorbing and squeezing prover messages.
+    """
     Unit = None
 
     @abstractmethod
@@ -129,6 +133,12 @@ class KeccakDuplexSpongeP384(DuplexSponge, ByteCodec, P384Codec):
         assert len(iv) == 32
         self.permutation_state = KeccakPermutationState()
         super().__init__(iv)
+
+    def prover_message(self, elements: list):
+        return self.absorb_elements(elements)
+
+    def verifier_challenge(self):
+        return self.squeeze_scalars(1)[0]
 
 if __name__ == "__main__":
     label = b"yellow submarine" * 2

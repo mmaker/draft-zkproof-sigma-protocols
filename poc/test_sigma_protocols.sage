@@ -2,30 +2,31 @@
 # vim: syntax=python
 
 try:
-    from sagelib.sigma_protocols import GroupMorphismPreimage, prove, verify
     from sagelib.test_drng import TestDRNG
+    from sagelib.sigma_protocols import GroupMorphismPreimage
     import json
 except ImportError as e:
     import sys
     sys.exit("Error loading preprocessed sage files. Try running `make setup && make clean pyfiles`. Full error: " + e)
 
-context_string = b'yellow submarine' * 2
+CONTEXT_STRING = b'yellow submarine' * 2
 
 def test_vector(test_vector_function):
     from sagelib.groups import GroupP384 as group
+    from sagelib.sigma_protocols import NISigmaProtocol
 
     def inner(vectors):
         rng = TestDRNG("test vector seed".encode('utf-8'))
         test_vector_name = test_vector_function.__name__
 
-        statement, witness = test_vector_function(rng, group)
-        narg_string = prove(rng, context_string, statement, witness)
-        assert verify(context_string, statement, narg_string)
+        instance, witness = test_vector_function(rng, group)
+        narg_string = NISigmaProtocol(CONTEXT_STRING, instance).prove(witness, rng)
+        assert  NISigmaProtocol(CONTEXT_STRING, instance).verify(narg_string)
         hex_narg_string = narg_string.hex()
         print(f"{test_vector_name} narg_string: {hex_narg_string}\n")
 
         vectors[test_vector_name] = {
-            "Context": context_string.hex(),
+            "Context": CONTEXT_STRING.hex(),
             "Statement": "TODO",
             "Proof": hex_narg_string,
         }
