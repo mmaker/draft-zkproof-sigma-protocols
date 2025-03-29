@@ -1,14 +1,13 @@
 from abc import ABC, abstractmethod
 from collections import namedtuple
 
-from sagelib.fiat_shamir import SHAKE128HashChainP384
+from sagelib.fiat_shamir import KeccakDuplexSpongeP384
 
 
 def prove(rng, label, statement, witness):
     sp = SchnorrProof(statement)
     (prover_state, commitment) = sp.prover_commit(rng, witness)
-    # challenge, = SHAKE128HashChainP384(label).absorb_elements(commitment).squeeze_scalars(1)
-    challenge = 42
+    challenge, = KeccakDuplexSpongeP384(label).absorb_elements(commitment).squeeze_scalars(1)
     response = sp.prover_response(prover_state, challenge)
 
     assert sp.verifier(commitment, challenge, response)
@@ -17,8 +16,7 @@ def prove(rng, label, statement, witness):
 def verify(label, statement, proof):
     sp = SchnorrProof(statement)
     commitment, response = sp.deserialize_batchable(proof)
-    # challenge, = SHAKE128HashChainP384(label).absorb_elements(commitment).squeeze_scalars(1)
-    challenge = 42
+    challenge, = KeccakDuplexSpongeP384(label).absorb_elements(commitment).squeeze_scalars(1)
     return sp.verifier(commitment, challenge, response)
 
 
@@ -27,7 +25,7 @@ class SigmaProtocol(ABC):
     """
     This is the abstract API of a Sigma protocol.
 
-    An (interactive) Sigma protocol is a 3-message protocol that is special sound and hvzk.
+    An (interactive) Sigma protocol is a 3-message protocol that is special sound and honest-verifier zero-knowledge.
     """
     @abstractmethod
     def __init__(self, statement):

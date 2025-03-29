@@ -9,18 +9,18 @@ except ImportError as e:
     import sys
     sys.exit("Error loading preprocessed sage files. Try running `make setup && make clean pyfiles`. Full error: " + e)
 
-context_string = b'sigma_protocols'
-from sagelib.groups import GroupP384 as group
-from functools import wraps
+context_string = b'yellow submarine' * 2
 
 def test_vector(test_vector_function):
+    from sagelib.groups import GroupP384 as group
+
     def inner(vectors):
         rng = TestDRNG("test vector seed".encode('utf-8'))
         test_vector_name = test_vector_function.__name__
 
-        statement, witness = test_vector_function(rng)
-        narg_string = prove(rng, b"name", statement, witness)
-        assert verify(b"test", statement, narg_string)
+        statement, witness = test_vector_function(rng, group)
+        narg_string = prove(rng, context_string, statement, witness)
+        assert verify(context_string, statement, narg_string)
         hex_narg_string = narg_string.hex()
         print(f"{test_vector_name} narg_string: {hex_narg_string}\n")
 
@@ -32,28 +32,26 @@ def test_vector(test_vector_function):
 
     return inner
 
-def wrap_write(fh, arg, *args):
+def wrap_write(fh, *args):
+    assert args
     line_length = 68
-    string = " ".join( [arg] + list(args))
+    string = " ".join(args)
     for hunk in (string[0+i:line_length+i] for i in range(0, len(string), line_length)):
         if hunk and len(hunk.strip()) > 0:
             fh.write(hunk + "\n")
-
-def write_blob(fh, name, blob):
-    wrap_write(fh, name + ' = ' + blob.hex())
 
 def write_value(fh, name, value):
     wrap_write(fh, name + ' = ' + value)
 
 def write_group_vectors(fh, label, vector):
-    fh.write("## " + label + "\n")
-    fh.write("~~~\n")
+    print("## ", label, file=fh)
+    print("~~~", file=fh)
     for key in vector:
         write_value(fh, key, vector[key])
-    fh.write("~~~\n\n")
+    print("~~~", file=fh, end="\n\n")
 
 @test_vector
-def discrete_logarithm(rng):
+def discrete_logarithm(rng, group):
     """
     Proves the following statement:
 
@@ -71,7 +69,7 @@ def discrete_logarithm(rng):
     return statement, [x]
 
 @test_vector
-def dleq(rng):
+def dleq(rng, group):
     """
     Proves the following statement:
 
@@ -92,11 +90,12 @@ def dleq(rng):
     return statement, [x]
 
 @test_vector
-def pedersen_commitment(rng):
+def pedersen_commitment(rng, group):
     """
     Proves the following statement:
 
         PEDERSEN(G, H, C) = PoK{(x, r): C = x * G + r * H}
+
     """
     G = group.generator()
     H = group.random(rng)
@@ -111,7 +110,7 @@ def pedersen_commitment(rng):
     return statement, witness
 
 @test_vector
-def pedersen_commitment_dleq(rng):
+def pedersen_commitment_dleq(rng, group):
     """
     Proves the following statement:
 
@@ -135,7 +134,7 @@ def pedersen_commitment_dleq(rng):
 
 
 @test_vector
-def bss_blind_commitment_computation(rng):
+def bss_blind_commitment_computation(rng, group):
     """
     This example test vector is meant to replace:
     https://www.ietf.org/archive/id/draft-kalos-bbs-blind-signatures-01.html#section-4.1.1
@@ -149,7 +148,7 @@ def bss_blind_commitment_computation(rng):
     # length(committed_messages)
     M = 3
     # BBS.create_generators(M + 1, "BLIND_" || api_id)
-    (Q_2, J_1, J_2, J_3) = generators =  [group.random(rng) for i in range(M+1)]
+    (Q_2, J_1, J_2, J_3) = [group.random(rng) for i in range(M+1)]
     # BBS.messages_to_scalars(committed_messages,  api_id)
     (msg_1, msg_2, msg_3) =  [group.ScalarField.random(rng) for i in range(M)]
 
