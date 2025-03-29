@@ -41,17 +41,22 @@ class SigmaProtocol(ABC):
 
 Witness = list
 ScalarVar = int
+GroupVar = int
 
 # A sparse linear combination
 ProverState = namedtuple("ProverState", ["witness", "nonces"])
 
 class Morphism:
-    LinearCombination = namedtuple("LinearCombination", ["scalar_indices", "elements"])
+    LinearCombination = namedtuple("LinearCombination", ["scalar_indices", "element_indices"])
     Group = None
 
     def __init__(self, group):
         self.linear_combinations = []
+        self.group_elements = []
+
         self.num_scalars = 0
+        self.num_elements = 0
+
         self.Group = group
 
     def append(self, linear_combination: LinearCombination):
@@ -69,13 +74,16 @@ class Morphism:
         image = []
         for linear_combination in self.linear_combinations:
             coefficients = [scalars[i] for i in linear_combination.scalar_indices]
-            image.append(self.Group.msm(coefficients, linear_combination.elements))
+            elements = [self.group_elements[i] for i in linear_combination.element_indices]
+
+            image.append(self.Group.msm(coefficients, elements))
         return image
 
 class GroupMorphismPreimage:
     def __init__(self, group):
         self.morphism = Morphism(group)
-        self.image = []
+        self._image = []
+
         self.group = group
         self.Domain = group.ScalarField
         self.Image = group
@@ -87,16 +95,31 @@ class GroupMorphismPreimage:
     def append_equation(self, lhs, rhs):
         linear_combination = Morphism.LinearCombination(
             scalar_indices=[x[0] for x in rhs],
-            elements=[x[1] for x in rhs]
+            element_indices=[x[1] for x in rhs]
         )
         self.morphism.append(linear_combination)
-        self.image.append(lhs)
+        self._image.append(lhs)
 
     def allocate_scalars(self, n: int):
         indices = [ScalarVar(i)
                    for i in range(self.morphism.num_scalars, self.morphism.num_scalars + n)]
         self.morphism.num_scalars += n
         return indices
+
+    def allocate_elements(self, n: int):
+        indices = [GroupVar(i)
+                   for i in range(self.morphism.num_elements, self.morphism.num_elements + n)]
+        self.morphism.group_elements.extend([None] * n)
+        self.morphism.num_elements += n
+        return indices
+
+    def set_elements(self, elements):
+        for index, element in elements:
+            self.morphism.group_elements[index] = element
+
+    @property
+    def image(self):
+        return [self.morphism.group_elements[i] for i in self._image]
 
 
 class SchnorrProof(SigmaProtocol):

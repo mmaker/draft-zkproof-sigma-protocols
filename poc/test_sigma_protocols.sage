@@ -59,13 +59,20 @@ def discrete_logarithm(rng, group):
         DL(X) = PoK{(x): X = x * G}
 
     """
-    x = group.ScalarField.random(rng)
-    G = group.generator()
-    X = G * x
 
     statement = GroupMorphismPreimage(group)
     [var_x] = statement.allocate_scalars(1)
-    statement.append_equation(X, [(var_x, G)])
+    [var_G, var_X] = statement.allocate_elements(2)
+    statement.append_equation(var_X, [(var_x, var_G)])
+
+    G = group.generator()
+    statement.set_elements([(var_G, G)])
+
+
+    x = group.ScalarField.random(rng)
+    X = G * x
+    assert [X] == statement.morphism([x])
+    statement.set_elements([(var_X, X)])
 
     return statement, [x]
 
@@ -85,9 +92,12 @@ def dleq(rng, group):
 
     statement = GroupMorphismPreimage(group)
     [var_x] = statement.allocate_scalars(1)
-    statement.append_equation(X, [(var_x, G)])
-    statement.append_equation(Y, [(var_x, H)])
+    [var_G, var_H, var_X, var_Y] = statement.allocate_elements(4)
+    statement.set_elements([(var_G, G), (var_H, H), (var_X, X), (var_Y, Y)])
+    statement.append_equation(var_X, [(var_x, var_G)])
+    statement.append_equation(var_Y, [(var_x, var_H)])
 
+    assert [X, Y] == statement.morphism([x])
     return statement, [x]
 
 @test_vector
@@ -107,7 +117,10 @@ def pedersen_commitment(rng, group):
     C = G * x + H * r
     statement = GroupMorphismPreimage(group)
     var_x, var_r = statement.allocate_scalars(2)
-    statement.append_equation(C, [(var_x, G), (var_r, H)])
+    var_G, var_H, var_C = statement.allocate_elements(3)
+    statement.set_elements([(var_G, G), (var_H, H), (var_C, C)])
+    statement.append_equation(var_C, [(var_x, var_G), (var_r, var_H)])
+
     return statement, witness
 
 @test_vector
@@ -128,9 +141,15 @@ def pedersen_commitment_dleq(rng, group):
     Y = group.msm(witness, generators[2:4])
 
     statement = GroupMorphismPreimage(group)
-    [var_x, var_r] = statement.allocate_scalars(2)
-    statement.append_equation(X, [(var_x, generators[0]), (var_r, generators[1])])
-    statement.append_equation(Y, [(var_x, generators[2]), (var_r, generators[3])])
+    var_x, var_r = statement.allocate_scalars(2)
+    var_Gs = statement.allocate_elements(4)
+    var_X, var_Y = statement.allocate_elements(2)
+
+    statement.set_elements([(var_Gs[i], generators[i]) for i in range(4)])
+    statement.set_elements([(var_X, X), (var_Y, Y)])
+
+    statement.append_equation(var_X, [(var_x, var_Gs[0]), (var_r, var_Gs[1])])
+    statement.append_equation(var_Y, [(var_x, var_Gs[2]), (var_r, var_Gs[3])])
     return statement, witness
 
 
@@ -160,9 +179,24 @@ def bss_blind_commitment_computation(rng, group):
     ## This is the part that needs to be changed in the specification of blind bbs.
     statement = GroupMorphismPreimage(group)
     [var_secret_prover_blind, var_msg_1, var_msg_2, var_msg_3] = statement.allocate_scalars(M+1)
+    [var_Q_2, var_J_1, var_J_2, var_J_3] = statement.allocate_elements(M+1)
+    var_C, = statement.allocate_elements(1)
+    statement.set_elements([(var_Q_2, Q_2),
+                            (var_J_1, J_1),
+                            (var_J_2, J_2),
+                            (var_J_3, J_3),
+                            (var_C, C)
+    ])
+
     statement.append_equation(
-        C, [(var_secret_prover_blind, Q_2), (var_msg_1, J_1), (var_msg_2, J_2), (var_msg_3, J_3)]
+        var_C, [
+            (var_secret_prover_blind, var_Q_2),
+            (var_msg_1, var_J_1),
+            (var_msg_2, var_J_2),
+            (var_msg_3, var_J_3)
+        ]
     )
+
     witness = [secret_prover_blind, msg_1, msg_2, msg_3]
     return statement, witness
 
