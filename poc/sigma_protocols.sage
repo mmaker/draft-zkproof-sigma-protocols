@@ -3,7 +3,6 @@ from collections import namedtuple
 
 from sagelib.fiat_shamir import KeccakDuplexSpongeP384
 
-
 class SigmaProtocol(ABC):
     """
     This is the abstract API of a Sigma protocol.
@@ -38,13 +37,32 @@ class SigmaProtocol(ABC):
     def simulate_commitment(self, response, challenge):
         raise NotImplementedError
 
+class NISigmaProtocol:
+    """
+    The generic Fiat-Shamir Transform for the Sigma protocol `Protocol`
+    producing challenges using `Codec`.
+    """
+    Protocol: SigmaProtocol = None
+    Codec = None
 
-Witness = list
-ScalarVar = int
-GroupVar = int
+    def __init__(self, iv, instance):
+        self.hash_state = self.Codec(iv)
+        self.sp = self.Protocol(instance)
 
-# A sparse linear combination
-ProverState = namedtuple("ProverState", ["witness", "nonces"])
+    def prove(self, witness, rng):
+        (prover_state, commitment) = self.sp.prover_commit(witness, rng)
+        challenge = self.hash_state.prover_message(commitment).verifier_challenge()
+        response = self.sp.prover_response(prover_state, challenge)
+
+        assert self.sp.verifier(commitment, challenge, response)
+        return self.sp.serialize_batchable(commitment, challenge, response)
+
+    def verify(self, proof):
+        commitment, response = self.sp.deserialize_batchable(proof)
+        challenge = self.hash_state.prover_message(commitment).verifier_challenge()
+        return self.sp.verifier(commitment, challenge, response)
+
+
 
 class Morphism:
     LinearCombination = namedtuple("LinearCombination", ["scalar_indices", "element_indices"])
@@ -101,14 +119,13 @@ class GroupMorphismPreimage:
         self._image.append(lhs)
 
     def allocate_scalars(self, n: int):
-        indices = [ScalarVar(i)
+        indices = [i
                    for i in range(self.morphism.num_scalars, self.morphism.num_scalars + n)]
         self.morphism.num_scalars += n
         return indices
 
     def allocate_elements(self, n: int):
-        indices = [GroupVar(i)
-                   for i in range(self.morphism.num_elements, self.morphism.num_elements + n)]
+        indices = list(range(self.morphism.num_elements, self.morphism.num_elements + n))
         self.morphism.group_elements.extend([None] * n)
         self.morphism.num_elements += n
         return indices
@@ -123,33 +140,37 @@ class GroupMorphismPreimage:
 
 
 class SchnorrProof(SigmaProtocol):
-    def __init__(self, index):
-        self.statement = index
+
+    # A sparse linear combination
+    ProverState = namedtuple("ProverState", ["witness", "nonces"])
+
+    def __init__(self, instance):
+        self.instance = instance
 
     def prover_commit(self, witness, rng):
         nonces = [
-            self.statement.Domain.random(rng)
-            for _ in range(self.statement.morphism.num_scalars)
+            self.instance.Domain.random(rng)
+            for _ in range(self.instance.morphism.num_scalars)
         ]
-        prover_state = ProverState(witness, nonces)
-        commitment = self.statement.morphism(nonces)
+        prover_state = self.ProverState(witness, nonces)
+        commitment = self.instance.morphism(nonces)
         return (prover_state, commitment)
 
     def prover_response(self, prover_state: ProverState, challenge):
         (witness, nonces) = prover_state
         return [
             nonces[i] + challenge * witness[i]
-            for i in range(self.statement.morphism.num_scalars)
+            for i in range(self.instance.morphism.num_scalars)
         ]
 
     def verifier(self, commitment, challenge, response):
-        assert len(commitment) == self.statement.morphism.num_statements
-        assert len(response) == self.statement.morphism.num_scalars
+        assert len(commitment) == self.instance.morphism.num_statements
+        assert len(response) == self.instance.morphism.num_scalars
 
-        expected = self.statement.morphism(response)
+        expected = self.instance.morphism(response)
         got = [
-            commitment[i] + self.statement.image[i] * challenge
-            for i in range(self.statement.morphism.num_statements)
+            commitment[i] + self.instance.image[i] * challenge
+            for i in range(self.instance.morphism.num_statements)
         ]
 
         # fail hard if the proof does not verify
@@ -158,43 +179,23 @@ class SchnorrProof(SigmaProtocol):
 
     def serialize_batchable(self, commitment, challenge, response):
         return (
-            self.statement.Image.serialize(commitment) +
-            self.statement.Domain.serialize(response)
+            self.instance.Image.serialize(commitment) +
+            self.instance.Domain.serialize(response)
         )
 
     def deserialize_batchable(self, encoded):
-        commitment_bytes = encoded[: self.statement.commit_bytes_len]
-        commitment = self.statement.Image.deserialize(commitment_bytes)
+        commitment_bytes = encoded[: self.instance.commit_bytes_len]
+        commitment = self.instance.Image.deserialize(commitment_bytes)
 
-        response_bytes = encoded[self.statement.commit_bytes_len :]
-        response = self.statement.Domain.deserialize(response_bytes)
+        response_bytes = encoded[self.instance.commit_bytes_len :]
+        response = self.instance.Domain.deserialize(response_bytes)
 
         return (commitment, response)
 
 
-
-class NISigmaProtocol:
+class NISchnorrProof(NISigmaProtocol):
     """
-    Performs the Fiat-Shamir Transform for the Sigma protocol `protocol`
-    producing challenges using `codec`.
+    Schnorr proof using the Fiat-Shamir transform.
     """
     Protocol = SchnorrProof
     Codec = KeccakDuplexSpongeP384
-
-    def __init__(self, iv, instance):
-        self.hash_state = self.Codec(iv)
-        self.sp = self.Protocol(instance)
-
-    def prove(self, witness, rng):
-        (prover_state, commitment) = self.sp.prover_commit(witness, rng)
-        challenge = self.hash_state.prover_message(commitment).verifier_challenge()
-        response = self.sp.prover_response(prover_state, challenge)
-
-        assert self.sp.verifier(commitment, challenge, response)
-        return self.sp.serialize_batchable(commitment, challenge, response)
-
-    def verify(self, proof):
-        commitment, response = self.sp.deserialize_batchable(proof)
-        challenge = self.hash_state.prover_message(commitment).verifier_challenge()
-        return self.sp.verifier(commitment, challenge, response)
-

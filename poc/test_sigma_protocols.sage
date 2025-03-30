@@ -13,15 +13,15 @@ CONTEXT_STRING = b'yellow submarine' * 2
 
 def test_vector(test_vector_function):
     from sagelib.groups import GroupP384 as group
-    from sagelib.sigma_protocols import NISigmaProtocol
+    from sagelib.sigma_protocols import NISchnorrProof
 
     def inner(vectors):
         rng = TestDRNG("test vector seed".encode('utf-8'))
         test_vector_name = test_vector_function.__name__
 
         instance, witness = test_vector_function(rng, group)
-        narg_string = NISigmaProtocol(CONTEXT_STRING, instance).prove(witness, rng)
-        assert  NISigmaProtocol(CONTEXT_STRING, instance).verify(narg_string)
+        narg_string = NISchnorrProof(CONTEXT_STRING, instance).prove(witness, rng)
+        assert  NISchnorrProof(CONTEXT_STRING, instance).verify(narg_string)
         hex_narg_string = narg_string.hex()
         print(f"{test_vector_name} narg_string: {hex_narg_string}\n")
 
@@ -199,6 +199,49 @@ def bss_blind_commitment_computation(rng, group):
 
     witness = [secret_prover_blind, msg_1, msg_2, msg_3]
     return statement, witness
+
+
+def test_and_composition():
+    from sagelib.sigma_protocols import SigmaProtocol, SchnorrProof
+    from sagelib.sigma_protocols import NISigmaProtocol
+    from sagelib.fiat_shamir import KeccakDuplexSpongeP384
+    class AndProof(SigmaProtocol, SchnorrProof):
+        ProverState: list[SchnorrProof.ProverState]
+
+        def __init__(self, instances: list[GroupMorphismPreimage]):
+            self.protocols = [SchnorrProof(instance) for instance in instances]
+
+        def prover_commit(self, witnesses, rng):
+            prover_states = []
+            commitments = []
+
+            for protocol, witness in zip(self.protocols, witnesses):
+                commitment, prover_state = protocol.prover_commit(witness, rng)
+                commitments.extend(commitment)
+                prover_states.append(prover_state)
+
+            return (prover_states, commitments)
+
+        def prover_response(self, prover_states, challenge):
+            responses = []
+            for prover_state, protocol in zip(prover_states, self.protocols):
+                response = protocol.prover_response(prover_state, challenge)
+                responses.append(response)
+            return responses
+
+        def verifier(self, commitments, challenge, responses):
+            assert len(commitments) == len(responses)
+            assert all(
+                protocol.verifier(commitment, challenge, response)
+                for protocol, commitment, response in zip(self.protocols, commitments, responses)
+            )
+
+    class NIAndProof(NISigmaProtocol):
+        Protocol = AndProof
+        ProverState = KeccakDuplexSpongeP384
+
+
+
 
 
 
