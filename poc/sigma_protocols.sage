@@ -6,7 +6,6 @@ from sagelib.fiat_shamir import KeccakDuplexSpongeP384
 class SigmaProtocol(ABC):
     """
     This is the abstract API of a Sigma protocol.
-    It can be extended for AND/OR composition, for OR proofs, for
 
     An (interactive) Sigma protocol is a 3-message protocol that is special sound and honest-verifier zero-knowledge.
     Relations for sigma protocols are seen as ternary relations composed of:

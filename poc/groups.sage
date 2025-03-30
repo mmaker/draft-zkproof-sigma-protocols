@@ -104,12 +104,6 @@ class NISTCurveScalar(Scalar):
             for i in range(0, encoded_len, scalar_len)
         ]
 
-    @classmethod
-    def hash_to_scalar(cls, msg, dst):
-        expander = cls.expander(dst, cls.H, cls.k)
-        return hash_to_field(msg, 1, cls.order, cls.m, cls.L, expander)[0][0]
-
-
 
 class Group(ABC):
     ScalarField = None
@@ -123,11 +117,6 @@ class Group(ABC):
     @classmethod
     @abstractmethod
     def identity(cls):
-        raise NotImplementedError
-
-    @classmethod
-    @abstractmethod
-    def order(cls):
         raise NotImplementedError
 
     @abstractmethod
@@ -157,11 +146,6 @@ class Group(ABC):
     @classmethod
     @abstractmethod
     def element_byte_length(self):
-        raise NotImplementedError
-
-    @classmethod
-    @abstractmethod
-    def hash_to_group(cls, x):
         raise NotImplementedError
 
     @classmethod
@@ -201,10 +185,6 @@ class GroupNISTCurve(Group):
     @classmethod
     def generator(cls):
         return cls.G
-
-    @classmethod
-    def order(cls):
-        return cls.group_order
 
     @classmethod
     def identity(cls):
@@ -275,10 +255,6 @@ class Ristretto255ScalarField(Scalar):
     def serialize(cls, scalar):
         return I2OSP(scalar % cls.order, cls.scalar_byte_length())[::-1]
 
-    def hash_to_scalar(self, msg, dst):
-        uniform_bytes = expand_message_xmd(msg, dst, 64, hashlib.sha512, self.k)
-        return OS2IP_le(uniform_bytes) % self.order
-
 
 class GroupRistretto255(Group):
     def __new__(cls):
@@ -289,9 +265,6 @@ class GroupRistretto255(Group):
 
     def generator(self):
         return Ed25519Point.base()
-
-    def order(self):
-        return Ed25519Point.order
 
     def identity(self):
         return Ed25519Point.identity()
@@ -305,10 +278,6 @@ class GroupRistretto255(Group):
     def element_byte_length(self):
         return self.field_bytes_length
 
-    @classmethod
-    def hash_to_group(cls, msg, dst):
-        return Ed25519Point.hash_to_group(msg, dst)
-
     def scalar_mult(self, x, y):
         return x * y
 
@@ -320,10 +289,6 @@ class Decaf448ScalarField(Scalar):
     def serialize_scalar(self, scalar):
         return I2OSP(scalar % self.order, self.scalar_byte_length())[::-1]
 
-    def hash_to_scalar(self, msg, dst):
-        uniform_bytes = expand_message_xof(msg, dst, int(64), hashlib.shake_256, self.k)
-        return OS2IP_le(uniform_bytes) % self.order()
-
 class GroupDecaf448(Group):
     def __new__(cls):
         cls.L = 84
@@ -334,10 +299,6 @@ class GroupDecaf448(Group):
     @classmethod
     def generator(cls):
         return Ed448GoldilocksPoint.base()
-
-    @classmethod
-    def order(cls):
-        return Ed448GoldilocksPoint.order
 
     @classmethod
     def identity(cls):
