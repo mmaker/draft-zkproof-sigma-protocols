@@ -17,7 +17,7 @@ def test_vector(test_vector_function):
 
     def inner(vectors):
         rng = TestDRNG("test vector seed".encode('utf-8'))
-        test_vector_name = test_vector_function.__name__
+        test_vector_name = f"{test_vector_function.__name__}"
 
         instance, witness = test_vector_function(rng, group)
         narg_string = NISchnorrProof(CONTEXT_STRING, instance).prove(witness, rng)
@@ -67,7 +67,6 @@ def discrete_logarithm(rng, group):
 
     G = group.generator()
     statement.set_elements([(var_G, G)])
-
 
     x = group.ScalarField.random(rng)
     X = G * x

@@ -17,6 +17,94 @@ try:
 except ImportError as e:
     sys.exit("Error loading preprocessed sage files. Try running `make setup && make clean pyfiles`. Full error: " + e)
 
+
+class Scalar(ABC):
+    def __new__(cls, order, *args, **kwargs):
+        cls.field = GF(order)  # Delegate field operations to GF instance
+        cls.order = order
+        cls.field_bytes_length = (order.bit_length() + 7) // 8
+        return cls
+
+    def __getattr__(self, name):
+        return getattr(self.field, name)  # Delegate missing attributes
+
+    @classmethod
+    def scalar_byte_length(cls):
+        return int(cls.field_bytes_length)
+
+    @classmethod
+    def random(cls, rng):
+        return cls.field(rng.randint(1, cls.order - 1))
+
+    @classmethod
+    def serialize_scalar(cls, scalar):
+        return I2OSP(scalar % cls.order, cls.scalar_byte_length())[::-1]
+
+    @classmethod
+    @abstractmethod
+    def deserialize_scalar(cls, encoded):
+        raise NotImplementedError
+
+
+class Group(ABC):
+    ScalarField = None
+    name = None
+
+    @classmethod
+    @abstractmethod
+    def generator(cls):
+        raise NotImplementedError
+
+    @classmethod
+    @abstractmethod
+    def identity(cls):
+        raise NotImplementedError
+
+    @abstractmethod
+    def _serialize(self, element):
+        raise NotImplementedError
+
+    @abstractmethod
+    def _deserialize(self, element):
+        raise NotImplementedError
+
+    @classmethod
+    @abstractmethod
+    def element_byte_length(self):
+        raise NotImplementedError
+
+    @classmethod
+    @abstractmethod
+    def scalar_mult(cls, x, y):
+        raise NotImplementedError
+
+    @classmethod
+    def serialize(cls, elements):
+        return b"".join([cls._serialize(element) for element in elements])
+
+    @classmethod
+    def deserialize(cls, encoded: bytes):
+        encoded_len = len(encoded)
+        element_len = cls.element_byte_length()
+        num_elements, remainder = divmod(encoded_len, element_len)
+        if remainder != 0:
+            raise ValueError("invalid element length")
+        return [
+            cls._deserialize(encoded[i: i + element_len])
+            for i in range(0, encoded_len, element_len)
+        ]
+
+    @classmethod
+    def random(cls, rng):
+        return cls.generator() * cls.ScalarField.random(rng)
+
+    @classmethod
+    def msm(cls, scalars, points):
+        return sum(cls.scalar_mult(scalars[i], points[i]) for i in range(len(scalars)))
+
+
+
+
 # little-endian version of I2OSP
 def I2OSP_le(val, length):
     val = int(val)
@@ -41,33 +129,6 @@ def OS2IP_le(octets, skip_assert=False):
         assert octets == I2OSP_le(ret, len(octets))
     return ret
 
-class Scalar(ABC):
-    def __new__(cls, order, *args, **kwargs):
-        cls.field = GF(order)  # Delegate field operations to GF instance
-        cls.order = order
-        cls.field_bytes_length = (order.bit_length() + 7) // 8
-        return cls
-
-    def __getattr__(self, name):
-        return getattr(self.field, name)  # Delegate missing attributes
-
-    @classmethod
-    def scalar_byte_length(cls):
-        return int(cls.field_bytes_length)
-
-    @classmethod
-    def random(cls, rng):
-        return cls.field(rng.randint(1, cls.order - 1))
-
-    @classmethod
-    @abstractmethod
-    def serialize_scalar(cls, scalar):
-        raise NotImplementedError
-
-    @classmethod
-    @abstractmethod
-    def deserialize_scalar(cls, encoded):
-        raise NotImplementedError
 
 
 class NISTCurveScalar(Scalar):
@@ -104,65 +165,6 @@ class NISTCurveScalar(Scalar):
             for i in range(0, encoded_len, scalar_len)
         ]
 
-
-class Group(ABC):
-    ScalarField = None
-    name = None
-
-    @classmethod
-    @abstractmethod
-    def generator(cls):
-        raise NotImplementedError
-
-    @classmethod
-    @abstractmethod
-    def identity(cls):
-        raise NotImplementedError
-
-    @abstractmethod
-    def _serialize(self, element):
-        raise NotImplementedError
-
-    @abstractmethod
-    def _deserialize(self, element):
-        raise NotImplementedError
-
-    @classmethod
-    def serialize(cls, elements):
-        return b"".join([cls._serialize(element) for element in elements])
-
-    @classmethod
-    def deserialize(cls, encoded: bytes):
-        encoded_len = len(encoded)
-        element_len = cls.element_byte_length()
-        num_elements, remainder = divmod(encoded_len, element_len)
-        if remainder != 0:
-            raise ValueError("invalid element length")
-        return [
-            cls._deserialize(encoded[i: i + element_len])
-            for i in range(0, encoded_len, element_len)
-        ]
-
-    @classmethod
-    @abstractmethod
-    def element_byte_length(self):
-        raise NotImplementedError
-
-    @classmethod
-    @abstractmethod
-    def scalar_mult(cls, x, y):
-        raise NotImplementedError
-
-    @classmethod
-    def random(cls, rng):
-        return cls.generator() * cls.ScalarField.random(rng)
-
-    @classmethod
-    def msm(cls, scalars, points):
-        return sum(cls.scalar_mult(scalars[i], points[i]) for i in range(len(scalars)))
-
-    def __str__(self):
-        return self.name
 
 class GroupNISTCurve(Group):
     def __new__(cls, name, suite, F, A, B, p, order, gx, gy, L, H, expander, k):
@@ -286,9 +288,6 @@ class Decaf448ScalarField(Scalar):
         Scalar.__init__(self, order)
         self.k = 224
 
-    def serialize_scalar(self, scalar):
-        return I2OSP(scalar % self.order, self.scalar_byte_length())[::-1]
-
 class GroupDecaf448(Group):
     def __new__(cls):
         cls.L = 84
@@ -312,9 +311,6 @@ class GroupDecaf448(Group):
 
     def element_byte_length(self):
         return self.field_bytes_length
-
-    def hash_to_group(self, msg, dst):
-        return Ed448GoldilocksPoint.hash_to_group(msg, dst)
 
     def scalar_mult(self, x, y):
         return x * y
