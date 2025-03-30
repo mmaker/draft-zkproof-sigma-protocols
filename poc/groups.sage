@@ -314,3 +314,61 @@ class GroupDecaf448(Group):
 
     def scalar_mult(self, x, y):
         return x * y
+
+
+
+
+class BLS12_381_Scalar(Scalar):
+    def __new__(cls):
+        order = 0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001
+        return super().__new__(cls, order)
+
+
+class BLS12_381_G1(Group):
+    ScalarField = BLS12_381_Scalar()
+    name = "BLS12-381 G1"
+
+    Fq = GF(0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab)
+    E = EllipticCurve(Fq, [0, 4])
+    G = E.lift_x(0x17f1d3a73191b2b7e7c6f67eb9a9999c4f36c99f1e4ffecf7f24ddcd0294c7)
+    order = 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001
+
+    @classmethod
+    def generator(cls):
+        return cls.G
+
+    @classmethod
+    def identity(cls):
+        return cls.E(0)
+
+    @classmethod
+    def _serialize(cls, element):
+        x, y = element[0], element[1]
+        sgn = sgn0(y)
+        byte = 2 if sgn == 0 else 3
+        return I2OSP(byte, 1) + I2OSP(x, cls.element_byte_length())
+
+   # this is using point compression
+    @classmethod
+    def _deserialize(cls, encoded):
+        # 0x02 | 0x03 || x
+        pve = encoded[0] == 0x02
+        nve = encoded[0] == 0x03
+        assert(pve or nve)
+        assert(len(encoded) % 2 != 0)
+        element_length = (len(encoded) - 1) / 2
+        x = OS2IP(encoded[1:])
+        y2 = x^3 + cls.a*x + cls.b
+        y = y2.sqrt()
+        parity = 0 if pve else 1
+        if sgn0(y) != parity:
+            y = -y
+        return cls.curve(cls.F(x), cls.F(y))
+
+    @classmethod
+    def element_byte_length(cls):
+        return (cls.Fq.order().bit_length() + 7) // 8
+
+    @classmethod
+    def scalar_mult(cls, x, y):
+        return y * x
