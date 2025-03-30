@@ -47,12 +47,12 @@ In addition, the specification provides codes, a way to absorb specific data typ
 The Fiat-Shamir transformation relies on a hash function that can absorb inputs incrementally and squeeze variable-length unpredictable messages. On a high level, it consists of three main components:
 
 - A label.
-- An underlying hash function H, in a chosen mode, which the hash state invokes to execute the actions.
+- An underlying hash function H, in a chosen mode, and instantiated over a chosen domain, which the hash state invokes to execute the actions.
 
 The core actions supported are:
 
-- `absorb` indicates a sequence of `len` elements in input
-- `squeeze` indicates an amount `len` of output to be produced
+- `absorb` indicates a sequence of elements in input to be absorbed by the underlying hash function.
+- `squeeze` given input `length`, produces that many elements as output.
 
 The API follows the template of duplex sponges.
 
@@ -64,7 +64,7 @@ A duplex sponge has the following interface:
       type Unit
 
       def new(iv: bytes) -> hash_state
-      def absorb(self, x)
+      def absorb(self, x: [Unit])
       def squeeze(self, length: int) -> [Unit]
       def finalize(self)
 
@@ -75,7 +75,7 @@ where
 - `DuplexSpongeInterface.squeeze(hash_state, length)`, squeezes from the `hash_state` object a list of `Unit` elements.
 - `DuplexSpongeInterface.finalize(hash_state)`, deletes the hash object safely.
 
-The above can be extended to support absorption and squeeze from different domains. Such extensions are called codecs.
+The above can be extended to support absorption and squeeze from different domains than the domain in which the hash function is initialized over. Such extensions are called codecs.
 
 # Duplex Sponges
 
@@ -237,7 +237,7 @@ Where the function `scalar_to_bytes` is defined in {#notation}
 
 # Notation and Terminology {#notation}
 
-For an elliptic curve, we consider two fields, the coordinate fields, which indicates the field over which the elliptic curve equation is defined, and the scalar field, over which the scalar operations are performed.
+For an elliptic curve, we consider two fields, the coordinate fields, which indicates the base field, the field over which the elliptic curve equation is defined, and the scalar field, over which the scalar operations are performed.
 
 The following functions and notation are used throughout the document.
 
