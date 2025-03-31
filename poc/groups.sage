@@ -37,13 +37,30 @@ class Scalar(ABC):
         return cls.field(rng.randint(1, cls.order - 1))
 
     @classmethod
-    def serialize_scalar(cls, scalar):
-        return I2OSP(scalar % cls.order, cls.scalar_byte_length())[::-1]
+    @abstractmethod
+    def _serialize(cls, scalar):
+        raise NotImplementedError
 
     @classmethod
     @abstractmethod
-    def deserialize_scalar(cls, encoded):
+    def _deserialize(cls, encoded):
         raise NotImplementedError
+
+    @classmethod
+    def serialize(cls, scalars):
+        return b"".join([cls._serialize(scalar) for scalar in scalars])
+
+    @classmethod
+    def deserialize(cls, encoded):
+        encoded_len = len(encoded)
+        scalar_len = cls.scalar_byte_length()
+        num_scalars, remainder = divmod(encoded_len, scalar_len)
+        if remainder != 0:
+            raise ValueError("invalid scalar length")
+        return [
+            cls._deserialize(encoded[i: i + scalar_len])
+            for i in range(0, encoded_len, scalar_len)
+        ]
 
 
 class Group(ABC):
@@ -149,22 +166,6 @@ class NISTCurveScalar(Scalar):
     def _deserialize(cls, encoded):
         return OS2IP(encoded)
 
-    @classmethod
-    def serialize(cls, scalars):
-        return b"".join([cls._serialize(scalar) for scalar in scalars])
-
-    @classmethod
-    def deserialize(cls, encoded):
-        encoded_len = len(encoded)
-        scalar_len = cls.scalar_byte_length()
-        num_scalars, remainder = divmod(encoded_len, scalar_len)
-        if remainder != 0:
-            raise ValueError("invalid scalar length")
-        return [
-            cls._deserialize(encoded[i: i + scalar_len])
-            for i in range(0, encoded_len, scalar_len)
-        ]
-
 
 class GroupNISTCurve(Group):
     def __new__(cls, name, suite, F, A, B, p, order, gx, gy, L, H, expander, k):
@@ -254,7 +255,7 @@ class Ristretto255ScalarField(Scalar):
         self.k = 128
 
     @classmethod
-    def serialize(cls, scalar):
+    def _serialize(cls, scalar):
         return I2OSP(scalar % cls.order, cls.scalar_byte_length())[::-1]
 
 
@@ -318,20 +319,29 @@ class GroupDecaf448(Group):
 
 
 
-class BLS12_381_Scalar(Scalar):
+class BLS12_381_Fr(Scalar):
     def __new__(cls):
         order = 0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001
         return super().__new__(cls, order)
 
+    @classmethod
+    def _serialize(cls, scalar):
+        assert(0 <= int(scalar) < cls.order)
+        return I2OSP(scalar, cls.scalar_byte_length())
+
+    @classmethod
+    def _deserialize(cls, encoded):
+        return OS2IP(encoded) % cls.order
+
 
 class BLS12_381_G1(Group):
-    ScalarField = BLS12_381_Scalar()
+    ScalarField = BLS12_381_Fr()
     name = "BLS12-381 G1"
-
     Fq = GF(0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab)
     E = EllipticCurve(Fq, [0, 4])
-    G = E.lift_x(0x17f1d3a73191b2b7e7c6f67eb9a9999c4f36c99f1e4ffecf7f24ddcd0294c7)
-    order = 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001
+    G = E(0x17F1D3A73197D7942695638C4FA9AC0FC3688C4F9774B905A14E3A3F171BAC586C55E83FF97A1AEFFB3AF00ADB22C6BB,
+          0x08B3F481E3AAA0F1A09E30ED741D8AE4FCF5E095D5D00AF600DB18CB2C04B3EDD03CC744A2888AE40CAA232946C5E7E1)
+    E.set_order(0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001 * 0x396C8C005555E1568C00AAAB0000AAAB)
 
     @classmethod
     def generator(cls):
