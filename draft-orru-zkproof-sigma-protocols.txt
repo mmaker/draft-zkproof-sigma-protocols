@@ -5,8 +5,8 @@
 Network Working Group                                            M. Orrù
 Internet-Draft                                                      CNRS
 Intended status: Informational                                    C. Yun
-Expires: 1 October 2025                                      Apple, Inc.
-                                                           30 March 2025
+Expires: 3 October 2025                                      Apple, Inc.
+                                                            1 April 2025
 
 
                             Sigma Protocols
@@ -48,7 +48,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 1 October 2025.
+   This Internet-Draft will expire on 3 October 2025.
 
 Copyright Notice
 
@@ -99,9 +99,9 @@ Table of Contents
 1.  Introduction
 
    A Sigma Protocol is a simple zero-knowledge proof of knowledge.  Any
-   sigma protocols must define three objects:
+   sigma protocol must define three objects:
 
-   *  A commitment, sometimes also called nonce.  This message is
+   *  A commitment, sometimes also called a nonce.  This message is
       computed by the prover.
 
    *  A challenge, computed using the Fiat-Shamir transformation using a
@@ -110,8 +110,8 @@ Table of Contents
    *  A response, computed by the prover, which depends on the
       commitment and the challenge.
 
-   A sigma protocol allows to convince a *verifier* of the knowledge of
-   a secret *witness* satisfying a *statement*.
+   A sigma protocol allows a *prover* to convince a *verifier* of the
+   knowledge of a secret *witness* satisfying a *statement*.
 
 2.  Public functions
 
@@ -125,10 +125,10 @@ prove(domain_separator, statement, witness, rng)
 
 Inputs:
 
-- domain_separator, a unique 32-bytes array uniquely indicating the protocol and the session being proven
+- domain_separator, a unique 32-byte array uniquely indicating the protocol and the session being proven
 - statement, the instance being proven
 - witness, the witness for the given statement
-- rng, a random number generator
+- rng, a cryptographic random number generator
 
 Outputs:
 
@@ -140,14 +140,14 @@ verify(domain_separator, statement, proof)
 
 Inputs:
 
-- domain_separator, a unique 32-bytes array uniquely indicating the protocol and the session being proven
+- domain_separator, a unique 32-byte array uniquely indicating the protocol and the session being proven
 - statement, the instance being proven
 - proof, a byte array containing the cryptographic proof
 
 
 Outputs:
 
-- the verification bit
+- the verification bit, 1 indicating that the proof is accepted, 0 indicating that the proof is rejected.
 
 2.3.  Core interface
 
@@ -183,10 +183,11 @@ class SigmaProtocol:
       protocol.  This method outputs a new commitment together with its
       associated prover state, depending on the witness known to the
       prover and the statement to be proven.  This step generally
-      requires access to a high-quality entropy source.  Leakage of even
-      just of a few bits of the nonce could allow for the complete
-      recovery of the witness.  The commitment meant to be shared, while
-      prover_state must be kept secret.
+      requires access to a high-quality entropy source to perform the
+      commitment.  Leakage of even just of a few bits of the commitment
+      could allow for the complete recovery of the witness.  The
+      commitment is meant to be shared, while prover_state must be kept
+      secret.
 
    *  prover_response(self, prover_state, challenge) -> response,
       denoting the *response phase*, that is, the computation of the
@@ -198,11 +199,12 @@ class SigmaProtocol:
    *  verifier(self, commitment, challenge, response) -> bool, denoting
       the *verifier algorithm*. This method checks that the protocol
       transcript is valid for the given statement.  The verifier
-      algorithm outputs nothing if verification succeeds, or an error if
+      algorithm outputs true if verification succeeds, or false if
       verification fails.
 
    The final two algorithms describe the *zero-knowledge simulator* and
-   are optional.  The simulator is primarily an efficient algorithm for
+   are optional, as a sigma protocol is not necessarily zero-knowledge
+   by definition.  The simulator is primarily an efficient algorithm for
    proving zero-knowledge in a theoretical construction, but it is also
    needed for verifying short proofs and for or-composition, where a
    witness is not known and thus has to be simulated.  We have:
@@ -210,11 +212,15 @@ class SigmaProtocol:
    *  simulate_response() -> response, denoting the first stage of the
       simulator.  It is an algorithm drawing a random response that
       follows the same output distribution of the algorithm
-      prover_response
+      prover_response.
 
    *  simulate_commitment(response, challenge) -> commitment, returning
       a simulated commitment -- the second phase of the zero-knowledge
       simulator.
+
+   Together, these zero-knowledge simulators provide a transcript that
+   should be computationally indistinguishable from the transcript
+   generated by running the original sigma protocol.
 
    The abstraction SigmaProtocol allows implementing different types of
    statements and combiners of those, such as OR statements, validity of
@@ -250,8 +256,8 @@ def prove(domain_separator, statement, witness, rng):
 
 Inputs:
 
-- domain_separator, a 32-bytes array that uniquely describes the protocol
-- statement, the instance being proven
+- domain_separator, a 32-byte array that uniquely describes the protocol.
+- statement, the instance being proven.
 - witness, the secret prover's witness.
 
 Parameters:
@@ -333,7 +339,7 @@ Constants:
       same and false` otherwise.
 
    *  scalar_mul(scalar: Scalar), implements scalar multiplication for a
-      group element by a scalar.
+      group element by an element in its respective scalar field.
 
    Functions such as add, equal, and scalar_mul SHOULD be implemented
    using operator overloading whenever possible.
@@ -344,11 +350,11 @@ Constants:
       field.
 
    *  add(scalar: Scalar): implements field addition for the elements in
-      the field
+      the field.
 
-   *  mult(scalar: Scalar), implements field multiplication
+   *  mult(scalar: Scalar), implements field multiplication.
 
-   *  random(): outputs a random element
+   *  random(): outputs a random scalar field element.
 
    *  serialize(scalars: [Scalar; N]): serializes a list of scalars and
       returns their canonical representation of fixed length Ns * N.
@@ -483,7 +489,7 @@ Inputs:
    1. nonces = Scalar::random()
    2. prover_state = (witness, nonces)
    3. commitment = self.statement.map(witness)
-   4. return (prover_state, commitment
+   4. return (prover_state, commitment)
 
 3.5.1.2.  Prover response
 

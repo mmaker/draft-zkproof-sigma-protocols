@@ -1045,11 +1045,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Sigma Protocols</td>
-<td class="right">March 2025</td>
+<td class="right">April 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Orrù &amp; Yun</td>
-<td class="center">Expires 1 October 2025</td>
+<td class="center">Expires 3 October 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1062,12 +1062,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-orru-zkproof-sigma-protocols-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-03-30" class="published">30 March 2025</time>
+<time datetime="2025-04-01" class="published">1 April 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-10-01">1 October 2025</time></dd>
+<dd class="expires"><time datetime="2025-10-03">3 October 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1116,7 +1116,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 1 October 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 3 October 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1268,10 +1268,10 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
 <p id="section-1-1">A Sigma Protocol is a simple zero-knowledge proof of knowledge.
-Any sigma protocols must define three objects:<a href="#section-1-1" class="pilcrow">¶</a></p>
+Any sigma protocol must define three objects:<a href="#section-1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-1-2.1">
-          <p id="section-1-2.1.1">A commitment, sometimes also called nonce. This message is computed by the prover.<a href="#section-1-2.1.1" class="pilcrow">¶</a></p>
+          <p id="section-1-2.1.1">A commitment, sometimes also called a nonce. This message is computed by the prover.<a href="#section-1-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-2.2">
           <p id="section-1-2.2.1">A challenge, computed using the Fiat-Shamir transformation using a hash function.<a href="#section-1-2.2.1" class="pilcrow">¶</a></p>
@@ -1280,7 +1280,7 @@ Any sigma protocols must define three objects:<a href="#section-1-1" class="pilc
           <p id="section-1-2.3.1">A response, computed by the prover, which depends on the commitment and the challenge.<a href="#section-1-2.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-1-3">A sigma protocol allows to convince a <strong>verifier</strong> of the knowledge of a secret <strong>witness</strong> satisfying a <strong>statement</strong>.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-3">A sigma protocol allows a <strong>prover</strong> to convince a <strong>verifier</strong> of the knowledge of a secret <strong>witness</strong> satisfying a <strong>statement</strong>.<a href="#section-1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="public-functions">
@@ -1301,10 +1301,10 @@ prove(domain_separator, statement, witness, rng)
 
 Inputs:
 
-- domain_separator, a unique 32-bytes array uniquely indicating the protocol and the session being proven
+- domain_separator, a unique 32-byte array uniquely indicating the protocol and the session being proven
 - statement, the instance being proven
 - witness, the witness for the given statement
-- rng, a random number generator
+- rng, a cryptographic random number generator
 
 Outputs:
 
@@ -1324,14 +1324,14 @@ verify(domain_separator, statement, proof)
 
 Inputs:
 
-- domain_separator, a unique 32-bytes array uniquely indicating the protocol and the session being proven
+- domain_separator, a unique 32-byte array uniquely indicating the protocol and the session being proven
 - statement, the instance being proven
 - proof, a byte array containing the cryptographic proof
 
 
 Outputs:
 
-- the verification bit
+- the verification bit, 1 indicating that the proof is accepted, 0 indicating that the proof is rejected.
 </pre><a href="#section-2.2-1" class="pilcrow">¶</a>
 </div>
 </section>
@@ -1362,25 +1362,26 @@ class SigmaProtocol:
 This function should pre-compute parts of the statement, or initialize the state of the hash function.<a href="#section-2.3-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.3-4.2">
-            <p id="section-2.3-4.2.1"><code>prover_commit(self, witness: Witness) -&gt; (commitment, prover_state)</code>, denoting the <strong>commitment phase</strong>, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover and the statement to be proven. This step generally requires access to a high-quality entropy source. Leakage of even just of a few bits of the nonce could allow for the complete recovery of the witness. The commitment meant to be shared, while <code>prover_state</code> must be kept secret.<a href="#section-2.3-4.2.1" class="pilcrow">¶</a></p>
+            <p id="section-2.3-4.2.1"><code>prover_commit(self, witness: Witness) -&gt; (commitment, prover_state)</code>, denoting the <strong>commitment phase</strong>, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover and the statement to be proven. This step generally requires access to a high-quality entropy source to perform the commitment. Leakage of even just of a few bits of the commitment could allow for the complete recovery of the witness. The commitment is meant to be shared, while <code>prover_state</code> must be kept secret.<a href="#section-2.3-4.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.3-4.3">
             <p id="section-2.3-4.3.1"><code>prover_response(self, prover_state, challenge) -&gt; response</code>, denoting the <strong>response phase</strong>, that is, the computation of the second message sent by the prover, depending on the witness, the statement, the challenge received from the verifier, and the internal state <code>prover_state</code>. The returned value <code>response</code> is meant to be shared.<a href="#section-2.3-4.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.3-4.4">
-            <p id="section-2.3-4.4.1"><code>verifier(self, commitment, challenge, response) -&gt; bool</code>, denoting the <strong>verifier algorithm</strong>. This method checks that the protocol transcript is valid for the given statement. The verifier algorithm outputs nothing if verification succeeds, or an error if verification fails.<a href="#section-2.3-4.4.1" class="pilcrow">¶</a></p>
+            <p id="section-2.3-4.4.1"><code>verifier(self, commitment, challenge, response) -&gt; bool</code>, denoting the <strong>verifier algorithm</strong>. This method checks that the protocol transcript is valid for the given statement. The verifier algorithm outputs true if verification succeeds, or false if verification fails.<a href="#section-2.3-4.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-2.3-5">The final two algorithms describe the <strong>zero-knowledge simulator</strong> and are optional. The simulator is primarily an efficient algorithm for proving zero-knowledge in a theoretical construction, but it is also needed for verifying short proofs and for or-composition, where a witness is not known and thus has to be simulated. We have:<a href="#section-2.3-5" class="pilcrow">¶</a></p>
+<p id="section-2.3-5">The final two algorithms describe the <strong>zero-knowledge simulator</strong> and are optional, as a sigma protocol is not necessarily zero-knowledge by definition. The simulator is primarily an efficient algorithm for proving zero-knowledge in a theoretical construction, but it is also needed for verifying short proofs and for or-composition, where a witness is not known and thus has to be simulated. We have:<a href="#section-2.3-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-2.3-6.1">
-            <p id="section-2.3-6.1.1"><code>simulate_response() -&gt; response</code>, denoting the first stage of the simulator. It is an algorithm drawing a random response that follows the same output distribution of the algorithm  <code>prover_response</code><a href="#section-2.3-6.1.1" class="pilcrow">¶</a></p>
+            <p id="section-2.3-6.1.1"><code>simulate_response() -&gt; response</code>, denoting the first stage of the simulator. It is an algorithm drawing a random response that follows the same output distribution of the algorithm  <code>prover_response</code>.<a href="#section-2.3-6.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.3-6.2">
             <p id="section-2.3-6.2.1"><code>simulate_commitment(response, challenge) -&gt; commitment</code>, returning a simulated commitment -- the second phase of the zero-knowledge simulator.<a href="#section-2.3-6.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-2.3-7">The abstraction <code>SigmaProtocol</code> allows implementing different types of statements and combiners of those, such as OR statements, validity of t-out-of-n statements, and more.<a href="#section-2.3-7" class="pilcrow">¶</a></p>
+<p id="section-2.3-7">Together, these zero-knowledge simulators provide a transcript that should be computationally indistinguishable from the transcript generated by running the original sigma protocol.<a href="#section-2.3-7" class="pilcrow">¶</a></p>
+<p id="section-2.3-8">The abstraction <code>SigmaProtocol</code> allows implementing different types of statements and combiners of those, such as OR statements, validity of t-out-of-n statements, and more.<a href="#section-2.3-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1421,8 +1422,8 @@ def prove(domain_separator, statement, witness, rng):
 
 Inputs:
 
-- domain_separator, a 32-bytes array that uniquely describes the protocol
-- statement, the instance being proven
+- domain_separator, a 32-byte array that uniquely describes the protocol.
+- statement, the instance being proven.
 - witness, the secret prover's witness.
 
 Parameters:
@@ -1516,7 +1517,7 @@ counterparts over residue classes.<a href="#section-3.2-1" class="pilcrow">¶</a
               <p id="section-3.2.1-1.8.1"><code>equal(element: Group)</code>, returns <code>true</code> if the two elements are the same and false` otherwise.<a href="#section-3.2.1-1.8.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.2.1-1.9">
-              <p id="section-3.2.1-1.9.1"><code>scalar_mul(scalar: Scalar)</code>, implements scalar multiplication for a group element by a scalar.<a href="#section-3.2.1-1.9.1" class="pilcrow">¶</a></p>
+              <p id="section-3.2.1-1.9.1"><code>scalar_mul(scalar: Scalar)</code>, implements scalar multiplication for a group element by an element in its respective scalar field.<a href="#section-3.2.1-1.9.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 <p id="section-3.2.1-2">Functions such as <code>add</code>, <code>equal</code>, and <code>scalar_mul</code> SHOULD be implemented using operator overloading whenever possible.<a href="#section-3.2.1-2" class="pilcrow">¶</a></p>
@@ -1532,13 +1533,13 @@ counterparts over residue classes.<a href="#section-3.2-1" class="pilcrow">¶</a
               <p id="section-3.2.2-1.1.1"><code>identity()</code>: outputs the (additive) identity element in the scalar field.<a href="#section-3.2.2-1.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.2.2-1.2">
-              <p id="section-3.2.2-1.2.1"><code>add(scalar: Scalar)</code>: implements field addition for the elements in the field<a href="#section-3.2.2-1.2.1" class="pilcrow">¶</a></p>
+              <p id="section-3.2.2-1.2.1"><code>add(scalar: Scalar)</code>: implements field addition for the elements in the field.<a href="#section-3.2.2-1.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.2.2-1.3">
-              <p id="section-3.2.2-1.3.1"><code>mult(scalar: Scalar)</code>, implements field multiplication<a href="#section-3.2.2-1.3.1" class="pilcrow">¶</a></p>
+              <p id="section-3.2.2-1.3.1"><code>mult(scalar: Scalar)</code>, implements field multiplication.<a href="#section-3.2.2-1.3.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.2.2-1.4">
-              <p id="section-3.2.2-1.4.1"><code>random()</code>: outputs a random element<a href="#section-3.2.2-1.4.1" class="pilcrow">¶</a></p>
+              <p id="section-3.2.2-1.4.1"><code>random()</code>: outputs a random scalar field element.<a href="#section-3.2.2-1.4.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.2.2-1.5">
               <p id="section-3.2.2-1.5.1"><code>serialize(scalars: [Scalar; N])</code>: serializes a list of scalars and returns their canonical representation of fixed length <code>Ns * N</code>.<a href="#section-3.2.2-1.5.1" class="pilcrow">¶</a></p>
@@ -1730,7 +1731,7 @@ prover_commit(self, witness: Witness)
 1. nonces = Scalar::random()
 2. prover_state = (witness, nonces)
 3. commitment = self.statement.map(witness)
-4. return (prover_state, commitment
+4. return (prover_state, commitment)
 </pre><a href="#section-3.5.1.1-1" class="pilcrow">¶</a>
 </div>
 </section>

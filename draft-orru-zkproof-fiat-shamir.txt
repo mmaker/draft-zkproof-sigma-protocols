@@ -4,8 +4,8 @@
 
 Zkproof                                                          M. Orrù
 Internet-Draft                                                      CNRS
-Intended status: Informational                             30 March 2025
-Expires: 1 October 2025
+Intended status: Informational                              1 April 2025
+Expires: 3 October 2025
 
 
                        Fiat-Shamir Transformation
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 1 October 2025.
+   This Internet-Draft will expire on 3 October 2025.
 
 Copyright Notice
 
@@ -103,14 +103,16 @@ Table of Contents
 
    *  A label.
 
-   *  An underlying hash function H, in a chosen mode, which the hash
-      state invokes to execute the actions.
+   *  An underlying hash function H, in a chosen mode, and instantiated
+      over a chosen domain, which the hash state invokes to execute the
+      actions.
 
    The core actions supported are:
 
-   *  absorb indicates a sequence of len elements in input
+   *  absorb indicates a sequence of elements in input to be absorbed by
+      the underlying hash function.
 
-   *  squeeze indicates an amount len of output to be produced
+   *  squeeze given input length, produces that many elements as output.
 
    The API follows the template of duplex sponges.
 
@@ -121,7 +123,7 @@ Table of Contents
    class DuplexSpongeInterface: type Unit
 
      def new(iv: bytes) -> hash_state
-     def absorb(self, x)
+     def absorb(self, x: [Unit])
      def squeeze(self, length: int) -> [Unit]
      def finalize(self)
 
@@ -140,7 +142,8 @@ Table of Contents
       object safely.
 
    The above can be extended to support absorption and squeeze from
-   different domains.  Such extensions are called codecs.
+   different domains than the domain in which the hash function is
+   initialized over.  Such extensions are called codecs.
 
 3.  Duplex Sponges
 
@@ -307,9 +310,9 @@ def squeeze(self, length: int):
 5.  Notation and Terminology
 
    For an elliptic curve, we consider two fields, the coordinate fields,
-   which indicates the field over which the elliptic curve equation is
-   defined, and the scalar field, over which the scalar operations are
-   performed.
+   which indicates the base field, the field over which the elliptic
+   curve equation is defined, and the scalar field, over which the
+   scalar operations are performed.
 
    The following functions and notation are used throughout the
    document.
