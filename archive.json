@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-30T01:18:17.976958+00:00",
+  "timestamp": "2025-04-01T01:23:15.988451+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -366,6 +366,58 @@
           "updatedAt": "2025-03-11T09:42:27Z"
         }
       ],
+      "reviews": []
+    },
+    {
+      "number": 13,
+      "id": "PR_kwDONyiw_86QtSjn",
+      "title": "FS spec comments",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/13",
+      "state": "CLOSED",
+      "author": "vishady721",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-03-30T23:44:05Z",
+      "updatedAt": "2025-03-31T00:25:15Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "3ac87f13e0bc4edb73c20cfa2d4ed960803ea94d",
+      "headRepository": "vishady721/draft-zkproof-sigma-protocols",
+      "headRefName": "main",
+      "headRefOid": "c3688ca57281ea45513872498e7e424c1cba2de5",
+      "closedAt": "2025-03-31T00:25:15Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 14,
+      "id": "PR_kwDONyiw_86QtYuA",
+      "title": "FS/SP spec comments",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/14",
+      "state": "OPEN",
+      "author": "vishady721",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-03-31T00:25:59Z",
+      "updatedAt": "2025-03-31T00:26:00Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "3ac87f13e0bc4edb73c20cfa2d4ed960803ea94d",
+      "headRepository": "vishady721/draft-zkproof-sigma-protocols",
+      "headRefName": "main",
+      "headRefOid": "bffd0960ac94f9f87abd3953fc8182c685bc8e71",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
       "reviews": []
     }
   ]
