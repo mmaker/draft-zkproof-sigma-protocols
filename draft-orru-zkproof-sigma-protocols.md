@@ -54,13 +54,13 @@ This document describes Sigma protocols, a secure, general-purpose non-interacti
 # Introduction
 
 A Sigma Protocol is a simple zero-knowledge proof of knowledge.
-Any sigma protocols must define three objects:
+Any sigma protocol must define three objects:
 
-- A commitment, sometimes also called nonce. This message is computed by the prover.
+- A commitment, sometimes also called a nonce. This message is computed by the prover.
 - A challenge, computed using the Fiat-Shamir transformation using a hash function.
 - A response, computed by the prover, which depends on the commitment and the challenge.
 
-A sigma protocol allows to convince a **verifier** of the knowledge of a secret **witness** satisfying a **statement**.
+A sigma protocol allows a **prover** to convince a **verifier** of the knowledge of a secret **witness** satisfying a **statement**.
 
 # Public functions
 
@@ -73,10 +73,10 @@ For how to implement these function in prime-order groups and elliptic curves, s
 
     Inputs:
 
-    - domain_separator, a unique 32-bytes array uniquely indicating the protocol and the session being proven
+    - domain_separator, a unique 32-byte array uniquely indicating the protocol and the session being proven
     - statement, the instance being proven
     - witness, the witness for the given statement
-    - rng, a random number generator
+    - rng, a cryptographic random number generator
 
     Outputs:
 
@@ -88,14 +88,14 @@ For how to implement these function in prime-order groups and elliptic curves, s
 
     Inputs:
 
-    - domain_separator, a unique 32-bytes array uniquely indicating the protocol and the session being proven
+    - domain_separator, a unique 32-byte array uniquely indicating the protocol and the session being proven
     - statement, the instance being proven
     - proof, a byte array containing the cryptographic proof
 
 
     Outputs:
 
-    - the verification bit
+    - the verification bit, 1 indicating that the proof is accepted, 0 indicating that the proof is rejected.
 
 ## Core interface
 
@@ -116,17 +116,19 @@ Where:
 - `new(domain_separator: [u8; 32], cs: GroupMorphismPreimage) -> SigmaProtocol`, denoting the initialization function. This function takes as input a label identifying local context information (such as: session identifiers, to avoid replay attacks; protocol metadata, to avoid hijacking; optionally, a timestamp and some pre-shared randomness, to guarantee freshness of the proof) and an instance generated via the `GroupMorphismPreimage`, the public information shared between prover and verifier.
 This function should pre-compute parts of the statement, or initialize the state of the hash function.
 
-- `prover_commit(self, witness: Witness) -> (commitment, prover_state)`, denoting the **commitment phase**, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover and the statement to be proven. This step generally requires access to a high-quality entropy source. Leakage of even just of a few bits of the nonce could allow for the complete recovery of the witness. The commitment meant to be shared, while `prover_state` must be kept secret.
+- `prover_commit(self, witness: Witness) -> (commitment, prover_state)`, denoting the **commitment phase**, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover and the statement to be proven. This step generally requires access to a high-quality entropy source to perform the commitment. Leakage of even just of a few bits of the commitment could allow for the complete recovery of the witness. The commitment is meant to be shared, while `prover_state` must be kept secret.
 
 - `prover_response(self, prover_state, challenge) -> response`, denoting the **response phase**, that is, the computation of the second message sent by the prover, depending on the witness, the statement, the challenge received from the verifier, and the internal state `prover_state`. The returned value `response` is meant to be shared.
 
-- `verifier(self, commitment, challenge, response) -> bool`, denoting the **verifier algorithm**. This method checks that the protocol transcript is valid for the given statement. The verifier algorithm outputs nothing if verification succeeds, or an error if verification fails.
+- `verifier(self, commitment, challenge, response) -> bool`, denoting the **verifier algorithm**. This method checks that the protocol transcript is valid for the given statement. The verifier algorithm outputs true if verification succeeds, or false if verification fails.
 
-The final two algorithms describe the **zero-knowledge simulator** and are optional. The simulator is primarily an efficient algorithm for proving zero-knowledge in a theoretical construction, but it is also needed for verifying short proofs and for or-composition, where a witness is not known and thus has to be simulated. We have:
+The final two algorithms describe the **zero-knowledge simulator** and are optional, as a sigma protocol is not necessarily zero-knowledge by definition. The simulator is primarily an efficient algorithm for proving zero-knowledge in a theoretical construction, but it is also needed for verifying short proofs and for or-composition, where a witness is not known and thus has to be simulated. We have:
 
-- `simulate_response() -> response`, denoting the first stage of the simulator. It is an algorithm drawing a random response that follows the same output distribution of the algorithm  `prover_response`
+- `simulate_response() -> response`, denoting the first stage of the simulator. It is an algorithm drawing a random response that follows the same output distribution of the algorithm  `prover_response`.
 
 - `simulate_commitment(response, challenge) -> commitment`, returning a simulated commitment -- the second phase of the zero-knowledge simulator.
+
+Together, these zero-knowledge simulators provide a transcript that should be computationally indistinguishable from the transcript generated by running the original sigma protocol.
 
 The abstraction `SigmaProtocol` allows implementing different types of statements and combiners of those, such as OR statements, validity of t-out-of-n statements, and more.
 
@@ -155,8 +157,8 @@ The proving function demands to instantiate a statement and a witness (as in {{w
 
     Inputs:
 
-    - domain_separator, a 32-bytes array that uniquely describes the protocol
-    - statement, the instance being proven
+    - domain_separator, a 32-byte array that uniquely describes the protocol.
+    - statement, the instance being proven.
     - witness, the secret prover's witness.
 
     Parameters:
@@ -216,16 +218,16 @@ We detail the functions that can be invoked on these objects. Example choices ca
 - `deserialize(buffer)`, attempts to map a byte array `buffer` of size `Ng * N` into `[Group; N]`, and fails if the input is not the valid canonical byte representation of an element of the group. This function can raise a `DeserializeError` if deserialization fails.
 - `add(element: Group)`, implements elliptic curve addition for the two group elements.
 - `equal(element: Group)`, returns `true` if the two elements are the same and false` otherwise.
-- `scalar_mul(scalar: Scalar)`, implements scalar multiplication for a group element by a scalar.
+- `scalar_mul(scalar: Scalar)`, implements scalar multiplication for a group element by an element in its respective scalar field.
 
 Functions such as `add`, `equal`, and `scalar_mul` SHOULD be implemented using operator overloading whenever possible.
 
 ### Scalar
 
 - `identity()`: outputs the (additive) identity element in the scalar field.
-- `add(scalar: Scalar)`: implements field addition for the elements in the field
-- `mult(scalar: Scalar)`, implements field multiplication
-- `random()`: outputs a random element
+- `add(scalar: Scalar)`: implements field addition for the elements in the field.
+- `mult(scalar: Scalar)`, implements field multiplication.
+- `random()`: outputs a random scalar field element.
 - `serialize(scalars: [Scalar; N])`: serializes a list of scalars and returns their canonical representation of fixed length `Ns * N`.
 - `deserialize(buffer)`, attempts to map a byte array `buffer` of size `Ns * N` into `[Scalar; N]`, and fails if the input is not the valid canonical byte representation of an element of the group. This function can raise a `DeserializeError` if deserialization fails.
 
@@ -346,7 +348,7 @@ This defines the object `SchnorrProof`. The initialization function takes as inp
     1. nonces = Scalar::random()
     2. prover_state = (witness, nonces)
     3. commitment = self.statement.map(witness)
-    4. return (prover_state, commitment
+    4. return (prover_state, commitment)
 
 #### Prover response
 
