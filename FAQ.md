@@ -10,11 +10,12 @@ where $A \in \mathbb{G}^{m \times n}$ and $B \in \mathbb{G}^m$ are the public. T
 
 This specification will focus on ciphersuites in elliptic curve groups.
 This specification will **NOT** include:
-- proofs over prime-order groups, or RSA groups, or lattices;
+- Proofs over prime-order groups, or RSA groups, or lattices;
 - AND and OR composition of sigma protocols;
 - Compressed Sigma protocols;
 - Recursive arguments via algebraic hash functions;
-- Sigma protocols from MPC-in-the-Head techniques.
+- Sigma protocols from MPC-in-the-Head techniques;
+- 
 
 However, the API and the primitives WILL BE described in such a way that all these things MAY be built on top in future drafts, given the prominence of all these techniques.
 
