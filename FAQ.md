@@ -15,7 +15,6 @@ This specification will **NOT** include:
 - Compressed Sigma protocols;
 - Recursive arguments via algebraic hash functions;
 - Sigma protocols from MPC-in-the-Head techniques;
-- 
 
 However, the API and the primitives WILL BE described in such a way that all these things MAY be built on top in future drafts, given the prominence of all these techniques.
 
