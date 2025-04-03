@@ -4,9 +4,9 @@
 
 The scope of this specification are non-interactive, 3-message arguments for proving knoweldge of a private $x \in \mathbb{F}^n$ such that:
 
-$Ax = B$
+$$Ax = B$$
 
-where $A \in \mathbb{G}^{n \times m}$ and $B \in \mathbb{G}^n$ are the public. These are sometimes informally called _Schnorr proofs_ [Schnorr91], _Maurer proofs_ [[Maurer09]](https://crypto-test.ethz.ch/publications/files/Maurer09.pdf).
+where $A \in \mathbb{G}^{m \times n}$ and $B \in \mathbb{G}^m$ are the public. These are sometimes informally called _Schnorr proofs_ [Schnorr91], _Maurer proofs_ [[Maurer09]](https://crypto-test.ethz.ch/publications/files/Maurer09.pdf).
 
 This specification will focus on ciphersuites in elliptic curve groups.
 This specification will **NOT** include:
@@ -27,8 +27,15 @@ However, the API and the primitives WILL BE described in such a way that all the
 Sigma protocols have been formalized over 30 years ago. However, due to [a patent](https://patents.google.com/patent/US4995082A/en) from Claus Schnorr they haven't been widely adopted yet. This is also part of the reasons why cryptographers designed DSA in the way it is designed.
 
 Previous RFCs that describe how to perform this type of proofs are:
-- [RFC8235](https://datatracker.ietf.org/doc/html/rfc8235), which is a Schnorr proof for proving knowledge of $x$ such that $xG = X$. In other words, it is a proof for the instance $A = [G]$ and $B = [X]$.
-- [RFC9497](https://datatracker.ietf.org/doc/html/rfc9497#section-2.2), which is a Schnorr proof for proving knowledge of $x$ such that $xG = X$ and $x H = Y$. In other words, it is a proof for the instance $A = \begin{bmatrix}G \\ H\end{bmatrix}$ and $B = \begin{bmatrix} X \\ Y\end{bmatrix}$.
+- [RFC8235](https://datatracker.ietf.org/doc/html/rfc8235), which is a Schnorr proof for proving knowledge of $x$ such that $xG = X$. In other words, it is a proof for 
+```math
+   \begin{bmatrix}G \end{bmatrix} x = \begin{bmatrix} X \end{bmatrix}\enspace.
+```
+- [RFC9497](https://datatracker.ietf.org/doc/html/rfc9497#section-2.2), which is a Schnorr proof for proving knowledge of $x$ such that $xG = X$ and $x H = Y$. In other words, it is a proof for
+
+```math
+   \begin{bmatrix}G \\ H \end{bmatrix} x = \begin{bmatrix} X \\ Y\end{bmatrix}\enspace.
+```
 
 They are therefore a specialization of the proofs we are trying to standardize.
 
