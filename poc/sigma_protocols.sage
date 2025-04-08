@@ -6,7 +6,6 @@ from sagelib.fiat_shamir import KeccakDuplexSpongeP384
 class SigmaProtocol(ABC):
     """
     This is the abstract API of a Sigma protocol.
-    It can be extended for AND/OR composition, for OR proofs, for
 
     An (interactive) Sigma protocol is a 3-message protocol that is special sound and honest-verifier zero-knowledge.
     Relations for sigma protocols are seen as ternary relations composed of:
@@ -63,8 +62,10 @@ class NISigmaProtocol:
         return self.sp.verifier(commitment, challenge, response)
 
 
-
 class Morphism:
+    """
+    This class describes a linear morphism of [Maurer09].
+    """
     LinearCombination = namedtuple("LinearCombination", ["scalar_indices", "element_indices"])
     Group = None
 
@@ -86,9 +87,6 @@ class Morphism:
 
     # def map(self, scalars):
     def __call__(self, scalars):
-        """
-        This is the linear morphism of [Maurer09].
-        """
         image = []
         for linear_combination in self.linear_combinations:
             coefficients = [scalars[i] for i in linear_combination.scalar_indices]
@@ -96,6 +94,7 @@ class Morphism:
 
             image.append(self.Group.msm(coefficients, elements))
         return image
+
 
 class GroupMorphismPreimage:
     def __init__(self, group):
@@ -119,8 +118,7 @@ class GroupMorphismPreimage:
         self._image.append(lhs)
 
     def allocate_scalars(self, n: int):
-        indices = [i
-                   for i in range(self.morphism.num_scalars, self.morphism.num_scalars + n)]
+        indices = list(range(self.morphism.num_scalars, self.morphism.num_scalars + n))
         self.morphism.num_scalars += n
         return indices
 
@@ -140,7 +138,6 @@ class GroupMorphismPreimage:
 
 
 class SchnorrProof(SigmaProtocol):
-
     # A sparse linear combination
     ProverState = namedtuple("ProverState", ["witness", "nonces"])
 

@@ -3,7 +3,9 @@ import struct
 
 from hash_to_field import OS2IP
 from keccak import Keccak
-from sagelib.groups import GroupP384
+from sagelib.groups import Group
+from sagelib import groups
+
 
 class DuplexSpongeInterface(ABC):
     """
@@ -99,46 +101,37 @@ class DuplexSponge(DuplexSpongeInterface):
             output += bytes(self.permutation_state[self.squeeze_index:self.squeeze_index+chunk_size])
         return output
 
-class ByteCodec:
-    def absorb_bytes(self, bytes: bytes):
-        return self.absorb(bytes)
-
-    def squeeze_bytes(self, length: int):
-        return self.squeeze(length)
-
-class P384Codec:
-    GG = None
-
-    def absorb_scalars(self, scalars: list):
-        self.absorb_bytes(self.GG.ScalarField.serialize(scalars))
-
-    def squeeze_scalars(self, length: int):
-        byte_len = self.GG.ScalarField.scalar_byte_length() + 16
-        scalars = []
-        for _ in range(length):
-            uniform_bytes = self.squeeze_bytes(byte_len)
-            scalar = OS2IP(uniform_bytes) % self.GG.order()
-            scalars.append(scalar)
-        return scalars
-
-    def absorb_elements(self, elements: list):
-        self.absorb_bytes(self.GG.serialize(elements))
-        return self
-
-
-class KeccakDuplexSpongeP384(DuplexSponge, ByteCodec, P384Codec):
-    GG = GroupP384()
+class ByteSchnorrCodec:
+    GG: Group = None
+    Hash: DuplexSpongeInterface = None
 
     def __init__(self, iv: bytes):
-        assert len(iv) == 32
+        self.hash_state = self.Hash(iv)
+
+    def prover_message(self, elements: list):
+        self.hash_state.absorb(self.GG.serialize(elements))
+        # calls can be chained
+        return self
+
+    def verifier_challenge(self):
+        uniform_bytes = self.hash_state.squeeze(self.GG.ScalarField.scalar_byte_length() + 16)
+        scalar = OS2IP(uniform_bytes) % self.GG.ScalarField.order
+        return scalar
+
+
+class KeccakDuplexSponge(DuplexSponge):
+    def __init__(self, iv: bytes):
         self.permutation_state = KeccakPermutationState()
         super().__init__(iv)
 
-    def prover_message(self, elements: list):
-        return self.absorb_elements(elements)
+class KeccakDuplexSpongeP384(ByteSchnorrCodec):
+    GG = groups.GroupP384()
+    Hash = KeccakDuplexSponge
 
-    def verifier_challenge(self):
-        return self.squeeze_scalars(1)[0]
+class KeccakDuplexSpongeBls12381(ByteSchnorrCodec):
+    GG = groups.BLS12_381_G1
+    Hash = KeccakDuplexSponge
+
 
 if __name__ == "__main__":
     label = b"yellow submarine" * 2
