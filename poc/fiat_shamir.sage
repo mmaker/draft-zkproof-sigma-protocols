@@ -128,9 +128,9 @@ class KeccakDuplexSpongeP384(ByteSchnorrCodec):
     GG = groups.GroupP384()
     Hash = KeccakDuplexSponge
 
-# class KeccakDuplexSpongeBls12381(ByteSchnorrCodec):
-#     GG = groups.BLS12_381_G1
-#     Hash = KeccakDuplexSponge
+class KeccakDuplexSpongeBls12381(ByteSchnorrCodec):
+    GG = groups.BLS12_381_G1
+    Hash = KeccakDuplexSponge
 
 
 if __name__ == "__main__":

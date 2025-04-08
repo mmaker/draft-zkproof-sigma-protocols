@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from collections import namedtuple
 
-from sagelib.fiat_shamir import KeccakDuplexSpongeBls12381
+from sagelib.fiat_shamir import KeccakDuplexSpongeP384
 
 class SigmaProtocol(ABC):
     """
@@ -195,4 +195,4 @@ class NISchnorrProof(NISigmaProtocol):
     Schnorr proof using the Fiat-Shamir transform.
     """
     Protocol = SchnorrProof
-    Codec = KeccakDuplexSpongeBls12381
+    Codec = KeccakDuplexSpongeP384

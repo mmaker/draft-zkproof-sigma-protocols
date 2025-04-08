@@ -12,7 +12,7 @@ except ImportError as e:
 CONTEXT_STRING = b'yellow submarine' * 2
 
 def test_vector(test_vector_function):
-    from sagelib.groups import BLS12_381_G1 as group
+    from sagelib.groups import GroupP384 as group
     from sagelib.sigma_protocols import NISchnorrProof
 
     def inner(vectors):
