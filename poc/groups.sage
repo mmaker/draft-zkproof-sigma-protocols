@@ -120,8 +120,6 @@ class Group(ABC):
         return sum(cls.scalar_mult(scalars[i], points[i]) for i in range(len(scalars)))
 
 
-
-
 # little-endian version of I2OSP
 def I2OSP_le(val, length):
     val = int(val)
@@ -137,6 +135,8 @@ def I2OSP_le(val, length):
     return ret
 
 # little-endian version of OS2IP
+
+
 def OS2IP_le(octets, skip_assert=False):
     ret = 0
     for octet in reversed(struct.unpack("=" + "B" * len(octets), octets)):
@@ -145,7 +145,6 @@ def OS2IP_le(octets, skip_assert=False):
     if not skip_assert:
         assert octets == I2OSP_le(ret, len(octets))
     return ret
-
 
 
 class NISTCurveScalar(Scalar):
@@ -159,7 +158,7 @@ class NISTCurveScalar(Scalar):
 
     @classmethod
     def _serialize(cls, scalar):
-        assert(0 <= int(scalar) < cls.order)
+        assert (0 <= int(scalar) < cls.order)
         return I2OSP(scalar, cls.scalar_byte_length())
 
     @classmethod
@@ -206,8 +205,8 @@ class GroupNISTCurve(Group):
         # 0x02 | 0x03 || x
         pve = encoded[0] == 0x02
         nve = encoded[0] == 0x03
-        assert(pve or nve)
-        assert(len(encoded) % 2 != 0)
+        assert (pve or nve)
+        assert (len(encoded) % 2 != 0)
         element_length = (len(encoded) - 1) / 2
         x = OS2IP(encoded[1:])
         y2 = x^3 + cls.a*x + cls.b
@@ -228,12 +227,14 @@ class GroupNISTCurve(Group):
     def vec_scalar_mult(self, scalar, points):
         return [point * scalar for point in points]
 
+
 class GroupP256(GroupNISTCurve):
     def __new__(cls):
         # See FIPS 186-3, section D.2.3
         gx = 0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296
         gy = 0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5
         return GroupNISTCurve.__new__(cls, "P256_XMD:SHA-256_SSWU_RO_", p256_sswu_ro, p256_F, p256_A, p256_B, p256_p, p256_order, gx, gy, 48, hashlib.sha256, XMDExpander, 128)
+
 
 class GroupP384(GroupNISTCurve):
     def __new__(cls):
@@ -242,12 +243,14 @@ class GroupP384(GroupNISTCurve):
         gy = 0x3617de4a96262c6f5d9e98bf9292dc29f8f41dbd289a147ce9da3113b5f0b8c00a60b1ce1d7e819d7a431d7c90ea0e5f
         return GroupNISTCurve.__new__(cls, "P384_XMD:SHA-384_SSWU_RO_", p384_sswu_ro, p384_F, p384_A, p384_B, p384_p, p384_order, gx, gy, 72, hashlib.sha384, XMDExpander, 192)
 
+
 class GroupP521(GroupNISTCurve):
     def __new__(cls):
         # See FIPS 186-3, section D.2.5
         gx = 0xc6858e06b70404e9cd9e3ecb662395b4429c648139053fb521f828af606b4d3dbaa14b5e77efe75928fe1dc127a2ffa8de3348b3c1856a429bf97e7e31c2e5bd66
         gy = 0x11839296a789a3bc0045c8a5fb42c7d1bd998f54449579b446817afbd17273e662c97ee72995ef42640c550b9013fad0761353c7086a272c24088be94769fd16650
         return GroupNISTCurve.__new__(cls, "P521_XMD:SHA-512_SSWU_RO_", p521_sswu_ro, p521_F, p521_A, p521_B, p521_p, p521_order, gx, gy, 98, hashlib.sha512, XMDExpander, 256)
+
 
 class Ristretto255ScalarField(Scalar):
     def __init__(self, order):
@@ -284,10 +287,12 @@ class GroupRistretto255(Group):
     def scalar_mult(self, x, y):
         return x * y
 
+
 class Decaf448ScalarField(Scalar):
     def __init__(self, order):
         Scalar.__init__(self, order)
         self.k = 224
+
 
 class GroupDecaf448(Group):
     def __new__(cls):
@@ -317,8 +322,6 @@ class GroupDecaf448(Group):
         return x * y
 
 
-
-
 class BLS12_381_Fr(Scalar):
     def __new__(cls):
         order = 0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001
@@ -326,7 +329,7 @@ class BLS12_381_Fr(Scalar):
 
     @classmethod
     def _serialize(cls, scalar):
-        assert(0 <= int(scalar) < cls.order)
+        assert (0 <= int(scalar) < cls.order)
         return I2OSP(scalar, cls.scalar_byte_length())
 
     @classmethod
@@ -341,7 +344,8 @@ class BLS12_381_G1(Group):
     E = EllipticCurve(Fq, [0, 4])
     G = E(0x17F1D3A73197D7942695638C4FA9AC0FC3688C4F9774B905A14E3A3F171BAC586C55E83FF97A1AEFFB3AF00ADB22C6BB,
           0x08B3F481E3AAA0F1A09E30ED741D8AE4FCF5E095D5D00AF600DB18CB2C04B3EDD03CC744A2888AE40CAA232946C5E7E1)
-    E.set_order(0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001 * 0x396C8C005555E1568C00AAAB0000AAAB)
+    E.set_order(0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001 *
+                0x396C8C005555E1568C00AAAB0000AAAB)
 
     @classmethod
     def generator(cls):
@@ -422,10 +426,12 @@ class BLS12_381_G1(Group):
         # Step 2: Validate length based on compression flag
         if C_bit == 1:
             if len(s_string) != 48:
-                raise ValueError(f"Invalid length for compressed G1 point: {len(s_string)}")
+                raise ValueError(
+                    f"Invalid length for compressed G1 point: {len(s_string)}")
         else:
             if len(s_string) != 96:
-                raise ValueError(f"Invalid length for uncompressed G1 point: {len(s_string)}")
+                raise ValueError(
+                    f"Invalid length for uncompressed G1 point: {len(s_string)}")
 
         # Step 3: Clear the metadata bits
         s_copy = bytearray(s_string)
@@ -467,7 +473,8 @@ class BLS12_381_G1(Group):
         # (y2^((p-1)/2) ≡ 1 (mod p)) if y2 is a square
         p = Fq.order()
         if pow(y2, (p-1)//2, p) != 1:
-            raise ValueError("Invalid compressed point: y² is not a square in the field")
+            raise ValueError(
+                "Invalid compressed point: y² is not a square in the field")
 
         # Calculate the square root
         # For BLS12-381, p ≡ 3 (mod 4), so we can use y = ±y2^((p+1)/4) mod p

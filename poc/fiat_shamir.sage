@@ -81,10 +81,10 @@ class DuplexSponge(DuplexSpongeInterface):
 
             chunk_size = min(self.rate - self.absorb_index, len(input))
             next_chunk = input[:chunk_size]
-            self.permutation_state[self.absorb_index : self.absorb_index + chunk_size] = next_chunk
+            self.permutation_state[self.absorb_index:
+                                   self.absorb_index + chunk_size] = next_chunk
             self.absorb_index += chunk_size
             input = input[chunk_size:]
-
 
     def squeeze(self, length: int):
         self.absorb_index = self.rate
@@ -98,8 +98,10 @@ class DuplexSponge(DuplexSpongeInterface):
             chunk_size = min(self.rate - self.squeeze_index, length)
             self.squeeze_index += chunk_size
             length -= chunk_size
-            output += bytes(self.permutation_state[self.squeeze_index:self.squeeze_index+chunk_size])
+            output += bytes(
+                self.permutation_state[self.squeeze_index:self.squeeze_index+chunk_size])
         return output
+
 
 class ByteSchnorrCodec:
     GG: Group = None
@@ -114,7 +116,8 @@ class ByteSchnorrCodec:
         return self
 
     def verifier_challenge(self):
-        uniform_bytes = self.hash_state.squeeze(self.GG.ScalarField.scalar_byte_length() + 16)
+        uniform_bytes = self.hash_state.squeeze(
+            self.GG.ScalarField.scalar_byte_length() + 16)
         scalar = OS2IP(uniform_bytes) % self.GG.ScalarField.order
         return scalar
 
@@ -124,9 +127,11 @@ class KeccakDuplexSponge(DuplexSponge):
         self.permutation_state = KeccakPermutationState()
         super().__init__(iv)
 
+
 class KeccakDuplexSpongeP384(ByteSchnorrCodec):
     GG = groups.GroupP384()
     Hash = KeccakDuplexSponge
+
 
 class KeccakDuplexSpongeBls12381(ByteSchnorrCodec):
     GG = groups.BLS12_381_G1

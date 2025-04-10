@@ -1,10 +1,12 @@
 #!/usr/bin/sage
 # vim: syntax=python
 
-def test_dst(suite_name, L = 0):
+def test_dst(suite_name, L=0):
     length = len("QUUX-V01-CS02-with-") + len(suite_name) + 1
-    dst = "-".join(filter(None, ["QUUX-V01-CS02-with", suite_name, "1" * max(0, L - length)]))
+    dst = "-".join(filter(None, ["QUUX-V01-CS02-with",
+                   suite_name, "1" * max(0, L - length)]))
     return dst
+
 
 def CMOV(x, y, b):
     """
@@ -12,7 +14,10 @@ def CMOV(x, y, b):
     """
     return int(not bool(b))*x + int(bool(b))*y
 
+
 ZZR = PolynomialRing(ZZ, name='XX')
+
+
 def sgn0_be(x):
     """
     Returns -1 if x is 'negative' (big-endian sense), else 1.
@@ -25,7 +30,8 @@ def sgn0_be(x):
         xi_values = (ZZ(x),)
     else:
         # field extension
-        xi_values = ZZR(x)  # extract vector repr of field element (faster than x._vector_())
+        # extract vector repr of field element (faster than x._vector_())
+        xi_values = ZZR(x)
     sign = 0
     # compute the sign in constant time
     for i in reversed(range(0, degree)):
@@ -37,6 +43,7 @@ def sgn0_be(x):
         sign = CMOV(sign, sign_i, sign == 0)
     return CMOV(sign, 1, sign == 0)
 
+
 def sgn0(x):
     """
     Returns 1 if x is 'negative' (little-endian sense), else 0.
@@ -47,7 +54,8 @@ def sgn0(x):
         xi_values = (ZZ(x),)
     else:
         # field extension
-        xi_values = ZZR(x)  # extract vector repr of field element (faster than x._vector_())
+        # extract vector repr of field element (faster than x._vector_())
+        xi_values = ZZR(x)
     sign = 0
     zero = 1
     # compute the sign in constant time
@@ -61,14 +69,18 @@ def sgn0(x):
         zero = zero & zero_i
     return sign
 
+
 def square_root_random_sign(x):
     a = square_root(x)
     if a is not None and randint(0, 1) == 1:
         return -a
     return a
 
+
 # cache for per-p values
 sqrt_cache = {}
+
+
 def square_root(x):
     """
     Returns a square root defined through fixed formulas.
@@ -94,7 +106,8 @@ def square_root(x):
         if sqrt_cache.get(p) is None:
             sqrt_m1 = F(-1).sqrt()
             sqrt_sqrt_m1 = sqrt_m1.sqrt()
-            sqrt_cache[p] = (F(1), sqrt_m1, sqrt_sqrt_m1, sqrt_sqrt_m1 * sqrt_m1)
+            sqrt_cache[p] = (F(1), sqrt_m1, sqrt_sqrt_m1,
+                             sqrt_sqrt_m1 * sqrt_m1)
         z = x ** ((p + 7) // 16)
 
     for mul in sqrt_cache[p]:
@@ -107,6 +120,8 @@ def square_root(x):
 # constant-time Tonelli-Shanks
 # Adapted from https://github.com/zkcrypto/jubjub/blob/master/src/fq.rs by Michael Scott.
 # See also Cohen, "A Course in Computational # Algebraic Number Theory," Algorithm 1.5.1.
+
+
 def tonelli_shanks_ct(x):
     F = x.parent()
     p = F.order()
@@ -122,7 +137,7 @@ def tonelli_shanks_ct(x):
     c = c5
     for i in range(c1, 1, -1):
         for j in range(1, i - 1):
-             b = b * b
+            b = b * b
         e = b == 1
         zt = z * c
         z = CMOV(zt, z, e)
@@ -137,6 +152,8 @@ def tonelli_shanks_ct(x):
     return None
 
 # cache pre-computable values -- no need for CT here
+
+
 def ts_precompute(p, F):
     c2 = p - 1
     c1 = 0
@@ -151,6 +168,7 @@ def ts_precompute(p, F):
     c3 = (c2 - 1) // 2
     c5 = c4^c2
     sqrt_cache[p] = (c1, c3, c5)
+
 
 def is_square_quadratic(x):
     F = x.parent()
@@ -167,8 +185,10 @@ def is_square_quadratic(x):
     e1 = tv1 != -1
     return e1
 
+
 def test_ts():
     print("Testing Tonelli-Shanks")
+
     def _test(F):
         for _ in range(0, 256):
             x = F.random_element()
@@ -193,14 +213,15 @@ def test_ts():
         F = GF(p^3)
         _test(F)
 
+
 def test_issq():
     print("Testing is_square for quadratic extensions")
     for _ in range(0, 8):
-        p = random_prime(1<<64)
+        p = random_prime(1 << 64)
         b = 2
         while True:
             try:
-                F.<X> = GF(p^2, modulus=[b,0,1])
+                F.<X> = GF(p^2, modulus=[b, 0, 1])
             except:
                 b += 1
                 continue
@@ -209,9 +230,11 @@ def test_issq():
             a = F.random_element()
             assert a.is_square() == is_square_quadratic(a)
 
+
 def test_sqrt_issq():
     test_ts()
     test_issq()
+
 
 if __name__ == "__main__":
     test_ts()

@@ -9,6 +9,7 @@ try:
 except ImportError:
     sys.exit("Error loading preprocessed sage files. Try running `make clean pyfiles`")
 
+
 class GenericSvdW(GenericMap):
     def __init__(self, F, A, B):
         self.name = "SVDW"
@@ -123,6 +124,7 @@ class GenericSvdW(GenericMap):
         if sgn0(u) != sgn0(y):
             y = -y
         return (x, y)
+
 
 if __name__ == "__main__":
     for _ in range(0, 32):

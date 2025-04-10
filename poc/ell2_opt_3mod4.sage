@@ -8,6 +8,7 @@ try:
 except ImportError:
     sys.exit("Error loading preprocessed sage files. Try running `make clean pyfiles`")
 
+
 class OptimizedEll2_K1_3mod4(object):
     def __init__(self, F, J):
         assert F.order() % 4 == 3
@@ -61,7 +62,7 @@ class OptimizedEll2_K1_3mod4(object):
         xn = CMOV(x2n, x1n, e2)  # If e2, x = x1, else x = x2
         y = CMOV(y2, y1, e2)    # If e2, y = y1, else y = y2
         e3 = sgn0(y) == 1        # Fix sign of y
-        y = CMOV(y, -y, e2 ^^ e3)
+        y = CMOV(y, -y, e2^^ e3)
         return (xn, xd, y, 1)
 
     def test_map(self, u=None):
@@ -84,6 +85,7 @@ class OptimizedEll2_K1_3mod4(object):
             self.test_map(und)
         for _ in range(0, 256):
             self.test_map()
+
 
 class OptimizedEll2_3mod4(object):
     def __init__(self, F, J, K):
@@ -146,7 +148,7 @@ class OptimizedEll2_3mod4(object):
         xn = xn * K
         y = CMOV(y2, y1, e2)    # If e2, y = y1, else y = y2
         e3 = sgn0(y) == 1        # Fix sign of y
-        y = CMOV(y, -y, e2 ^^ e3)
+        y = CMOV(y, -y, e2^^ e3)
         y = y * K
         return (xn, xd, y, 1)
 
@@ -172,12 +174,14 @@ class OptimizedEll2_3mod4(object):
         for _ in range(0, 256):
             self.test_map()
 
+
 p_448 = 2^448 - 2^224 - 1
 F_448 = GF(p_448)
 J_448 = F_448(156326)
 K_448 = F_448(1)
 test_curve448 = OptimizedEll2_K1_3mod4(F_448, J_448)
 test2_curve448 = OptimizedEll2_3mod4(F_448, J_448, K_448)
+
 
 def map_to_curve_elligator2_edwards448(u):
     (xn, xd, yn, yd) = test_curve448.map_to_curve(u)
@@ -220,6 +224,7 @@ def map_to_curve_elligator2_edwards448(u):
     yEd = CMOV(yEd, 1, e)
     return (xEn, xEd, yEn, yEd)
 
+
 def curve448_to_edwards448(u, v, _):
     xn = 4 * v * (u^2 - 1)
     xd = (u^4 - 2 * u^2 + 4 * v^2 + 1)
@@ -228,6 +233,7 @@ def curve448_to_edwards448(u, v, _):
     if xd * yd == 0:
         return (0, 1)
     return (xn / xd, yn / yd)
+
 
 def test_edwards448(u=None):
     F = test_curve448.F
@@ -244,6 +250,7 @@ def test_edwards448(u=None):
     assert xp == x
     assert yp == y
 
+
 def test_ell2_448():
     print("Testing curve448 and edwards448")
     F = test_curve448.F
@@ -258,6 +265,7 @@ def test_ell2_448():
         test_curve448.test_map()
         test2_curve448.test_map()
         test_edwards448()
+
 
 def test_ell2_K1_3mod4_random():
     print("Testing random curves (q = 5 mod 8, K == 1): ", end="")
@@ -277,6 +285,7 @@ def test_ell2_K1_3mod4_random():
         sys.stdout.write('.')
         sys.stdout.flush()
     print()
+
 
 def test_ell2_3mod4_random():
     print("Testing random curves (q = 5 mod 8, K != 1): ", end="")
@@ -298,10 +307,12 @@ def test_ell2_3mod4_random():
         sys.stdout.flush()
     print()
 
+
 def test_ell2_3mod4():
     test_ell2_448()
     test_ell2_K1_3mod4_random()
     test_ell2_3mod4_random()
+
 
 if __name__ == "__main__":
     test_ell2_3mod4()

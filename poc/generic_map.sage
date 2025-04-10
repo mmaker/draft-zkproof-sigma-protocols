@@ -7,6 +7,7 @@ try:
 except ImportError:
     sys.exit("Error loading preprocessed sage files. Try running `make clean pyfiles`")
 
+
 class GenericMap(object):
     undefs = None
     E = None
@@ -19,7 +20,7 @@ class GenericMap(object):
 
     def __dict__(self):
         return {
-            "name" :  self.name,
+            "name":  self.name,
         }
 
     def set_sqrt(self, fn):
@@ -28,7 +29,8 @@ class GenericMap(object):
     def map_to_curve(self, u):
         (x1, y1) = self.straight_line(u)
         (x2, y2) = self.not_straight_line(u)
-        assert (x1, y1) == (x2, y2), "straight-line / non-straight-line mismatch"
+        assert (x1, y1) == (
+            x2, y2), "straight-line / non-straight-line mismatch"
         return self.E(*self.to_weierstrass(x1, y1))
 
     def is_square(self, x):

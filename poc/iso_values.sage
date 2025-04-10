@@ -1,13 +1,15 @@
 #!/usr/bin/sage
 # vim: syntax=python
 
-ZZR.<XX> = PolynomialRing(ZZ)
+ZZR. < XX > = PolynomialRing(ZZ)
+
+
 def show_elm(val):
     if val.parent().degree() == 1:
         return "0x%x" % val
     if val == 0:
         return "0"
-    vals = [ (ii, vv) for (ii, vv) in enumerate(ZZR(val)) if vv > 0 ]
+    vals = [(ii, vv) for (ii, vv) in enumerate(ZZR(val)) if vv > 0]
     ostrs = [None] * len(vals)
     for (idx, (ii, vv)) in enumerate(vals):
         if ii == 0:
@@ -17,6 +19,7 @@ def show_elm(val):
         else:
             ostrs[idx] = "0x%x * I^%d" % (vv, ii)
     return " + ".join(ostrs)
+
 
 def show_iso(iso):
     (xm, ym) = iso.rational_maps()
@@ -58,6 +61,8 @@ def show_iso(iso):
 
 # SECP256k1 iso
 _iso_secp256k1 = None
+
+
 def iso_secp256k1():
     global _iso_secp256k1
     if _iso_secp256k1 is not None:
@@ -75,8 +80,11 @@ def iso_secp256k1():
     _iso_secp256k1 = iso
     return iso
 
+
 # BLS12-381 G1 iso
 _iso_bls12381g1 = None
+
+
 def iso_bls12381g1():
     global _iso_bls12381g1
     if _iso_bls12381g1 is not None:
@@ -94,14 +102,17 @@ def iso_bls12381g1():
     _iso_bls12381g1 = iso
     return iso
 
+
 # BLS12-381 G2 iso
 _iso_bls12381g2 = None
+
+
 def iso_bls12381g2():
     global _iso_bls12381g2
     if _iso_bls12381g2 is not None:
         return _iso_bls12381g2
     p = 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab
-    F.<II> = GF(p^2, modulus=[1,0,1])
+    F. < II > = GF(p^2, modulus=[1, 0, 1])
     A = 0
     B = 4 * (1 + II)
     E = EllipticCurve(F, [A, B])
@@ -114,6 +125,7 @@ def iso_bls12381g2():
         iso.switch_sign()
     _iso_bls12381g2 = iso
     return iso
+
 
 if __name__ == "__main__":
     print("** SECP256k1\n")

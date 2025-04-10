@@ -11,6 +11,7 @@ except ImportError as e:
 
 CONTEXT_STRING = b'yellow submarine' * 2
 
+
 def test_vector(test_vector_function):
     from sagelib.groups import GroupP384 as group
     from sagelib.sigma_protocols import NISchnorrProof
@@ -20,8 +21,9 @@ def test_vector(test_vector_function):
         test_vector_name = f"{test_vector_function.__name__}"
 
         instance, witness = test_vector_function(rng, group)
-        narg_string = NISchnorrProof(CONTEXT_STRING, instance).prove(witness, rng)
-        assert  NISchnorrProof(CONTEXT_STRING, instance).verify(narg_string)
+        narg_string = NISchnorrProof(
+            CONTEXT_STRING, instance).prove(witness, rng)
+        assert NISchnorrProof(CONTEXT_STRING, instance).verify(narg_string)
         hex_narg_string = narg_string.hex()
         print(f"{test_vector_name} narg_string: {hex_narg_string}\n")
 
@@ -33,6 +35,7 @@ def test_vector(test_vector_function):
 
     return inner
 
+
 def wrap_write(fh, *args):
     assert args
     line_length = 68
@@ -41,8 +44,10 @@ def wrap_write(fh, *args):
         if hunk and len(hunk.strip()) > 0:
             fh.write(hunk + "\n")
 
+
 def write_value(fh, name, value):
     wrap_write(fh, name + ' = ' + value)
+
 
 def write_group_vectors(fh, label, vector):
     print("## ", label, file=fh)
@@ -50,6 +55,7 @@ def write_group_vectors(fh, label, vector):
     for key in vector:
         write_value(fh, key, vector[key])
     print("~~~", file=fh, end="\n\n")
+
 
 @test_vector
 def discrete_logarithm(rng, group):
@@ -75,6 +81,7 @@ def discrete_logarithm(rng, group):
 
     return statement, [x]
 
+
 @test_vector
 def dleq(rng, group):
     """
@@ -99,6 +106,7 @@ def dleq(rng, group):
     assert [X, Y] == statement.morphism([x])
     return statement, [x]
 
+
 @test_vector
 def pedersen_commitment(rng, group):
     """
@@ -121,6 +129,7 @@ def pedersen_commitment(rng, group):
     statement.append_equation(var_C, [(var_x, var_G), (var_r, var_H)])
 
     return statement, witness
+
 
 @test_vector
 def pedersen_commitment_dleq(rng, group):
@@ -169,15 +178,16 @@ def bss_blind_commitment_computation(rng, group):
     # BBS.create_generators(M + 1, "BLIND_" || api_id)
     (Q_2, J_1, J_2, J_3) = [group.random(rng) for i in range(M+1)]
     # BBS.messages_to_scalars(committed_messages,  api_id)
-    (msg_1, msg_2, msg_3) =  [group.ScalarField.random(rng) for i in range(M)]
+    (msg_1, msg_2, msg_3) = [group.ScalarField.random(rng) for i in range(M)]
 
-    ## these are computed before the proof in the specification
+    # these are computed before the proof in the specification
     secret_prover_blind = group.ScalarField.random(rng)
     C = secret_prover_blind * Q_2 + msg_1 * J_1 + msg_2 * J_2 + msg_3 * J_3
 
-    ## This is the part that needs to be changed in the specification of blind bbs.
+    # This is the part that needs to be changed in the specification of blind bbs.
     statement = GroupMorphismPreimage(group)
-    [var_secret_prover_blind, var_msg_1, var_msg_2, var_msg_3] = statement.allocate_scalars(M+1)
+    [var_secret_prover_blind, var_msg_1, var_msg_2,
+        var_msg_3] = statement.allocate_scalars(M+1)
     [var_Q_2, var_J_1, var_J_2, var_J_3] = statement.allocate_elements(M+1)
     var_C, = statement.allocate_elements(1)
     statement.set_elements([(var_Q_2, Q_2),
@@ -185,7 +195,7 @@ def bss_blind_commitment_computation(rng, group):
                             (var_J_2, J_2),
                             (var_J_3, J_3),
                             (var_C, C)
-    ])
+                            ])
 
     statement.append_equation(
         var_C, [
@@ -204,6 +214,7 @@ def test_and_composition():
     from sagelib.sigma_protocols import SigmaProtocol, SchnorrProof
     from sagelib.sigma_protocols import NISigmaProtocol
     from sagelib.fiat_shamir import KeccakDuplexSpongeP384
+
     class AndProof(SigmaProtocol, SchnorrProof):
         ProverState: list[SchnorrProof.ProverState]
 
@@ -240,10 +251,6 @@ def test_and_composition():
         ProverState = KeccakDuplexSpongeP384
 
 
-
-
-
-
 def main(path="vectors"):
     vectors = {}
     test_vectors = [
@@ -262,6 +269,7 @@ def main(path="vectors"):
     with open(path + "/allVectors.txt", 'wt') as f:
         for proof_type in vectors:
             write_group_vectors(f, proof_type, vectors[proof_type])
+
 
 if __name__ == "__main__":
     main()

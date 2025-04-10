@@ -18,6 +18,7 @@ Bp = F(1)
 a = F(1)        # a * v^2 + w^2 = 1 + d * v^2 * w^2
 d = F(-39081)
 
+
 def m2e_448(P):
     (u, v, z) = P
     u = F(u)
@@ -36,26 +37,29 @@ def m2e_448(P):
         return (0, 1, 0)
     return (xn / xd, yn / yd, 1)
 
+
 def monty_suite(suite_name, is_ro):
     dst = test_dst(suite_name)
     k = 224
     expander = XOFExpander(dst, hashlib.shake_256, k)
     return BasicH2CSuiteDef("curve448", F, Ap, Bp, expander, hashlib.shake_256, 84, None, 4, k, is_ro, expander.dst)
 
+
 def edw_suite(suite_name, is_ro):
-    return EdwH2CSuiteDef(monty_suite(suite_name, is_ro)._replace(E="edwards448",Aa=a, Bd=d), Ap, Bp, m2e_448)
+    return EdwH2CSuiteDef(monty_suite(suite_name, is_ro)._replace(E="edwards448", Aa=a, Bd=d), Ap, Bp, m2e_448)
+
 
 suite_name = "edwards448_XOF:SHAKE256_ELL2_RO_"
-edw448_hash_ro = EdwH2CSuite(suite_name,edw_suite(suite_name, True))
+edw448_hash_ro = EdwH2CSuite(suite_name, edw_suite(suite_name, True))
 
 suite_name = "curve448_XOF:SHAKE256_ELL2_RO_"
-monty448_hash_ro = MontyH2CSuite(suite_name,monty_suite(suite_name, True))
+monty448_hash_ro = MontyH2CSuite(suite_name, monty_suite(suite_name, True))
 
 suite_name = "edwards448_XOF:SHAKE256_ELL2_NU_"
-edw448_hash_nu = EdwH2CSuite(suite_name,edw_suite(suite_name, False))
+edw448_hash_nu = EdwH2CSuite(suite_name, edw_suite(suite_name, False))
 
 suite_name = "curve448_XOF:SHAKE256_ELL2_NU_"
-monty448_hash_nu = MontyH2CSuite(suite_name,monty_suite(suite_name, False))
+monty448_hash_nu = MontyH2CSuite(suite_name, monty_suite(suite_name, False))
 
 assert edw448_hash_ro.m2c.Z == edw448_hash_nu.m2c.Z == -1
 assert monty448_hash_ro.m2c.Z == monty448_hash_nu.m2c.Z == -1
@@ -72,6 +76,7 @@ edwards449_F = F
 edwards449_A = a
 edwards449_B = a
 
+
 def test_suite_448():
     _test_suite(edw448_hash_ro, monty448_hash_ro, m2e_448, group_order)
     _test_suite(edw448_hash_nu, monty448_hash_nu, m2e_448, group_order)
@@ -80,6 +85,7 @@ def test_suite_448():
     _test_suite(EdwH2CSuite(suite_name, edw_suite(suite_name, True)),
                 MontyH2CSuite(suite_name, monty_suite(suite_name, True)),
                 m2e_448, group_order, nreps=128, is_equal=True)
+
 
 if __name__ == "__main__":
     test_suite_448()

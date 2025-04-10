@@ -8,6 +8,7 @@ try:
 except ImportError:
     sys.exit("Error loading preprocessed sage files. Try running `make clean pyfiles`")
 
+
 class OptimizedSSWU_5mod8(OptimizedSSWU):
     def __init__(self, F, A, B):
         assert F.order() % 8 == 5
@@ -86,6 +87,7 @@ class OptimizedSSWU_5mod8(OptimizedSSWU):
         for _ in range(0, 256):
             self.test_map()
 
+
 def test_sswu_5mod8():
     print("Testing random curves (q = 5 mod 8): ", end="")
     for _ in range(0, 8):
@@ -99,6 +101,7 @@ def test_sswu_5mod8():
         sys.stdout.write('.')
         sys.stdout.flush()
     print()
+
 
 if __name__ == "__main__":
     test_sswu_5mod8()

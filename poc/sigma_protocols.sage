@@ -3,6 +3,7 @@ from collections import namedtuple
 
 from sagelib.fiat_shamir import KeccakDuplexSpongeP384
 
+
 class SigmaProtocol(ABC):
     """
     This is the abstract API of a Sigma protocol.
@@ -36,6 +37,7 @@ class SigmaProtocol(ABC):
     def simulate_commitment(self, response, challenge):
         raise NotImplementedError
 
+
 class NISigmaProtocol:
     """
     The generic Fiat-Shamir Transform for the Sigma protocol `Protocol`
@@ -50,7 +52,8 @@ class NISigmaProtocol:
 
     def prove(self, witness, rng):
         (prover_state, commitment) = self.sp.prover_commit(witness, rng)
-        challenge = self.hash_state.prover_message(commitment).verifier_challenge()
+        challenge = self.hash_state.prover_message(
+            commitment).verifier_challenge()
         response = self.sp.prover_response(prover_state, challenge)
 
         assert self.sp.verifier(commitment, challenge, response)
@@ -58,7 +61,8 @@ class NISigmaProtocol:
 
     def verify(self, proof):
         commitment, response = self.sp.deserialize_batchable(proof)
-        challenge = self.hash_state.prover_message(commitment).verifier_challenge()
+        challenge = self.hash_state.prover_message(
+            commitment).verifier_challenge()
         return self.sp.verifier(commitment, challenge, response)
 
 
@@ -66,7 +70,8 @@ class Morphism:
     """
     This class describes a linear morphism of [Maurer09].
     """
-    LinearCombination = namedtuple("LinearCombination", ["scalar_indices", "element_indices"])
+    LinearCombination = namedtuple(
+        "LinearCombination", ["scalar_indices", "element_indices"])
     Group = None
 
     def __init__(self, group):
@@ -89,8 +94,10 @@ class Morphism:
     def __call__(self, scalars):
         image = []
         for linear_combination in self.linear_combinations:
-            coefficients = [scalars[i] for i in linear_combination.scalar_indices]
-            elements = [self.group_elements[i] for i in linear_combination.element_indices]
+            coefficients = [scalars[i]
+                            for i in linear_combination.scalar_indices]
+            elements = [self.group_elements[i]
+                        for i in linear_combination.element_indices]
 
             image.append(self.Group.msm(coefficients, elements))
         return image
@@ -118,12 +125,14 @@ class GroupMorphismPreimage:
         self._image.append(lhs)
 
     def allocate_scalars(self, n: int):
-        indices = list(range(self.morphism.num_scalars, self.morphism.num_scalars + n))
+        indices = list(range(self.morphism.num_scalars,
+                       self.morphism.num_scalars + n))
         self.morphism.num_scalars += n
         return indices
 
     def allocate_elements(self, n: int):
-        indices = list(range(self.morphism.num_elements, self.morphism.num_elements + n))
+        indices = list(range(self.morphism.num_elements,
+                       self.morphism.num_elements + n))
         self.morphism.group_elements.extend([None] * n)
         self.morphism.num_elements += n
         return indices
@@ -184,7 +193,7 @@ class SchnorrProof(SigmaProtocol):
         commitment_bytes = encoded[: self.instance.commit_bytes_len]
         commitment = self.instance.Image.deserialize(commitment_bytes)
 
-        response_bytes = encoded[self.instance.commit_bytes_len :]
+        response_bytes = encoded[self.instance.commit_bytes_len:]
         response = self.instance.Domain.deserialize(response_bytes)
 
         return (commitment, response)

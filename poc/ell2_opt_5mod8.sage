@@ -8,6 +8,7 @@ try:
 except ImportError:
     sys.exit("Error loading preprocessed sage files. Try running `make clean pyfiles`")
 
+
 class OptimizedEll2_K1_5mod8(object):
     def __init__(self, F, J):
         assert F.order() % 8 == 5
@@ -78,7 +79,7 @@ class OptimizedEll2_K1_5mod8(object):
         xn = CMOV(x2n, x1n, e3)  # If e3, x = x1, else x = x2
         y = CMOV(y2, y1, e3)    # If e3, y = y1, else y = y2
         e4 = sgn0(y) == 1        # Fix sign of y
-        y = CMOV(y, -y, e3 ^^ e4)
+        y = CMOV(y, -y, e3^^ e4)
         return (xn, xd, y, 1)
 
     def test_map(self, u=None):
@@ -101,6 +102,7 @@ class OptimizedEll2_K1_5mod8(object):
             self.test_map(und)
         for _ in range(0, 256):
             self.test_map()
+
 
 class OptimizedEll2_5mod8(object):
     def __init__(self, F, J, K):
@@ -181,7 +183,7 @@ class OptimizedEll2_5mod8(object):
         xn = xn * K
         y = CMOV(y2, y1, e3)    # If e3, y = y1, else y = y2
         e4 = sgn0(y) == 1        # Fix sign of y
-        y = CMOV(y, -y, e3 ^^ e4)
+        y = CMOV(y, -y, e3^^ e4)
         y = y * K
         return (xn, xd, y, 1)
 
@@ -207,12 +209,14 @@ class OptimizedEll2_5mod8(object):
         for _ in range(0, 256):
             self.test_map()
 
+
 p_25519 = 2^255 - 19
 F_25519 = GF(p_25519)
 J_25519 = F_25519(486662)
 K_25519 = F_25519(1)
 test_curve25519 = OptimizedEll2_K1_5mod8(F_25519, J_25519)
 test2_curve25519 = OptimizedEll2_5mod8(F_25519, J_25519, K_25519)
+
 
 def map_to_curve_elligator2_edwards25519(u):
     F = test_curve25519.F
@@ -236,6 +240,7 @@ def map_to_curve_elligator2_edwards25519(u):
     yd = CMOV(yd, 1, e)
     return (xn, xd, yn, yd)
 
+
 def curve25519_to_edwards25519(u, v, _):
     F = test_curve25519.F
     c1 = sqrt(F(-486664))
@@ -250,6 +255,7 @@ def curve25519_to_edwards25519(u, v, _):
 
     return (x, y)
 
+
 def test_edwards25519(u=None):
     F = test_curve25519.F
     a = F(-1)
@@ -261,9 +267,11 @@ def test_edwards25519(u=None):
     x = xn / xd
     y = yn / yd
     assert a * x^2 + y^2 == 1 + d * x^2 * y^2
-    (xp, yp) = curve25519_to_edwards25519(*test_curve25519.ref_map.map_to_curve(u))
+    (xp, yp) = curve25519_to_edwards25519(
+        *test_curve25519.ref_map.map_to_curve(u))
     assert xp == x
     assert yp == y
+
 
 def test_ell2_25519():
     print("Testing curve25519 and edwards25519")
@@ -279,6 +287,7 @@ def test_ell2_25519():
         test_curve25519.test_map()
         test2_curve25519.test_map()
         test_edwards25519()
+
 
 def test_ell2_K1_5mod8_random():
     print("Testing random curves (q = 5 mod 8, K == 1): ", end="")
@@ -298,6 +307,7 @@ def test_ell2_K1_5mod8_random():
         sys.stdout.write('.')
         sys.stdout.flush()
     print()
+
 
 def test_ell2_5mod8_random():
     print("Testing random curves (q = 5 mod 8, K != 1): ", end="")
@@ -319,10 +329,12 @@ def test_ell2_5mod8_random():
         sys.stdout.flush()
     print()
 
+
 def test_ell2_5mod8():
     test_ell2_25519()
     test_ell2_K1_5mod8_random()
     test_ell2_5mod8_random()
+
 
 if __name__ == "__main__":
     test_ell2_5mod8()

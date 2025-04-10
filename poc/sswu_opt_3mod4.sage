@@ -8,6 +8,7 @@ try:
 except ImportError:
     sys.exit("Error loading preprocessed sage files. Try running `make clean pyfiles`")
 
+
 class OptimizedSSWU_3mod4(OptimizedSSWU):
     def __init__(self, F, A, B):
         assert F.order() % 4 == 3
@@ -69,6 +70,7 @@ class OptimizedSSWU_3mod4(OptimizedSSWU):
         for _ in range(0, 256):
             self.test_map()
 
+
 p_p256 = 2^256 - 2^224 + 2^192 + 2^96 - 1
 F_p256 = GF(p_p256)
 B_p256 = 0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b
@@ -103,6 +105,7 @@ Bp_bls12381g1 = 0x12e2908d11688030018b12e8753eee3b2016c1f0f24f4070a0b9c14fcef35e
 test_bls12381g1 = OptimizedSSWU_3mod4(F_bls12381, Ap_bls12381g1, Bp_bls12381g1)
 assert test_bls12381g1.Z == F_bls12381(11)
 
+
 def test_sswu_3mod4():
     print("Testing P-256")
     test_p256.test()
@@ -114,6 +117,7 @@ def test_sswu_3mod4():
     test_secp256k1.test()
     print("Testing BLS12-381 G1 isogeny")
     test_bls12381g1.test()
+
 
 if __name__ == "__main__":
     test_sswu_3mod4()

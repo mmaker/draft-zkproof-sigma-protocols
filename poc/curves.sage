@@ -39,6 +39,7 @@ class PointBase(object):
     def curve(self):
         return self.E
 
+
 class CurveBase(object):
     _add = None
     _dbl = None
@@ -63,7 +64,8 @@ class CurveBase(object):
 
     def add(self, p, q):
         ret = self._add(p, q)
-        assert self.to_weierstrass(ret) == self.to_weierstrass(p) + self.to_weierstrass(q)
+        assert self.to_weierstrass(ret) == self.to_weierstrass(
+            p) + self.to_weierstrass(q)
         return ret
 
     def dbl(self, p):
@@ -112,8 +114,8 @@ class CurveBase(object):
             points_W.append(P)
             points_M.append(PP)
 
-        sumW = sum( points_W[1:], points_W[0] )
-        sumM = sum( points_M[1:], points_M[0] )
+        sumW = sum(points_W[1:], points_W[0])
+        sumM = sum(points_M[1:], points_M[0])
         assert sumM == EllM.to_self(sumW)
         assert sumW == EllM.to_weierstrass(sumM)
 
@@ -128,6 +130,7 @@ class CurveBase(object):
             QQ = PP * r
             assert EllM.to_weierstrass(QQ) == Q
             assert EllM.to_self(Q) == QQ
+
 
 class MontgomeryPoint(PointBase):
     def __init__(self, E, x, y, z):
@@ -145,7 +148,8 @@ class MontgomeryPoint(PointBase):
             z = F(1)
             A = F(E.A)
             B = F(E.B)
-            assert B * y^2 == x^3 + A * x^2 + x, "point (%d, %d) is not on %s" % (x, y, str(E))
+            assert B * y^2 == x^3 + A * x^2 + \
+                x, "point (%d, %d) is not on %s" % (x, y, str(E))
         self.E = E
         self.x = x
         self.y = y
@@ -166,6 +170,7 @@ class MontgomeryPoint(PointBase):
 
     def __neg__(self):
         return self.E(self.x, -self.y, self.z)
+
 
 class MontgomeryCurve(CurveBase):
     PointT = MontgomeryPoint
@@ -205,7 +210,8 @@ class MontgomeryCurve(CurveBase):
         B = self.B
         A = self.A
         x3 = B * (y2 - y1)^2 / (x2 - x1)^2 - A - x1 - x2
-        y3 = (2 * x1 + x2 + A) * (y2 - y1) / (x2 - x1) - B * (y2 - y1)^3 / (x2 - x1)^3 - y1
+        y3 = (2 * x1 + x2 + A) * (y2 - y1) / (x2 - x1) - \
+            B * (y2 - y1)^3 / (x2 - x1)^3 - y1
         return self(x3, y3)
 
     def _dbl(self, p):
@@ -235,6 +241,7 @@ class MontgomeryCurve(CurveBase):
                 Ap = None
         return cls(F, Ap, Bp)
 
+
 class EdwardsPoint(PointBase):
     def __init__(self, E, x, y, z):
         F = E.F
@@ -251,7 +258,8 @@ class EdwardsPoint(PointBase):
             z = F(1)
             a = F(E.a)
             d = F(E.d)
-            assert a * x^2 + y^2 == 1 + d * x^2 * y^2, "point (%d, %d) is not on %s" % (x, y, str(E))
+            assert a * x^2 + y^2 == 1 + d * x^2 * \
+                y^2, "point (%d, %d) is not on %s" % (x, y, str(E))
         self.E = E
         self.x = x
         self.y = y
@@ -272,6 +280,7 @@ class EdwardsPoint(PointBase):
 
     def __neg__(self):
         return self.E(-self.x, self.y, self.z)
+
 
 class EdwardsCurve(CurveBase):
     PointT = EdwardsPoint
@@ -370,6 +379,7 @@ class EdwardsCurve(CurveBase):
             elif cls.force_complete and (not a.is_square() or d.is_square()):
                 a = None
         return cls(F, a, d)
+
 
 if __name__ == "__main__":
     MontgomeryCurve.test()

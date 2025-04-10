@@ -9,6 +9,7 @@ try:
 except ImportError:
     sys.exit("Error loading preprocessed sage files. Try running `make clean pyfiles`")
 
+
 class GenericEll2Edw(GenericMap):
     def __init__(self, F, a, d):
         self.F = F
@@ -82,7 +83,8 @@ class GenericEll2Edw(GenericMap):
     def map_to_curve(self, u):
         (v1, w1) = self.straight_line(u)
         (v2, w2) = self.not_straight_line(u)
-        assert (v1, w1) == (v2, w2), "straight-line / non-straight-line mismatch"
+        assert (v1, w1) == (
+            v2, w2), "straight-line / non-straight-line mismatch"
         assert self.a * v1^2 + w1^2 == 1 + self.d * v1^2 * w1^2
         (x, y) = self.to_weierstrass(v1, w1)
         ret = self.ell2_map.map_to_curve(u)
@@ -100,6 +102,7 @@ class GenericEll2Edw(GenericMap):
             self.test_map(*undef)
         for undef in self.ell2_map.undefs:
             self.map_to_curve(undef)
+
 
 if __name__ == "__main__":
     for _ in range(0, 32):

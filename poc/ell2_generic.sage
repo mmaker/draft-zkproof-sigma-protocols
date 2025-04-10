@@ -9,6 +9,7 @@ try:
 except ImportError:
     sys.exit("Error loading preprocessed sage files. Try running `make clean pyfiles`")
 
+
 class GenericEll2(GenericMap):
     def __init__(self, F, J, K):
         self.name = "ELL2"
@@ -21,7 +22,8 @@ class GenericEll2(GenericMap):
             raise ValueError("Ell2 requires K != 0")
         test = (J^2 - 4) / (K^2)
         if test == 0 or test.is_square():
-            raise ValueError("Ell2 requires (J^2 - 4) / K^2 != 0 and nonsquare")
+            raise ValueError(
+                "Ell2 requires (J^2 - 4) / K^2 != 0 and nonsquare")
         self.J = J
         self.K = K
         self.Z = find_z_ell2(F)
@@ -105,6 +107,7 @@ class GenericEll2(GenericMap):
         s = x * K
         t = y * K
         return (s, t)
+
 
 if __name__ == "__main__":
     for _ in range(0, 32):

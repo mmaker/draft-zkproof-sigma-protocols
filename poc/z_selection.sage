@@ -26,6 +26,8 @@ def find_z_sswu(F, A, B):
 
 # Argument:
 # - F, a field object, e.g., F = GF(2^255 - 19)
+
+
 def find_z_ell2(F):
     ctr = F.gen()
     while True:
@@ -39,9 +41,11 @@ def find_z_ell2(F):
 # Arguments:
 # - F, a field object, e.g., F = GF(2^521 - 1)
 # - A and B, the coefficients of the curve y^2 = x^3 + A * x + B
+
+
 def find_z_svdw(F, A, B, init_ctr=1):
-    g = lambda x: F(x)^3 + F(A) * F(x) + F(B)
-    h = lambda Z: -(F(3) * Z^2 + F(4) * A) / (F(4) * g(Z))
+    def g(x): return F(x)^3 + F(A) * F(x) + F(B)
+    def h(Z): return -(F(3) * Z^2 + F(4) * A) / (F(4) * g(Z))
     # NOTE: if init_ctr=1 fails to find Z, try setting it to F.gen()
     ctr = init_ctr
     while True:
