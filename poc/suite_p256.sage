@@ -4,13 +4,10 @@
 import hashlib
 import sys
 from hash_to_field import XMDExpander
-try:
-    from sagelib.common import test_dst
-    from sagelib.h2c_suite import BasicH2CSuiteDef, BasicH2CSuite
-    from sagelib.svdw_generic import GenericSvdW
-    from sagelib.sswu_generic import GenericSSWU
-except ImportError:
-    sys.exit("Error loading preprocessed sage files. Try running `make clean pyfiles`")
+from sagelib.common import test_dst
+from sagelib.h2c_suite import BasicH2CSuiteDef, BasicH2CSuite
+from sagelib.svdw_generic import GenericSvdW
+from sagelib.sswu_generic import GenericSSWU
 
 p = 2^256 - 2^224 + 2^192 + 2^96 - 1
 F = GF(p)

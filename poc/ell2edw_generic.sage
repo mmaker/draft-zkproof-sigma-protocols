@@ -2,12 +2,9 @@
 # vim: syntax=python
 
 import sys
-try:
-    from sagelib.common import CMOV
-    from sagelib.ell2_generic import GenericEll2
-    from sagelib.generic_map import GenericMap
-except ImportError:
-    sys.exit("Error loading preprocessed sage files. Try running `make clean pyfiles`")
+from sagelib.common import CMOV
+from sagelib.ell2_generic import GenericEll2
+from sagelib.generic_map import GenericMap
 
 
 class GenericEll2Edw(GenericMap):

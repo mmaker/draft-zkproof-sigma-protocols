@@ -1,14 +1,9 @@
 #!/usr/bin/sage
 # vim: syntax=python
 
-import sys
-try:
-    from sagelib.common import CMOV
-    from sagelib.generic_map import GenericMap
-    from sagelib.z_selection import find_z_svdw
-except ImportError:
-    sys.exit("Error loading preprocessed sage files. Try running `make clean pyfiles`")
-
+from sagelib.common import CMOV
+from sagelib.generic_map import GenericMap
+from sagelib.z_selection import find_z_svdw
 
 class GenericSvdW(GenericMap):
     def __init__(self, F, A, B):

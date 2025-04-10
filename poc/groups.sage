@@ -8,15 +8,11 @@ from abc import ABC, abstractmethod
 
 from hash_to_field import I2OSP, OS2IP, expand_message_xmd, expand_message_xof, XMDExpander, hash_to_field
 
-try:
-    from sagelib.suite_p256 import p256_sswu_ro, p256_order, p256_p, p256_F, p256_A, p256_B
-    from sagelib.suite_p384 import p384_sswu_ro, p384_order, p384_p, p384_F, p384_A, p384_B
-    from sagelib.suite_p521 import p521_sswu_ro, p521_order, p521_p, p521_F, p521_A, p521_B
-    from sagelib.common import sgn0
-    from sagelib.ristretto_decaf import Ed25519Point, Ed448GoldilocksPoint
-except ImportError as e:
-    sys.exit("Error loading preprocessed sage files. Try running `make setup && make clean pyfiles`. Full error: " + e)
-
+from sagelib.suite_p256 import p256_sswu_ro, p256_order, p256_p, p256_F, p256_A, p256_B
+from sagelib.suite_p384 import p384_sswu_ro, p384_order, p384_p, p384_F, p384_A, p384_B
+from sagelib.suite_p521 import p521_sswu_ro, p521_order, p521_p, p521_F, p521_A, p521_B
+from sagelib.common import sgn0
+from sagelib.ristretto_decaf import Ed25519Point, Ed448GoldilocksPoint
 
 class Scalar(ABC):
     def __new__(cls, order, *args, **kwargs):

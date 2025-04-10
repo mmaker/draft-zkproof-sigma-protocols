@@ -2,10 +2,7 @@
 # vim: syntax=python
 
 import sys
-try:
-    from sagelib.common import sgn0, square_root, square_root_random_sign
-except ImportError:
-    sys.exit("Error loading preprocessed sage files. Try running `make clean pyfiles`")
+from sagelib.common import sgn0, square_root, square_root_random_sign
 
 
 class GenericMap(object):

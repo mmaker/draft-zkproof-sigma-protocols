@@ -2,11 +2,8 @@
 # vim: syntax=python
 
 import sys
-try:
-    from sagelib.common import CMOV, sgn0, square_root_random_sign
-    from sagelib.ell2_generic import GenericEll2
-except ImportError:
-    sys.exit("Error loading preprocessed sage files. Try running `make clean pyfiles`")
+from sagelib.common import CMOV, sgn0, square_root_random_sign
+from sagelib.ell2_generic import GenericEll2
 
 
 class OptimizedEll2_K1_3mod4(object):

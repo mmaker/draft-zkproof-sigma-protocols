@@ -1,10 +1,7 @@
 #!/usr/bin/sage
 # vim: syntax=python
 
-try:
-    from sagelib.common import ZZR
-except ImportError:
-    sys.exit("Error loading preprocessed sage files. Try running `make clean pyfiles`")
+from sagelib.common import ZZR
 
 # base field characteristic equation
 b12p = (x^2 - 2 * x + 1) * (x^4 - x^2 + 1)/3 + x

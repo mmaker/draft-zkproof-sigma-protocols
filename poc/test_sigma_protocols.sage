@@ -1,13 +1,9 @@
 #!/usr/bin/sage
 # vim: syntax=python
 
-try:
-    from sagelib.test_drng import TestDRNG
-    from sagelib.sigma_protocols import GroupMorphismPreimage
-    import json
-except ImportError as e:
-    import sys
-    sys.exit("Error loading preprocessed sage files. Try running `make setup && make clean pyfiles`. Full error: " + e)
+from sagelib.test_drng import TestDRNG
+from sagelib.sigma_protocols import GroupMorphismPreimage
+import json
 
 CONTEXT_STRING = b'yellow submarine' * 2
 

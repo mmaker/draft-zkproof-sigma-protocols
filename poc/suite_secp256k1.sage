@@ -4,15 +4,12 @@
 import hashlib
 import sys
 from hash_to_field import XMDExpander
-try:
-    from sagelib.common import test_dst
-    from sagelib.h2c_suite import BasicH2CSuiteDef, BasicH2CSuite, IsoH2CSuiteDef, IsoH2CSuite
-    from sagelib.svdw_generic import GenericSvdW
-    from sagelib.sswu_generic import GenericSSWU
-    from sagelib.suite_p256 import _test_suite
-    from sagelib.iso_values import iso_secp256k1
-except ImportError:
-    sys.exit("Error loading preprocessed sage files. Try running `make clean pyfiles`")
+from sagelib.common import test_dst
+from sagelib.h2c_suite import BasicH2CSuiteDef, BasicH2CSuite, IsoH2CSuiteDef, IsoH2CSuite
+from sagelib.svdw_generic import GenericSvdW
+from sagelib.sswu_generic import GenericSSWU
+from sagelib.suite_p256 import _test_suite
+from sagelib.iso_values import iso_secp256k1
 
 p = 2^256 - 2^32 - 2^9 - 2^8 - 2^7 - 2^6 - 2^4 - 1
 F = GF(p)
