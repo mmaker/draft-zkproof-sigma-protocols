@@ -1,7 +1,6 @@
 #!/usr/bin/sage
 # vim: syntax=python
 
-import sys
 from sagelib.common import sgn0, square_root, square_root_random_sign
 
 

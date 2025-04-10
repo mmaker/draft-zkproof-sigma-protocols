@@ -1,12 +1,11 @@
 #!/usr/bin/sage
 # vim: syntax=python
 
-import sys
 import hashlib
 import struct
 from abc import ABC, abstractmethod
 
-from hash_to_field import I2OSP, OS2IP, expand_message_xmd, expand_message_xof, XMDExpander, hash_to_field
+from hash_to_field import I2OSP, OS2IP, XMDExpander
 
 from sagelib.suite_p256 import p256_sswu_ro, p256_order, p256_p, p256_F, p256_A, p256_B
 from sagelib.suite_p384 import p384_sswu_ro, p384_order, p384_p, p384_F, p384_A, p384_B

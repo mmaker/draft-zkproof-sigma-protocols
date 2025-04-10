@@ -1,7 +1,6 @@
 #!/usr/bin/sage
 # vim: syntax=python
 
-import sys
 from sagelib.common import CMOV
 from sagelib.ell2_generic import GenericEll2
 from sagelib.generic_map import GenericMap

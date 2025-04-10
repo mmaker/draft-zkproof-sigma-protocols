@@ -2,7 +2,6 @@
 # vim: syntax=python
 
 import hashlib
-import sys
 from hash_to_field import XMDExpander
 from sagelib.common import test_dst
 from sagelib.h2c_suite import BasicH2CSuiteDef, BasicH2CSuite, IsoH2CSuiteDef, IsoH2CSuite

@@ -2,7 +2,6 @@
 # vim: syntax=python
 
 import binascii
-import random
 import hashlib
 from hash_to_field import hash_to_field, expand_message_xmd, expand_message_xof
 
