@@ -1,0 +1,2007 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>Sigma Protocols</title>
+<meta content="Michele Orrù" name="author">
+<meta content="Cathie Yun" name="author">
+<meta content="
+       This document describes Sigma protocols, a secure, general-purpose non-interactive zero-knowledge proof of knowledge. Concretely, the scheme allows proving knowledge of a witness, without revealing any information about the undisclosed messages or the signature itself, while at the same time, guarantying soundness of the overall protocols. 
+    " name="description">
+<meta content="xml2rfc 3.28.1" name="generator">
+<meta content="zero-knowledge" name="keyword">
+<meta content="draft-orru-zkproof-sigma-protocols-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.28.1
+    Python 3.12.9
+    ConfigArgParse 1.7
+    google-i18n-address 3.1.1
+    intervaltree 3.1.0
+    Jinja2 3.1.6
+    lxml 5.3.0
+    platformdirs 4.3.7
+    pycountry 24.6.1
+    PyYAML 6.0.2
+    requests 2.32.3
+    setuptools 70.3.0
+    wcwidth 0.2.13
+-->
+<link href="draft-orru-zkproof-sigma-protocols.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  --font-title: "Sofia Sans Semi Condensed", sans-serif;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+section {
+  clear: both;
+}
+.section-number {
+  padding-right: 0.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 680;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1#title {
+  font-size: 32px;
+  line-height: 40px;
+  clear: both;
+}
+h1#title, h1#rfcnum {
+  margin: 1.5em 0 0.2em;
+}
+h1#rfcnum + h1#title {
+  margin: 0.2em 0;
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+}
+#abstract+p code, #abstract+p samp, #abstract+p tt {
+  font-size: 16px;
+  line-height: 0;
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+/* font-family isn't space-separated, but =~ will have to do */
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  border: none;
+  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+  display: table;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+  & :is(ol, ul) {
+    margin-left: 1em;
+  }
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+  & li {
+    margin-top: 0.5em;
+  }
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  margin: 0 0 0 2em;
+  & li {
+    margin: 0;
+    & :first-child { margin-top: 0; }
+    & :last-child { margin-bottom: 0; }
+  }
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+  &.olPercent {
+    --indent: 5ch;
+    & > dt {
+      min-width: calc(var(--indent) - 2ch);
+    }
+  }
+  &.olPercent > dt {
+    float: none;
+  }
+
+  dl > dd > & {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+  }
+}
+dl:not(.dlNewline) > dt {
+  float: left;
+  margin-right: 2ch;
+  min-width: 8ch;
+}
+dl > dd {
+  margin-bottom: .8em;
+  margin-left: var(--indent) !important; /* stupid element overrides */
+  min-height: 2ex;
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+  & > :is(:first-child, .break:first-child + *) {
+    margin-top: 0;
+  }
+  & > :is(:last-child) {
+    margin-bottom: 0;
+  }
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a, a[href].selfRef:hover {
+  text-decoration: none;
+}
+a[href] {
+  color: var(--link-color);
+}
+a[href].selfRef, .iref + a[href].internal {
+  color: var(--text-color);
+}
+a[href]:hover {
+  text-decoration: underline;
+}
+a[href].selfRef:hover {
+  background-color: var(--highlight-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+  caption-side: bottom;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) p {
+    margin: -2px 0;
+    max-height: 0;
+    transition: max-height 2s ease, margin 0.5s ease 0.5s;
+    overflow: hidden;
+  }
+  :is(#status-of-memo, #copyright):hover p,
+  :is(#status-of-memo, #copyright) h2:target ~ p {
+    margin: 0.5em 0;
+    max-height: 500px;
+    overflow: auto;
+  }
+  pre, svg {
+    display: inline-block;
+    /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+    overflow: auto hidden;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  width: auto;
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+}
+table.right {
+  margin-left: auto;
+}
+table.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+table.left {
+  margin-right: auto;
+}
+table .text-left {
+  text-align: left;
+}
+table .text-center {
+  text-align: center;
+}
+table .text-right {
+  text-align: right;
+}
+
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+table caption {
+  margin: 0;
+  padding: 3px 0 3px 1em;
+}
+table p {
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+  &[href] {
+    color: var(--pilcrow-weak);
+    &:hover { text-decoration: none; }
+  }
+}
+@media not print {
+  :hover > a.pilcrow {
+    opacity: 1;
+  }
+  a.pilcrow[href]:hover {
+    color: var(--pilcrow-strong);
+    background-color: transparent;
+  }
+}
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+  & dt {
+    width: var(--identifier-width);
+    min-width: var(--identifier-width);
+    clear: left;
+    float: left;
+    text-align: right;
+    margin-right: 1ch;
+  }
+  & dd {
+    margin: 0;
+    margin-left: calc(1em + var(--identifier-width)) !important;
+    min-width: 5em;
+  }
+  & .authors {
+    & .author {
+      display: inline-block;
+      margin-right: 1.5em;
+    }
+    & .org {
+      font-style: italic;
+    }
+  }
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+
+  & nav {
+    & ul {
+      margin: 0 0.5em 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    & li {
+      line-height: 1.3em;
+      margin: 2px 0;
+      padding-left: 1.2em;
+      text-indent: -1.2em;
+    }
+  }
+  & a.xref {
+    white-space: normal;
+  }
+}
+
+.references {
+  & > dt {
+    text-align: right;
+    font-weight: bold;
+    min-width: 10ch;
+    margin-right: 1.5ch;
+    &:target::before {
+      content: "⇒";
+      margin: 0 10px 0 -25px;
+    }
+  }
+  & > dd {
+    margin-left: 12ch !important;
+    overflow: visible;
+    & .refInstance {
+      margin-bottom: 0.8em;
+    }
+    & .ascii {
+      margin-bottom: 0.25em;
+    }
+  }
+}
+
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  max-width: 20em;
+  margin: 1em auto 1em 0;
+
+  & .nameRole {
+    font-weight: 700;
+    margin-left: 0;
+  }
+  & .label {
+    margin: 0.5em 0;
+  }
+  & .type {
+    display: none;
+  }
+  & .alternative-contact {
+    margin: 0.5em 0 0.25em 0;
+  }
+  & .non-ascii {
+    margin: 0 0 0 2em;
+  }
+  & div.left {
+    text-align: left;
+  }
+  & div.right {
+    text-align: right;
+  }
+}
+
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses > section {
+    column-count: 2;
+    column-gap: 20px;
+  }
+  #authors-addresses > section > h2 {
+    column-span: all;
+  }
+  /* hack for break-inside: avoid-column */
+  #authors-addresses address {
+    display: inline-block;
+    break-inside: avoid-column;
+  }
+}
+
+/* Comments */
+.rfcEditorRemove p:first-of-type {
+  font-style: italic;
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+
+@media screen {
+  #toc nav {
+    font-family: var(--font-title);
+    font-weight: 360;
+    & > ul { margin-bottom: 2em; }
+    & ul {
+      margin: 0 0 0 4px;
+      & :is(p, li) {
+        margin: 2px 0;
+      }
+    }
+  }
+  #toc a.toplink {
+    float: right;
+  }
+}
+@media not screen {
+  #toc a.toplink {
+    display: none;
+  }
+}
+
+
+/* TOC layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 1px 0 0 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 2px 0 2px 6px;
+    padding-right: 1em;
+    font-size: 18px;
+    line-height: 24px;
+    min-width: 190px;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+    &::before { /* css hamburger */
+      float: right;
+      position: relative;
+      width: 1em;
+      height: 1px;
+      left: -164px;
+      margin: 8px 0 0 0;
+      background: white none repeat scroll 0 0;
+      box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+      content: "";
+    }
+  }
+  #toc nav {
+    display: none;
+    background-color: var(--background-color);
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+  #toc.active {
+    opacity: 1;
+    & nav { display: block; }
+  }
+  /* Make the collapsed ToC header render white on gray also when it's a link */
+  #toc h2 a,
+  #toc h2 a:is(:link, :focus, :hover),
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+  #toc a.toplink {
+    margin: 2px 0.5em 0;
+  }
+}
+
+/* TOC layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 2em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+  #toc a.toplink {
+    margin: 8px 0.5em 0;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre, .vcard {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  :is(h2, h3, h4, h5, h6)+*, dd {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg :is([stroke="black"], [stroke^="#000"]) {
+  stroke: var(--text-color);
+}
+svg :is([stroke="white"], [stroke^="#fff"]) {
+  stroke: var(--background-color);
+}
+svg :is([fill="black"], [fill^="#000"], :not([fill])) {
+  fill: var(--text-color);
+}
+svg :is([fill="white"], [fill^="#fff"]) {
+  fill: var(--background-color);
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">Sigma Protocols</td>
+<td class="right">April 2025</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Orrù &amp; Yun</td>
+<td class="center">Expires 14 October 2025</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Network Working Group</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-orru-zkproof-sigma-protocols-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2025-04-12" class="published">12 April 2025</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Informational</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2025-10-14">14 October 2025</time></dd>
+<dt class="label-authors">Authors:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">M. Orrù</div>
+<div class="org">CNRS</div>
+</div>
+<div class="author">
+      <div class="author-name">C. Yun</div>
+<div class="org">Apple, Inc.</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">Sigma Protocols</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document describes Sigma protocols, a secure, general-purpose non-interactive zero-knowledge proof of knowledge. Concretely, the scheme allows proving knowledge of a witness, without revealing any information about the undisclosed messages or the signature itself, while at the same time, guarantying soundness of the overall protocols.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document">
+<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        The latest revision of this draft can be found at <span><a href="https://mmaker.github.io/stdsigma/draft-orru-zkproof-sigma-protocols.html">https://mmaker.github.io/stdsigma/draft-orru-zkproof-sigma-protocols.html</a></span>.
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-orru-zkproof-sigma-protocols/">https://datatracker.ietf.org/doc/draft-orru-zkproof-sigma-protocols/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/mmaker/stdsigma">https://github.com/mmaker/stdsigma</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 14 October 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2025 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-public-functions" class="internal xref">Public functions</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-proving-function" class="internal xref">Proving function</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
+                <p id="section-toc.1-1.2.2.2.1" class="keepWithNext"><a href="#section-2.2" class="auto internal xref">2.2</a>.  <a href="#name-verification" class="internal xref">Verification</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.3">
+                <p id="section-toc.1-1.2.2.3.1"><a href="#section-2.3" class="auto internal xref">2.3</a>.  <a href="#name-core-interface" class="internal xref">Core interface</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-sigma-protocols-over-prime-" class="internal xref">Sigma protocols over prime-order groups</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-schnorr-proofs" class="internal xref">Schnorr proofs</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1.2.1">
+                    <p id="section-toc.1-1.3.2.1.2.1.1"><a href="#section-3.1.1" class="auto internal xref">3.1.1</a>.  <a href="#name-public-proving-function" class="internal xref">Public proving function</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1.2.2">
+                    <p id="section-toc.1-1.3.2.1.2.2.1"><a href="#section-3.1.2" class="auto internal xref">3.1.2</a>.  <a href="#name-public-verification-functio" class="internal xref">Public verification function</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-group-abstraction" class="internal xref">Group abstraction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.1">
+                    <p id="section-toc.1-1.3.2.2.2.1.1"><a href="#section-3.2.1" class="auto internal xref">3.2.1</a>.  <a href="#name-group" class="internal xref">Group</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.2">
+                    <p id="section-toc.1-1.3.2.2.2.2.1"><a href="#section-3.2.2" class="auto internal xref">3.2.2</a>.  <a href="#name-scalar" class="internal xref">Scalar</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-witness-representation" class="internal xref">Witness representation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
+                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-constraints-for-preimage-of" class="internal xref">Constraints for preimage of a group morphism</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4.2.1">
+                    <p id="section-toc.1-1.3.2.4.2.1.1"><a href="#section-3.4.1" class="auto internal xref">3.4.1</a>.  <a href="#name-morphism-encoding" class="internal xref">Morphism encoding</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4.2.2">
+                    <p id="section-toc.1-1.3.2.4.2.2.1"><a href="#section-3.4.2" class="auto internal xref">3.4.2</a>.  <a href="#name-instantiation-of-the-constr" class="internal xref">Instantiation of the constraints</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4.2.3">
+                    <p id="section-toc.1-1.3.2.4.2.3.1"><a href="#section-3.4.3" class="auto internal xref">3.4.3</a>.  <a href="#name-morphism-mapping" class="internal xref">Morphism mapping</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5">
+                <p id="section-toc.1-1.3.2.5.1"><a href="#section-3.5" class="auto internal xref">3.5</a>.  <a href="#name-core-protocol" class="internal xref">Core protocol</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5.2.1">
+                    <p id="section-toc.1-1.3.2.5.2.1.1"><a href="#section-3.5.1" class="auto internal xref">3.5.1</a>.  <a href="#name-prover-procedures" class="internal xref">Prover procedures</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.6">
+                <p id="section-toc.1-1.3.2.6.1"><a href="#section-3.6" class="auto internal xref">3.6</a>.  <a href="#name-example-dleq-proofs" class="internal xref">Example: DLEQ proofs</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.7">
+                <p id="section-toc.1-1.3.2.7.1"><a href="#section-3.7" class="auto internal xref">3.7</a>.  <a href="#name-example-pedersen-commitment" class="internal xref">Example: Pedersen commitments</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.7.2.1">
+                    <p id="section-toc.1-1.3.2.7.2.1.1"><a href="#section-3.7.1" class="auto internal xref">3.7.1</a>.  <a href="#name-verifier-procedure" class="internal xref">Verifier procedure</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.7.2.2">
+                    <p id="section-toc.1-1.3.2.7.2.2.1"><a href="#section-3.7.2" class="auto internal xref">3.7.2</a>.  <a href="#name-statement-generation" class="internal xref">Statement generation</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-ciphersuites" class="internal xref">Ciphersuites</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-p-384" class="internal xref">P-384</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1.2.1">
+                    <p id="section-toc.1-1.4.2.1.2.1.1"><a href="#section-4.1.1" class="auto internal xref">4.1.1</a>.  <a href="#name-elliptic-curve-group-of-p-3" class="internal xref">Elliptic curve group of P-384 (secp384r1) NISTCurves</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1.2.2">
+                    <p id="section-toc.1-1.4.2.1.2.2.1"><a href="#section-4.1.2" class="auto internal xref">4.1.2</a>.  <a href="#name-scalar-field-of-p-384-secp3" class="internal xref">Scalar Field of P-384 (secp384r1)</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">A Sigma Protocol is a simple zero-knowledge proof of knowledge.
+Any sigma protocol must define three objects:<a href="#section-1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-1-2.1">
+          <p id="section-1-2.1.1">A commitment, sometimes also called a nonce. This message is computed by the prover.<a href="#section-1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-1-2.2">
+          <p id="section-1-2.2.1">A challenge, computed using the Fiat-Shamir transformation using a hash function.<a href="#section-1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-1-2.3">
+          <p id="section-1-2.3.1">A response, computed by the prover, which depends on the commitment and the challenge.<a href="#section-1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-1-3">A sigma protocol allows a <strong>prover</strong> to convince a <strong>verifier</strong> of the knowledge of a secret <strong>witness</strong> satisfying a <strong>statement</strong>.<a href="#section-1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="public-functions">
+<section id="section-2">
+      <h2 id="name-public-functions">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-public-functions" class="section-name selfRef">Public functions</a>
+      </h2>
+<p id="section-2-1">A sigma protocol provides the following two public functions.
+For how to implement these function in prime-order groups and elliptic curves, see <a href="#group-prove" class="auto internal xref">Section 3.1.1</a> and <a href="#group-verify" class="auto internal xref">Section 3.1.2</a>.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<div id="proving-function">
+<section id="section-2.1">
+        <h3 id="name-proving-function">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-proving-function" class="section-name selfRef">Proving function</a>
+        </h3>
+<div class="alignLeft art-text artwork" id="section-2.1-1">
+<pre>
+prove(domain_separator, statement, witness, rng)
+
+Inputs:
+
+- domain_separator, a unique 32-byte array uniquely indicating the protocol and the session being proven
+- statement, the instance being proven
+- witness, the witness for the given statement
+- rng, a cryptographic random number generator
+
+Outputs:
+
+- proof, a byte array.
+</pre><a href="#section-2.1-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="verification">
+<section id="section-2.2">
+        <h3 id="name-verification">
+<a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-verification" class="section-name selfRef">Verification</a>
+        </h3>
+<div class="alignLeft art-text artwork" id="section-2.2-1">
+<pre>
+verify(domain_separator, statement, proof)
+
+Inputs:
+
+- domain_separator, a unique 32-byte array uniquely indicating the protocol and the session being proven
+- statement, the instance being proven
+- proof, a byte array containing the cryptographic proof
+
+
+Outputs:
+
+- the verification bit, 1 indicating that the proof is accepted, 0 indicating that the proof is rejected.
+</pre><a href="#section-2.2-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="core-interface">
+<section id="section-2.3">
+        <h3 id="name-core-interface">
+<a href="#section-2.3" class="section-number selfRef">2.3. </a><a href="#name-core-interface" class="section-name selfRef">Core interface</a>
+        </h3>
+<p id="section-2.3-1">The public functions are obtained relying on an internal structure containing the definition of a sigma protocol.<a href="#section-2.3-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-2.3-2">
+<pre>
+class SigmaProtocol:
+   def new(instance: Statement) -&gt; SigmaProtocol
+   def prover_commit(self, witness: Witness) -&gt; (commitment, prover_state)
+   def prover_response(self, prover_state, challenge) -&gt; response
+   def verifier(self, commitment, challenge, response) -&gt; bool
+   # optional
+   def simulate_response() -&gt; response
+   # optional
+   def simulate_commitment(response, challenge) -&gt; commitment
+</pre><a href="#section-2.3-2" class="pilcrow">¶</a>
+</div>
+<p id="section-2.3-3">Where:<a href="#section-2.3-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2.3-4.1">
+            <p id="section-2.3-4.1.1"><code>new(domain_separator: [u8; 32], cs: GroupMorphismPreimage) -&gt; SigmaProtocol</code>, denoting the initialization function. This function takes as input a label identifying local context information (such as: session identifiers, to avoid replay attacks; protocol metadata, to avoid hijacking; optionally, a timestamp and some pre-shared randomness, to guarantee freshness of the proof) and an instance generated via the <code>GroupMorphismPreimage</code>, the public information shared between prover and verifier.
+This function should pre-compute parts of the statement, or initialize the state of the hash function.<a href="#section-2.3-4.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-2.3-4.2">
+            <p id="section-2.3-4.2.1"><code>prover_commit(self, witness: Witness) -&gt; (commitment, prover_state)</code>, denoting the <strong>commitment phase</strong>, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover and the statement to be proven. This step generally requires access to a high-quality entropy source to perform the commitment. Leakage of even just of a few bits of the commitment could allow for the complete recovery of the witness. The commitment is meant to be shared, while <code>prover_state</code> must be kept secret.<a href="#section-2.3-4.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-2.3-4.3">
+            <p id="section-2.3-4.3.1"><code>prover_response(self, prover_state, challenge) -&gt; response</code>, denoting the <strong>response phase</strong>, that is, the computation of the second message sent by the prover, depending on the witness, the statement, the challenge received from the verifier, and the internal state <code>prover_state</code>. The returned value <code>response</code> is meant to be shared.<a href="#section-2.3-4.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-2.3-4.4">
+            <p id="section-2.3-4.4.1"><code>verifier(self, commitment, challenge, response) -&gt; bool</code>, denoting the <strong>verifier algorithm</strong>. This method checks that the protocol transcript is valid for the given statement. The verifier algorithm outputs true if verification succeeds, or false if verification fails.<a href="#section-2.3-4.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-2.3-5">The final two algorithms describe the <strong>zero-knowledge simulator</strong> and are optional, as a sigma protocol is not necessarily zero-knowledge by definition. The simulator is primarily an efficient algorithm for proving zero-knowledge in a theoretical construction, but it is also needed for verifying short proofs and for or-composition, where a witness is not known and thus has to be simulated. We have:<a href="#section-2.3-5" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2.3-6.1">
+            <p id="section-2.3-6.1.1"><code>simulate_response() -&gt; response</code>, denoting the first stage of the simulator. It is an algorithm drawing a random response that follows the same output distribution of the algorithm  <code>prover_response</code>.<a href="#section-2.3-6.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-2.3-6.2">
+            <p id="section-2.3-6.2.1"><code>simulate_commitment(response, challenge) -&gt; commitment</code>, returning a simulated commitment -- the second phase of the zero-knowledge simulator.<a href="#section-2.3-6.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-2.3-7">Together, these zero-knowledge simulators provide a transcript that should be computationally indistinguishable from the transcript generated by running the original sigma protocol.<a href="#section-2.3-7" class="pilcrow">¶</a></p>
+<p id="section-2.3-8">The abstraction <code>SigmaProtocol</code> allows implementing different types of statements and combiners of those, such as OR statements, validity of t-out-of-n statements, and more.<a href="#section-2.3-8" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="sigma-protocol-group">
+<section id="section-3">
+      <h2 id="name-sigma-protocols-over-prime-">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-sigma-protocols-over-prime-" class="section-name selfRef">Sigma protocols over prime-order groups</a>
+      </h2>
+<p id="section-3-1">The following sub-section present concrete instantiations of sigma protocols over prime-order groups such as elliptic curves.
+Traditionally, sigma protocols are defined in Camenish-Stadtler notation as (for example):<a href="#section-3-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3-2">
+<pre>
+1. DLEQ(G, H, X, Y) = PoK{
+2.   (x):        // Secret variables
+3.   X = x * G, Y = x * H
+4. }
+</pre><a href="#section-3-2" class="pilcrow">¶</a>
+</div>
+<p id="section-3-3">In the above, line 1 declares that the proof name is "DLEQ", the public information (the <strong>instance</strong>) consists of the group elements <code>(G, X, H, Y)</code> denoted in upper-case.
+Line 2 states that the private information (the <strong>witness</strong>) consists of the scalar <code>x</code>.
+Finally, line 3 states that the constraints (the equations) that need to be proven are
+<code>x * G  = X</code> and <code>x * H = Y</code>.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<div id="schnorr-proofs">
+<section id="section-3.1">
+        <h3 id="name-schnorr-proofs">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-schnorr-proofs" class="section-name selfRef">Schnorr proofs</a>
+        </h3>
+<div id="group-prove">
+<section id="section-3.1.1">
+          <h4 id="name-public-proving-function">
+<a href="#section-3.1.1" class="section-number selfRef">3.1.1. </a><a href="#name-public-proving-function" class="section-name selfRef">Public proving function</a>
+          </h4>
+<p id="section-3.1.1-1">The proving function demands to instantiate a statement and a witness (as in <a href="#witness" class="auto internal xref">Section 3.3</a>)<a href="#section-3.1.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.1.1-2">
+<pre>
+def prove(domain_separator, statement, witness, rng):
+
+Inputs:
+
+- domain_separator, a 32-byte array that uniquely describes the protocol.
+- statement, the instance being proven.
+- witness, the secret prover's witness.
+
+Parameters:
+
+- SHO: A hash object implementing `absorb_elements` and `squeeze_scalars`
+
+1. sp = SchnorrProof(statement, group)
+2. (prover_state, commitment) = sp.prover_commit(rng, witness)
+3. challenge, = SHO(label).absorb_elements(commitment).squeeze_scalars(1)
+4. response = sp.prover_response(prover_state, challenge)
+5. assert sp.verifier(commitment, challenge, response)    # optional
+6. return (group.serialize_elements(commitment) + group.serialize_scalars(response))
+</pre><a href="#section-3.1.1-2" class="pilcrow">¶</a>
+</div>
+<p id="section-3.1.1-3">Implementations wanting to perform input validation for the witness SHOULD include Line 5.<a href="#section-3.1.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="group-verify">
+<section id="section-3.1.2">
+          <h4 id="name-public-verification-functio">
+<a href="#section-3.1.2" class="section-number selfRef">3.1.2. </a><a href="#name-public-verification-functio" class="section-name selfRef">Public verification function</a>
+          </h4>
+<div class="alignLeft art-text artwork" id="section-3.1.2-1">
+<pre>
+verify(domain_separator, statement, proof)
+
+Inputs:
+
+- domain_separator, a unique 32-bytes array uniquely indicating the protocol and the session being proven
+- statement, the instance being proven
+- proof, a byte array containing the cryptographic proof
+
+Outputs:
+
+- A boolean indicating validity of the proof
+
+Constants:
+
+- SHO, a hash state as specified in {{fiat-shamir}}.
+
+1. commitment_bytes = proof[: statement.commit_bytes_len]
+2. commitment = group.deserialize_elements(commitment_bytes)
+3. response_bytes = proof[statement.commit_bytes_len :]
+4. response = group.deserialize_scalars(response_bytes)
+5. challenge, = SHO(label).absorb_elements(commitment).squeeze_scalars(1)
+6. sp = SchnorrProof(statement, group)
+7. return sp.verifier(commitment, challenge, response)
+</pre><a href="#section-3.1.2-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="group-abstraction">
+<section id="section-3.2">
+        <h3 id="name-group-abstraction">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-group-abstraction" class="section-name selfRef">Group abstraction</a>
+        </h3>
+<p id="section-3.2-1">Because of their dominance, the presentation in the following focuses on proof goals over elliptic curves, therefore leveraging additive notation. For prime-order
+subgroups of residue classes, all notation needs to be changed to multiplicative, and references to elliptic curves (e.g., curve) need to be replaced by their respective
+counterparts over residue classes.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">We detail the functions that can be invoked on these objects. Example choices can be found in <a href="#ciphersuites" class="auto internal xref">Section 4</a>.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
+<div id="group">
+<section id="section-3.2.1">
+          <h4 id="name-group">
+<a href="#section-3.2.1" class="section-number selfRef">3.2.1. </a><a href="#name-group" class="section-name selfRef">Group</a>
+          </h4>
+<ul class="normal">
+<li class="normal" id="section-3.2.1-1.1">
+              <p id="section-3.2.1-1.1.1"><code>identity()</code>, returns the neutral element in the group.<a href="#section-3.2.1-1.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.2.1-1.2">
+              <p id="section-3.2.1-1.2.1"><code>generator()</code>, returns the generator of the prime-order elliptic-curve subgroup used for cryptographic operations.<a href="#section-3.2.1-1.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.2.1-1.3">
+              <p id="section-3.2.1-1.3.1"><code>order()</code>: Outputs the order of the group <code>p</code>.<a href="#section-3.2.1-1.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.2.1-1.4">
+              <p id="section-3.2.1-1.4.1"><code>random()</code>: outputs a random element in the group.<a href="#section-3.2.1-1.4.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.2.1-1.5">
+              <p id="section-3.2.1-1.5.1"><code>serialize(elements: [Group; N])</code>, serializes a list of group elements and returns a canonical byte array <code>buf</code> of fixed length <code>Ng * N</code>.<a href="#section-3.2.1-1.5.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.2.1-1.6">
+              <p id="section-3.2.1-1.6.1"><code>deserialize(buffer)</code>, attempts to map a byte array <code>buffer</code> of size <code>Ng * N</code> into <code>[Group; N]</code>, and fails if the input is not the valid canonical byte representation of an element of the group. This function can raise a <code>DeserializeError</code> if deserialization fails.<a href="#section-3.2.1-1.6.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.2.1-1.7">
+              <p id="section-3.2.1-1.7.1"><code>add(element: Group)</code>, implements elliptic curve addition for the two group elements.<a href="#section-3.2.1-1.7.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.2.1-1.8">
+              <p id="section-3.2.1-1.8.1"><code>equal(element: Group)</code>, returns <code>true</code> if the two elements are the same and false` otherwise.<a href="#section-3.2.1-1.8.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.2.1-1.9">
+              <p id="section-3.2.1-1.9.1"><code>scalar_mul(scalar: Scalar)</code>, implements scalar multiplication for a group element by an element in its respective scalar field.<a href="#section-3.2.1-1.9.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-3.2.1-2">Functions such as <code>add</code>, <code>equal</code>, and <code>scalar_mul</code> SHOULD be implemented using operator overloading whenever possible.<a href="#section-3.2.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="scalar">
+<section id="section-3.2.2">
+          <h4 id="name-scalar">
+<a href="#section-3.2.2" class="section-number selfRef">3.2.2. </a><a href="#name-scalar" class="section-name selfRef">Scalar</a>
+          </h4>
+<ul class="normal">
+<li class="normal" id="section-3.2.2-1.1">
+              <p id="section-3.2.2-1.1.1"><code>identity()</code>: outputs the (additive) identity element in the scalar field.<a href="#section-3.2.2-1.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.2.2-1.2">
+              <p id="section-3.2.2-1.2.1"><code>add(scalar: Scalar)</code>: implements field addition for the elements in the field.<a href="#section-3.2.2-1.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.2.2-1.3">
+              <p id="section-3.2.2-1.3.1"><code>mult(scalar: Scalar)</code>, implements field multiplication.<a href="#section-3.2.2-1.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.2.2-1.4">
+              <p id="section-3.2.2-1.4.1"><code>random()</code>: outputs a random scalar field element.<a href="#section-3.2.2-1.4.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.2.2-1.5">
+              <p id="section-3.2.2-1.5.1"><code>serialize(scalars: [Scalar; N])</code>: serializes a list of scalars and returns their canonical representation of fixed length <code>Ns * N</code>.<a href="#section-3.2.2-1.5.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.2.2-1.6">
+              <p id="section-3.2.2-1.6.1"><code>deserialize(buffer)</code>, attempts to map a byte array <code>buffer</code> of size <code>Ns * N</code> into <code>[Scalar; N]</code>, and fails if the input is not the valid canonical byte representation of an element of the group. This function can raise a <code>DeserializeError</code> if deserialization fails.<a href="#section-3.2.2-1.6.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-3.2.2-2">Functions such as <code>add</code>, <code>equal</code>, and <code>scalar_mul</code> SHOULD be implemented using operator overloading whenever possible.<a href="#section-3.2.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="witness">
+<section id="section-3.3">
+        <h3 id="name-witness-representation">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-witness-representation" class="section-name selfRef">Witness representation</a>
+        </h3>
+<p id="section-3.3-1">A witness is simply a list of <code>num_scalars</code> elements.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.3-2">
+<pre>
+Witness = [Scalar; num_scalars]
+</pre><a href="#section-3.3-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="constraints-for-preimage-of-a-group-morphism">
+<section id="section-3.4">
+        <h3 id="name-constraints-for-preimage-of">
+<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-constraints-for-preimage-of" class="section-name selfRef">Constraints for preimage of a group morphism</a>
+        </h3>
+<p id="section-3.4-1">Internally, the constraint is parametrized by a <code>Group</code> and can be represented as:<a href="#section-3.4-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.4-2">
+<pre>
+class GroupMorphismPreimage:
+    morphism: Morphism
+    image: [Group]
+
+    def append_equation(self, lhs, rhs)
+    def allocate_scalars(self, n)
+</pre><a href="#section-3.4-2" class="pilcrow">¶</a>
+</div>
+<p id="section-3.4-3">The object <code>GroupMorphismPreimage</code> has two attributes: a morphism <code>morphism</code>, which will be defined in <a href="#morphism" class="auto internal xref">Section 3.4.1</a>, and <code>image</code>, the morphism image of which the prover wants to show the pre-image of.<a href="#section-3.4-3" class="pilcrow">¶</a></p>
+<p id="section-3.4-4">As an example, the statement represented in <a href="#sigma-protocol-group" class="auto internal xref">Section 3</a> can be written as:<a href="#section-3.4-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.4-5">
+<pre>
+# let G, H, X, Y be public group elements in scope.
+cs = Equations()
+[x] = cs.allocate_scalars(1)
+cs.append_equation(lhs=X, rhs=[(x, G)])
+cs.append_equation(lhs=Y, rhs=[(x, H)])
+</pre><a href="#section-3.4-5" class="pilcrow">¶</a>
+</div>
+<div id="morphism">
+<section id="section-3.4.1">
+          <h4 id="name-morphism-encoding">
+<a href="#section-3.4.1" class="section-number selfRef">3.4.1. </a><a href="#name-morphism-encoding" class="section-name selfRef">Morphism encoding</a>
+          </h4>
+<div class="alignLeft art-text artwork" id="section-3.4.1-1">
+<pre>
+class Morphism:
+    linear_combinations: [([int], [Group])]
+    num_scalars: int
+</pre><a href="#section-3.4.1-1" class="pilcrow">¶</a>
+</div>
+<p id="section-3.4.1-2">A <code>Morphism</code> is a sparse linear combination of group elements, where the coefficients are indicated by integers (between 0 and <code>num_scalars</code>).<a href="#section-3.4.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="instantiation-of-the-constraints">
+<section id="section-3.4.2">
+          <h4 id="name-instantiation-of-the-constr">
+<a href="#section-3.4.2" class="section-number selfRef">3.4.2. </a><a href="#name-instantiation-of-the-constr" class="section-name selfRef">Instantiation of the constraints</a>
+          </h4>
+<div class="alignLeft art-text artwork" id="section-3.4.2-1">
+<pre>
+new(label)
+
+Outputs:
+
+- a `GroupMorphismPreimage` instance denoted `gmp`
+
+Procedure:
+
+1.  gmp.linear_combinations = []
+2.  gmp.num_scalars = 0
+3.  return gmp
+</pre><a href="#section-3.4.2-1" class="pilcrow">¶</a>
+</div>
+<div id="scalar-witness-allocation">
+<section id="section-3.4.2.1">
+            <h5 id="name-scalar-witness-allocation">
+<a href="#section-3.4.2.1" class="section-number selfRef">3.4.2.1. </a><a href="#name-scalar-witness-allocation" class="section-name selfRef">Scalar witness allocation</a>
+            </h5>
+<div class="alignLeft art-text artwork" id="section-3.4.2.1-1">
+<pre>
+allocate_scalars(self, n)
+
+Inputs:
+    - self, the current state of the GroupMorphismPreimage
+    - n, the number of scalars to allocate
+Outputs:
+    - indices, a list of integers each pointing to the new allocated scalars
+
+Procedure:
+
+1. indices = range(self.num_scalars, self.num_scalars + n)
+2. self.num_scalars += n
+3. return indices
+</pre><a href="#section-3.4.2.1-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="constraint-enforcing">
+<section id="section-3.4.2.2">
+            <h5 id="name-constraint-enforcing">
+<a href="#section-3.4.2.2" class="section-number selfRef">3.4.2.2. </a><a href="#name-constraint-enforcing" class="section-name selfRef">Constraint enforcing</a>
+            </h5>
+<div class="alignLeft art-text artwork" id="section-3.4.2.2-1">
+<pre>
+append_equation(self, lhs, rhs)
+
+Inputs:
+
+- self, the current state of the constraint system
+- lhs, the left-hand side of the equation
+- rhs, the right-hand side of the equation (a list of (ScalarIndex, GroupEltIndex) pairs)
+
+Outputs:
+
+- An Equation instance that enforces the desired relation
+
+Procedure:
+
+1. self.num_statements += 1
+2. self.image.append(lhs)
+3. self.matrix.append(rhs)
+</pre><a href="#section-3.4.2.2-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="morphism-mapping">
+<section id="section-3.4.3">
+          <h4 id="name-morphism-mapping">
+<a href="#section-3.4.3" class="section-number selfRef">3.4.3. </a><a href="#name-morphism-mapping" class="section-name selfRef">Morphism mapping</a>
+          </h4>
+<p id="section-3.4.3-1">A witness can be mapped to a group element via:<a href="#section-3.4.3-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.4.3-2">
+<pre>
+map(self, witness: [Scalar; num_scalars])
+
+Inputs:
+
+- self, the current sate of the constraint system
+- witness,
+
+1. image = []
+2. for linear_combination in self.linear_combinations:
+4.     coefficients = [scalars[i] for i in linear_combination.scalar_indices]
+5.     image.append(self.group.msm(coefficients, linear_combination.elements))
+6. return image
+</pre><a href="#section-3.4.3-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="core-protocol">
+<section id="section-3.5">
+        <h3 id="name-core-protocol">
+<a href="#section-3.5" class="section-number selfRef">3.5. </a><a href="#name-core-protocol" class="section-name selfRef">Core protocol</a>
+        </h3>
+<p id="section-3.5-1">This defines the object <code>SchnorrProof</code>. The initialization function takes as input the statement, and pre-processes it.<a href="#section-3.5-1" class="pilcrow">¶</a></p>
+<div id="prover-procedures">
+<section id="section-3.5.1">
+          <h4 id="name-prover-procedures">
+<a href="#section-3.5.1" class="section-number selfRef">3.5.1. </a><a href="#name-prover-procedures" class="section-name selfRef">Prover procedures</a>
+          </h4>
+<div id="prover-commit">
+<section id="section-3.5.1.1">
+            <h5 id="name-prover-commit">
+<a href="#section-3.5.1.1" class="section-number selfRef">3.5.1.1. </a><a href="#name-prover-commit" class="section-name selfRef">Prover commit</a>
+            </h5>
+<div class="alignLeft art-text artwork" id="section-3.5.1.1-1">
+<pre>
+prover_commit(self, witness: Witness)
+
+1. nonces = Scalar::random()
+2. prover_state = (witness, nonces)
+3. commitment = self.statement.map(witness)
+4. return (prover_state, commitment)
+</pre><a href="#section-3.5.1.1-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="prover-response">
+<section id="section-3.5.1.2">
+            <h5 id="name-prover-response">
+<a href="#section-3.5.1.2" class="section-number selfRef">3.5.1.2. </a><a href="#name-prover-response" class="section-name selfRef">Prover response</a>
+            </h5>
+<div class="alignLeft art-text artwork" id="section-3.5.1.2-1">
+<pre>
+prover_response(self, prover_state, challenge)
+
+1. response = [0; self.cs.num_scalars]
+2. for i in range(self.cs.num_scalars):
+3.     response[i] = witness[i] + challenge * nonces[i]
+4. return response
+</pre><a href="#section-3.5.1.2-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="example-dleq-proofs">
+<section id="section-3.6">
+        <h3 id="name-example-dleq-proofs">
+<a href="#section-3.6" class="section-number selfRef">3.6. </a><a href="#name-example-dleq-proofs" class="section-name selfRef">Example: DLEQ proofs</a>
+        </h3>
+<p id="section-3.6-1">A DLEQ proof proves a statement:<a href="#section-3.6-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.6-2">
+<pre>
+    DLEQ(G, H, X, Y) = PoK{(x): X = x * G, Y = x * H}
+</pre><a href="#section-3.6-2" class="pilcrow">¶</a>
+</div>
+<p id="section-3.6-3">Given group elements <code>G</code>, <code>H</code> and <code>X</code>, <code>Y</code> such that <code>x * G = X</code> and <code>x * H = Y</code>, then the statement is generated as:<a href="#section-3.6-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.6-4">
+<pre>
+1. statement = GroupMorphismPreimage()
+2. [var_x] = statement.allocate_scalars(1)
+3. statement.append_equation(X, [(var_x, G)])
+4. statement.append_equation(Y, [(var_x, H)])
+</pre><a href="#section-3.6-4" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="example-pedersen-commitments">
+<section id="section-3.7">
+        <h3 id="name-example-pedersen-commitment">
+<a href="#section-3.7" class="section-number selfRef">3.7. </a><a href="#name-example-pedersen-commitment" class="section-name selfRef">Example: Pedersen commitments</a>
+        </h3>
+<p id="section-3.7-1">A representation proof proves a statement<a href="#section-3.7-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.7-2">
+<pre>
+    REPR(G, H, C) = PoK{(x, r): C = x * G + r * H}
+</pre><a href="#section-3.7-2" class="pilcrow">¶</a>
+</div>
+<p id="section-3.7-3">Given group elements <code>G</code>, <code>H</code> such that <code>C = x * G + r * H</code>, then the statement is generated as:<a href="#section-3.7-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.7-4">
+<pre>
+statement = GroupMorphismPreimage()
+var_x, var_r = statement.allocate_scalars(2)
+statement.append_equation(C, [(var_x, G), (var_r, H)])
+</pre><a href="#section-3.7-4" class="pilcrow">¶</a>
+</div>
+<div id="verifier-procedure">
+<section id="section-3.7.1">
+          <h4 id="name-verifier-procedure">
+<a href="#section-3.7.1" class="section-number selfRef">3.7.1. </a><a href="#name-verifier-procedure" class="section-name selfRef">Verifier procedure</a>
+          </h4>
+<div class="alignLeft art-text artwork" id="section-3.7.1-1">
+<pre>
+verify(self, commitment, challenge, response)
+
+Inputs:
+
+- self, the current state of the SigmaProtocol
+- commitment, the commitment generated by the prover
+- challenge, the challenge generated by the verifier
+- response, the response generated by the prover
+
+Outputs:
+
+- A boolean indicating whether the verification succeeded
+
+Procedure:
+
+1. assert len(commitment) == self.statement.morphism.num_statements
+2. assert len(response) == self.statement.morphism.num_scalars
+3. expected = self.statement.morphism(response)
+4. got = [commitment[i].add(self.statement.image[i].scalar_mul(challenge))
+          for i in range(self.statement.morphism.num_statements)]
+5. return got == expected
+</pre><a href="#section-3.7.1-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="statement-generation">
+<section id="section-3.7.2">
+          <h4 id="name-statement-generation">
+<a href="#section-3.7.2" class="section-number selfRef">3.7.2. </a><a href="#name-statement-generation" class="section-name selfRef">Statement generation</a>
+          </h4>
+<p id="section-3.7.2-1">Let <code>H</code> be a hash object. The statement is encoded in a stateful hash object as follows.<a href="#section-3.7.2-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.7.2-2">
+<pre>
+hasher = H.new(domain_separator)
+hasher.update_usize([cs.num_statements, cs.num_scalars])
+for equation in cs.equations:
+  hasher.update_usize([equation.lhs, equation.rhs[0], equation.rhs[1]])
+hasher.update(generators)
+iv = hasher.digest()
+</pre><a href="#section-3.7.2-2" class="pilcrow">¶</a>
+</div>
+<p id="section-3.7.2-3">In simpler terms, without stateful hash objects, this should correspond to the following:<a href="#section-3.7.2-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.7.2-4">
+<pre>
+bin_challenge = SHAKE128(iv).update(commitment).digest(scalar_bytes)
+challenge = int(bin_challenge) % p
+</pre><a href="#section-3.7.2-4" class="pilcrow">¶</a>
+</div>
+<p id="section-3.7.2-5">and the nonce is produced as:<a href="#section-3.7.2-5" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.7.2-6">
+<pre>
+bin_nonce = SHAKE128(iv)
+            .update(random)
+            .update(pad)
+            .update(cs.scalars)
+            .digest(cs.num_scalars * scalar_bytes)
+nonces = [int(bin_nonce[i*scalar_bytes: i*(scalar_bytes+1)]) % p
+          for i in range(cs.num_scalars-1)]
+</pre><a href="#section-3.7.2-6" class="pilcrow">¶</a>
+</div>
+<p id="section-3.7.2-7">Where:
+    - <code>pad</code> is a (padding) zero string of length <code>168 - len(random)</code>.
+    - <code>scalar_bytes</code> is the number of bytes required to produce a uniformly random group element
+    - <code>random</code> is a random seed obtained from the operating system memory<a href="#section-3.7.2-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="ciphersuites">
+<section id="section-4">
+      <h2 id="name-ciphersuites">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-ciphersuites" class="section-name selfRef">Ciphersuites</a>
+      </h2>
+<div id="p-384">
+<section id="section-4.1">
+        <h3 id="name-p-384">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-p-384" class="section-name selfRef">P-384</a>
+        </h3>
+<p id="section-4.1-1">This ciphersuite uses P-384 <span>[<a href="#NISTCurves" class="cite xref">NISTCurves</a>]</span> for the Group.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<div id="elliptic-curve-group-of-p-384-secp384r1-nistcurves">
+<section id="section-4.1.1">
+          <h4 id="name-elliptic-curve-group-of-p-3">
+<a href="#section-4.1.1" class="section-number selfRef">4.1.1. </a><a href="#name-elliptic-curve-group-of-p-3" class="section-name selfRef">Elliptic curve group of P-384 (secp384r1) <span class="cite xref">[NISTCurves]</span></a>
+          </h4>
+<ul class="normal">
+<li class="normal" id="section-4.1.1-1.1">
+              <p id="section-4.1.1-1.1.1"><code>order()</code>: Return 0xffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973.<a href="#section-4.1.1-1.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4.1.1-1.2">
+              <p id="section-4.1.1-1.2.1"><code>serialize([A])</code>: Implemented using the compressed Elliptic-Curve-Point-to-Octet-String method according to <span>[<a href="#SEC1" class="cite xref">SEC1</a>]</span>; <code>Ng = 49</code>.<a href="#section-4.1.1-1.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4.1.1-1.3">
+              <p id="section-4.1.1-1.3.1"><code>deserialize(buf)</code>: Implemented by attempting to read <code>buf</code> into chunks of 49-byte arrays and convert them using the compressed Octet-String-to-Elliptic-Curve-Point method according to <span>[<a href="#SEC1" class="cite xref">SEC1</a>]</span>, and then performs partial public-key validation as defined in section 5.6.2.3.4 of <span>[<a href="#KEYAGREEMENT" class="cite xref">KEYAGREEMENT</a>]</span>. This includes checking that the coordinates of the resulting point are in the correct range, that the point is on the curve, and that the point is not the point at infinity.<a href="#section-4.1.1-1.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</section>
+</div>
+<div id="scalar-field-of-p-384-secp384r1">
+<section id="section-4.1.2">
+          <h4 id="name-scalar-field-of-p-384-secp3">
+<a href="#section-4.1.2" class="section-number selfRef">4.1.2. </a><a href="#name-scalar-field-of-p-384-secp3" class="section-name selfRef">Scalar Field of P-384 (secp384r1)</a>
+          </h4>
+<ul class="normal">
+<li class="normal" id="section-4.1.2-1.1">
+              <p id="section-4.1.2-1.1.1"><code>serialize(s)</code>: Relies on the Field-Element-to-Octet-String conversion according to <span>[<a href="#SEC1" class="cite xref">SEC1</a>]</span>; <code>Ns = 48</code>.<a href="#section-4.1.2-1.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4.1.2-1.2">
+              <p id="section-4.1.2-1.2.1"><code>deserialize(buf)</code>: Reads the byte array <code>buf</code> in chunks of 48 bytes using Octet-String-to-Field-Element from <span>[<a href="#SEC1" class="cite xref">SEC1</a>]</span>. This function can fail if the input does not represent a Scalar in the range [0, G.Order() - 1].<a href="#section-4.1.2-1.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="section-5">
+      <h2 id="name-acknowledgments">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      </h2>
+<p id="section-5-1">The authors thank Jan Bobolz, Stephan Krenn, Mary Maller, Ivan Visconti, Yuwen Zhang for reviewing a previous edition of this specification.<a href="#section-5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sec-combined-references">
+<section id="section-6">
+      <h2 id="name-references">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-6.1">
+        <h3 id="name-normative-references">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="KEYAGREEMENT">[KEYAGREEMENT]</dt>
+      <dd>
+<span class="refAuthor">Barker, E.</span>, <span class="refAuthor">Chen, L.</span>, <span class="refAuthor">Roginsky, A.</span>, <span class="refAuthor">Vassilev, A.</span>, and <span class="refAuthor">R. Davis</span>, <span class="refTitle">"Recommendation for pair-wise key-establishment schemes using discrete logarithm cryptography"</span>, <span class="refContent">National Institute of Standards and Technology</span>, <span class="seriesInfo">DOI 10.6028/nist.sp.800-56ar3</span>, <time datetime="2018-04" class="refDate">April 2018</time>, <span>&lt;<a href="https://doi.org/10.6028/nist.sp.800-56ar3">https://doi.org/10.6028/nist.sp.800-56ar3</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-6.2">
+        <h3 id="name-informative-references">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="fiat-shamir">[fiat-shamir]</dt>
+        <dd>
+<span class="refTitle">"draft-orru-zkproofs-fiat-shamir"</span>, <span>&lt;<a href="https://mmaker.github.io/spfs/draft-orru-zkproof-fiat-shamir.html">https://mmaker.github.io/spfs/draft-orru-zkproof-fiat-shamir.html</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="NISTCurves">[NISTCurves]</dt>
+        <dd>
+<span class="refTitle">"Digital signature standard (DSS)"</span>, <span class="refContent">National Institute of Standards and Technology (U.S.)</span>, <span class="seriesInfo">DOI 10.6028/nist.fips.186-4</span>, <time datetime="2013" class="refDate">2013</time>, <span>&lt;<a href="https://doi.org/10.6028/nist.fips.186-4">https://doi.org/10.6028/nist.fips.186-4</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="SEC1">[SEC1]</dt>
+      <dd>
+<span class="refAuthor">Standards for Efficient Cryptography Group (SECG)</span>, <span class="refTitle">"SEC 1: Elliptic Curve Cryptography"</span>, <span>&lt;<a href="https://www.secg.org/sec1-v2.pdf">https://www.secg.org/sec1-v2.pdf</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-A">
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Michele Orrù</span></div>
+<div dir="auto" class="left"><span class="org">CNRS</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:m@orru.net" class="email">m@orru.net</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Cathie Yun</span></div>
+<div dir="auto" class="left"><span class="org">Apple, Inc.</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:cathieyun@gmail.com" class="email">cathieyun@gmail.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
