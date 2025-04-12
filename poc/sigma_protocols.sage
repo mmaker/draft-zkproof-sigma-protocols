@@ -162,6 +162,8 @@ class SchnorrProof(SigmaProtocol):
 
     def prover_response(self, prover_state: ProverState, challenge):
         witness, nonces = prover_state
+        comms = self.instance.morphism(nonces)
+        images = self.instance.morphism(witness)
         return [
             nonces[i] + witness[i] * challenge
             for i in range(self.instance.morphism.num_scalars)

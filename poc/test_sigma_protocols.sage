@@ -207,9 +207,11 @@ def bbs_blind_commitment_computation(rng, group):
 def test_and_composition():
     from sagelib.sigma_protocols import SigmaProtocol, SchnorrProof
     from sagelib.sigma_protocols import NISigmaProtocol
-    from sagelib.fiat_shamir import KeccakDuplexSpongeP384
+    from sagelib.sigma_protocols import NISchnorrProofKeccakDuplexSpongeP384, KeccakDuplexSpongeP384
+    from sagelib.fiat_shamir import KeccakDuplexSponge
+    from sagelib import groups
 
-    class AndProof(SigmaProtocol, SchnorrProof):
+    class AndProof(SchnorrProof):
         ProverState: list[SchnorrProof.ProverState]
 
         def __init__(self, instances: list[GroupMorphismPreimage]):
@@ -220,8 +222,8 @@ def test_and_composition():
             commitments = []
 
             for protocol, witness in zip(self.protocols, witnesses):
-                commitment, prover_state = protocol.prover_commit(witness, rng)
-                commitments.extend(commitment)
+                prover_state, commitment = protocol.prover_commit(witness, rng)
+                commitments.append(commitment)
                 prover_states.append(prover_state)
 
             return (prover_states, commitments)
@@ -242,8 +244,57 @@ def test_and_composition():
 
     class NIAndProof(NISigmaProtocol):
         Protocol = AndProof
-        ProverState = KeccakDuplexSpongeP384
+        Codec = KeccakDuplexSpongeP384
 
+        def __init__(self, iv, instances):
+            self.hash_state = self.Codec(iv)
+            self.sp = self.Protocol(instances)
+
+        def prove(self, witnesses, rng):
+            (prover_states, commitments) = self.sp.prover_commit(witnesses, rng)
+            flattened_commitments = [commitment_elem for commitment in commitments for commitment_elem in commitment]
+            challenge = self.hash_state.prover_message(flattened_commitments).verifier_challenge()
+            responses = self.sp.prover_response(prover_states, challenge)
+            assert self.sp.verifier(commitments, challenge, responses)
+            return self.sp.serialize_batchable(commitments, challenge, responses)
+
+        def verify(self, proof):
+            commitments, responses = self.sp.deserialize_batchable(proof)
+            challenge = self.hash_state.prover_message(commitments).verifier_challenge()
+            return self.sp.verifier(commitments, challenge, responses)
+    
+    rng = TestDRNG("test vector seed".encode('utf-8'))
+    group = NISchnorrProofKeccakDuplexSpongeP384.Codec.GG
+    
+    statement_1 = GroupMorphismPreimage(group)
+    [var_x] = statement_1.allocate_scalars(1)
+    [var_G, var_X] = statement_1.allocate_elements(2)
+    statement_1.append_equation(var_X, [(var_x, var_G)])
+    G = group.generator()
+    statement_1.set_elements([(var_G, G)])
+    x = group.ScalarField.random(rng)
+    X = G * x
+    assert [X] == statement_1.morphism([x])
+    statement_1.set_elements([(var_X, X)])
+    witness_1 = [x]
+
+    statement_2 = GroupMorphismPreimage(group)
+    [var_y] = statement_2.allocate_scalars(1)
+    [var_H, var_Y] = statement_2.allocate_elements(2)
+    statement_2.append_equation(var_Y, [(var_y, var_H)])
+    H = group.generator()
+    statement_2.set_elements([(var_H, H)])
+    y = group.ScalarField.random(rng)
+    Y = H * y
+    assert [Y] == statement_2.morphism([y])
+    statement_2.set_elements([(var_Y, Y)]) 
+    witness_2 = [y]
+
+    instances = [statement_1, statement_2]
+    witnesses = [witness_1, witness_2]
+
+    narg_string = NIAndProof(CONTEXT_STRING, instances).prove(witnesses, rng)
+    assert NIAndProof(CONTEXT_STRING, instances).verify(narg_string)
 
 def main(path="vectors"):
     vectors = {}
@@ -256,6 +307,8 @@ def main(path="vectors"):
     ]
     for test_vector in test_vectors:
         test_vector(vectors)
+
+    test_and_composition()
 
     with open(path + "/allVectors.json", 'wt') as f:
         json.dump(vectors, f, sort_keys=True, indent=2)
