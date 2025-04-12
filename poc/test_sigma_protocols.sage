@@ -9,17 +9,15 @@ CONTEXT_STRING = b'yellow submarine' * 2
 
 
 def test_vector(test_vector_function):
-    from sagelib.groups import GroupP384 as group
-    from sagelib.sigma_protocols import NISchnorrProof
+    from sagelib.sigma_protocols import NISchnorrProofKeccakDuplexSpongeP256 as NIZK
 
     def inner(vectors):
         rng = TestDRNG("test vector seed".encode('utf-8'))
         test_vector_name = f"{test_vector_function.__name__}"
 
-        instance, witness = test_vector_function(rng, group)
-        narg_string = NISchnorrProof(
-            CONTEXT_STRING, instance).prove(witness, rng)
-        assert NISchnorrProof(CONTEXT_STRING, instance).verify(narg_string)
+        instance, witness = test_vector_function(rng, NIZK.Codec.GG)
+        narg_string = NIZK(CONTEXT_STRING, instance).prove(witness, rng)
+        assert NIZK(CONTEXT_STRING, instance).verify(narg_string)
         hex_narg_string = narg_string.hex()
         print(f"{test_vector_name} narg_string: {hex_narg_string}\n")
 
@@ -73,8 +71,8 @@ def discrete_logarithm(rng, group):
     x = group.ScalarField.random(rng)
     X = G * x
     assert [X] == statement.morphism([x])
-    statement.set_elements([(var_X, X)])
 
+    statement.set_elements([(var_X, X)])
     return statement, [x]
 
 
@@ -158,7 +156,7 @@ def pedersen_commitment_dleq(rng, group):
 
 
 @test_vector
-def bss_blind_commitment_computation(rng, group):
+def bbs_blind_commitment_computation(rng, group):
     """
     This example test vector is meant to replace:
     https://www.ietf.org/archive/id/draft-kalos-bbs-blind-signatures-01.html#section-4.1.1
@@ -254,7 +252,7 @@ def main(path="vectors"):
         dleq,
         pedersen_commitment,
         pedersen_commitment_dleq,
-        bss_blind_commitment_computation,
+        bbs_blind_commitment_computation,
     ]
     for test_vector in test_vectors:
         test_vector(vectors)

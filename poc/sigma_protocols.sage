@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from collections import namedtuple
 
-from sagelib.fiat_shamir import KeccakDuplexSpongeP384
-
+from sagelib import groups
+from sagelib.fiat_shamir import DuplexSpongeInterface, KeccakDuplexSponge
 
 class SigmaProtocol(ABC):
     """
@@ -52,8 +52,7 @@ class NISigmaProtocol:
 
     def prove(self, witness, rng):
         (prover_state, commitment) = self.sp.prover_commit(witness, rng)
-        challenge = self.hash_state.prover_message(
-            commitment).verifier_challenge()
+        challenge = self.hash_state.prover_message(commitment).verifier_challenge()
         response = self.sp.prover_response(prover_state, challenge)
 
         assert self.sp.verifier(commitment, challenge, response)
@@ -61,8 +60,7 @@ class NISigmaProtocol:
 
     def verify(self, proof):
         commitment, response = self.sp.deserialize_batchable(proof)
-        challenge = self.hash_state.prover_message(
-            commitment).verifier_challenge()
+        challenge = self.hash_state.prover_message(commitment).verifier_challenge()
         return self.sp.verifier(commitment, challenge, response)
 
 
@@ -163,9 +161,9 @@ class SchnorrProof(SigmaProtocol):
         return (prover_state, commitment)
 
     def prover_response(self, prover_state: ProverState, challenge):
-        (witness, nonces) = prover_state
+        witness, nonces = prover_state
         return [
-            nonces[i] + challenge * witness[i]
+            nonces[i] + witness[i] * challenge
             for i in range(self.instance.morphism.num_scalars)
         ]
 
@@ -180,7 +178,7 @@ class SchnorrProof(SigmaProtocol):
         ]
 
         # fail hard if the proof does not verify
-        assert got == expected
+        assert got == expected, f"verification equation fails.\n{got} != {expected}"
         return True
 
     def serialize_batchable(self, commitment, challenge, response):
@@ -199,9 +197,68 @@ class SchnorrProof(SigmaProtocol):
         return (commitment, response)
 
 
-class NISchnorrProof(NISigmaProtocol):
-    """
-    Schnorr proof using the Fiat-Shamir transform.
-    """
+class ByteSchnorrCodec:
+    GG: groups.Group = None
+    Hash: DuplexSpongeInterface = None
+
+    def __init__(self, iv: bytes):
+        self.hash_state = self.Hash(iv)
+
+    def prover_message(self, elements: list):
+        self.hash_state.absorb(self.GG.serialize(elements))
+        # calls can be chained
+        return self
+
+    def verifier_challenge(self):
+        from hash_to_field import OS2IP
+
+        uniform_bytes = self.hash_state.squeeze(
+            self.GG.ScalarField.scalar_byte_length() + 16
+        )
+        scalar = OS2IP(uniform_bytes) % self.GG.ScalarField.order
+        return scalar
+
+
+### Codecs for the different groups
+
+class KeccakDuplexSpongeP384(ByteSchnorrCodec):
+    GG = groups.GroupP384()
+    Hash = KeccakDuplexSponge
+
+
+class KeccakDuplexSpongeBls12381(ByteSchnorrCodec):
+    GG = groups.BLS12_381_G1
+    Hash = KeccakDuplexSponge
+
+class KeccakDuplexSpongeP256(ByteSchnorrCodec):
+    GG = groups.GroupP256()
+    Hash = KeccakDuplexSponge
+
+
+### Ciphersuite instantiation
+class NISchnorrProofKeccakDuplexSpongeP256(NISigmaProtocol):
+    Protocol = SchnorrProof
+    Codec = KeccakDuplexSpongeP256
+
+class NISchnorrProofKeccakDuplexSpongeP384(NISigmaProtocol):
     Protocol = SchnorrProof
     Codec = KeccakDuplexSpongeP384
+
+class NISchnorrProofKeccakDuplexSpongeBls12381(NISigmaProtocol):
+    Protocol = SchnorrProof
+    Codec = KeccakDuplexSpongeBls12381
+
+CIPHERSUITE = {
+    "sigma/OWKeccak1600+P256": NISchnorrProofKeccakDuplexSpongeP256,
+    "sigma/OWKeccak1600+P384": NISchnorrProofKeccakDuplexSpongeP384,
+    "sigma/OWKeccak1600+BLS12381": NISchnorrProofKeccakDuplexSpongeBls12381,
+}
+
+
+
+if __name__ == "__main__":
+    label = b"yellow submarine" * 2
+    sponge = KeccakDuplexSpongeP384(label)
+    sponge.absorb_bytes(b"\0" * 1000)
+    output = sponge.squeeze_bytes(1000)
+    print(output.hex())

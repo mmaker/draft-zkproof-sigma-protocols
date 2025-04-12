@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 import struct
 
-from hash_to_field import OS2IP
 from keccak import Keccak
 from sagelib.groups import Group
 from sagelib import groups
@@ -103,44 +102,7 @@ class DuplexSponge(DuplexSpongeInterface):
         return output
 
 
-class ByteSchnorrCodec:
-    GG: Group = None
-    Hash: DuplexSpongeInterface = None
-
-    def __init__(self, iv: bytes):
-        self.hash_state = self.Hash(iv)
-
-    def prover_message(self, elements: list):
-        self.hash_state.absorb(self.GG.serialize(elements))
-        # calls can be chained
-        return self
-
-    def verifier_challenge(self):
-        uniform_bytes = self.hash_state.squeeze(
-            self.GG.ScalarField.scalar_byte_length() + 16)
-        scalar = OS2IP(uniform_bytes) % self.GG.ScalarField.order
-        return scalar
-
-
 class KeccakDuplexSponge(DuplexSponge):
     def __init__(self, iv: bytes):
         self.permutation_state = KeccakPermutationState()
         super().__init__(iv)
-
-
-class KeccakDuplexSpongeP384(ByteSchnorrCodec):
-    GG = groups.GroupP384()
-    Hash = KeccakDuplexSponge
-
-
-class KeccakDuplexSpongeBls12381(ByteSchnorrCodec):
-    GG = groups.BLS12_381_G1
-    Hash = KeccakDuplexSponge
-
-
-if __name__ == "__main__":
-    label = b"yellow submarine" * 2
-    sponge = KeccakDuplexSpongeP384(label)
-    sponge.absorb_bytes(b"\0" * 1000)
-    output = sponge.squeeze_bytes(1000)
-    print(output.hex())
