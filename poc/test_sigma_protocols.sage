@@ -207,7 +207,7 @@ def bbs_blind_commitment_computation(rng, group):
 def test_and_composition():
     from sagelib.sigma_protocols import SigmaProtocol, SchnorrProof
     from sagelib.sigma_protocols import NISigmaProtocol
-    from sagelib.sigma_protocols import NISchnorrProofKeccakDuplexSpongeP384, KeccakDuplexSpongeP384
+    from sagelib.sigma_protocols import NISchnorrProofKeccakDuplexSpongeP256, KeccakDuplexSpongeP256
     from sagelib.fiat_shamir import KeccakDuplexSponge
     from sagelib import groups
 
@@ -241,10 +241,11 @@ def test_and_composition():
                 protocol.verifier(commitment, challenge, response)
                 for protocol, commitment, response in zip(self.protocols, commitments, responses)
             )
+            return True
 
     class NIAndProof(NISigmaProtocol):
         Protocol = AndProof
-        Codec = KeccakDuplexSpongeP384
+        Codec = KeccakDuplexSpongeP256
 
         def __init__(self, iv, instances):
             self.hash_state = self.Codec(iv)
@@ -256,15 +257,21 @@ def test_and_composition():
             challenge = self.hash_state.prover_message(flattened_commitments).verifier_challenge()
             responses = self.sp.prover_response(prover_states, challenge)
             assert self.sp.verifier(commitments, challenge, responses)
-            return self.sp.serialize_batchable(commitments, challenge, responses)
+            return [protocol.serialize_batchable(commitment, challenge, response) for protocol, commitment, response in zip(self.sp.protocols, commitments, responses)]
 
-        def verify(self, proof):
-            commitments, responses = self.sp.deserialize_batchable(proof)
-            challenge = self.hash_state.prover_message(commitments).verifier_challenge()
+        def verify(self, proofs):
+            commitments = []
+            responses = []
+            for (proof, protocol) in zip(proofs, self.sp.protocols):
+                commitment, response = protocol.deserialize_batchable(proof)
+                commitments.append(commitment)
+                responses.append(response)
+            flattened_commitments = [commitment_elem for commitment in commitments for commitment_elem in commitment]
+            challenge = self.hash_state.prover_message(flattened_commitments).verifier_challenge()
             return self.sp.verifier(commitments, challenge, responses)
     
     rng = TestDRNG("test vector seed".encode('utf-8'))
-    group = NISchnorrProofKeccakDuplexSpongeP384.Codec.GG
+    group = NISchnorrProofKeccakDuplexSpongeP256.Codec.GG
     
     statement_1 = GroupMorphismPreimage(group)
     [var_x] = statement_1.allocate_scalars(1)
@@ -293,8 +300,10 @@ def test_and_composition():
     instances = [statement_1, statement_2]
     witnesses = [witness_1, witness_2]
 
-    narg_string = NIAndProof(CONTEXT_STRING, instances).prove(witnesses, rng)
-    assert NIAndProof(CONTEXT_STRING, instances).verify(narg_string)
+    narg_strings = NIAndProof(CONTEXT_STRING, instances).prove(witnesses, rng)
+    assert NIAndProof(CONTEXT_STRING, instances).verify(narg_strings)
+    hex_narg_string = [narg_string.hex() for narg_string in narg_strings]
+    print(f"test_and_composition narg_string: {hex_narg_string}\n")
 
 def main(path="vectors"):
     vectors = {}
