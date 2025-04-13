@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-04-10T01:13:41.026437+00:00",
+  "timestamp": "2025-04-13T02:41:25.990964+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -244,7 +244,7 @@
       "labels": [],
       "body": "The file https://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/test_sigma_protocols.sage should contain an example showing how sigma protocols can be composed using AND composition.  \n\n For now, a \"sketch\" is available in `test_and_composition`, and a previously-reviewed algorithm is available in  https://sigma.zkproof.org/tex-spec.pdf section 2.5.1 ",
       "createdAt": "2025-04-01T12:41:57Z",
-      "updatedAt": "2025-04-09T08:12:03Z",
+      "updatedAt": "2025-04-10T08:22:51Z",
       "closedAt": null,
       "comments": []
     },
@@ -325,15 +325,17 @@
       "id": "I_kwDONyiw_86woap3",
       "title": "Clarify scope of the specification in `README.md` and inside the specification.",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/20",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
-      "assignees": [],
+      "assignees": [
+        "mmaker"
+      ],
       "labels": [],
       "body": "In https://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/draft-orru-zkproof-sigma-protocols.md : \ndescribe what are Maurer proofs, clarify the scope is limited to those\n\nReminder: the scope of this specification are non-interactive, 3-round arguments for:\n\n$Ax = B$\n\nwhere $A \\in \\mathbb{G}^{n \\times m}$ and $B \\in \\mathbb{G}^n$ are the public instance \nand $x \\in \\mathbb{F}^n$ is the private witness.\n\nThe draft is designed NOT TO step in the way of multi-round protocols or log-sized arguments.",
       "createdAt": "2025-04-01T13:02:36Z",
-      "updatedAt": "2025-04-01T13:02:36Z",
-      "closedAt": null,
+      "updatedAt": "2025-04-10T13:11:28Z",
+      "closedAt": "2025-04-10T13:10:59Z",
       "comments": []
     },
     {
@@ -362,11 +364,13 @@
       "state": "OPEN",
       "author": "mmaker",
       "authorAssociation": "OWNER",
-      "assignees": [],
+      "assignees": [
+        "cathieyun"
+      ],
       "labels": [],
-      "body": "SImilarly to [Privacy Pass](https://datatracker.ietf.org/doc/html/rfc9497#name-ciphersuites) we must add a section in the spec and in the test vectors that ties together the different cryptographic components. I see the following ones: \n\n- The elliptic curve: for instance, BLS12-381 and \n- The hash function: for instance, sha3 or turboshake\n- The codec: the hash_to_field, rejection sampling or modular reduction for field elements \n",
+      "body": "## Cryptographic Component Combinations\n\nSimilarly to [Privacy Pass](https://datatracker.ietf.org/doc/html/rfc9497#name-ciphersuites), we must add a section in the spec and in the test vectors that ties together the different cryptographic components. I see the following components:\n\n- **The elliptic curve**: for instance, BLS12-381\n- **The hash function**: for instance, SHA-3 or TurboSHAKE\n- **The codec**: the hash_to_field mechanism, rejection sampling, or modular reduction for field elements\n\nIn the Proof of Concept implementation, this requires updating the test vectors to support multiple groups and elliptic curves.",
       "createdAt": "2025-04-01T15:17:41Z",
-      "updatedAt": "2025-04-01T15:17:41Z",
+      "updatedAt": "2025-04-10T13:23:32Z",
       "closedAt": null,
       "comments": []
     },
@@ -431,6 +435,22 @@
       "body": "Given that the Fiat-Shamir spec is only used in the Sigma protocol spec, it seems like it would be simpler to combine the two and have the Fiat-Shamir definition as a sub-component of the Sigma protocol spec. (That way, we don't have to have too many layers of nested specs. For example, our spec dependencies for ARC would be: ARC -> Sigma -> F-S, and the dependences for BBS would be BBS-pseudonyms -> blinded-BBS -> Sigma -> F-S. It would be nice to remove one of those layers, but this is more of an editorial choice than a technical requirement.\n\nMerging the F-S definitions into the Sigma Protocol spec would also simplify the requirements for F-S, as it would no longer have to work in a multi-round setting. This may allow the F-S protocol to be simpler, or at least for its security requirements to be relaxed. ",
       "createdAt": "2025-04-09T20:26:34Z",
       "updatedAt": "2025-04-09T20:26:34Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 28,
+      "id": "I_kwDONyiw_86x9cMQ",
+      "title": "Add section evaluating the post-quantum guarantees of sigma protocols in the DL setting.",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/28",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Add the following sections to the draft (blatantly stolen from the VOPRF spec)\n\n``` \n  7.  Security Considerations . . . . . . . . . . . . . . . . . . .  42\n     7.1.  Security Properties . . . . . . . . . . . . . . . . . . .  42\n     7.2.  Security Assumptions  . . . . . . . . . . . . . . . . . .  44\n```",
+      "createdAt": "2025-04-10T13:20:21Z",
+      "updatedAt": "2025-04-10T13:20:21Z",
       "closedAt": null,
       "comments": []
     }
