@@ -5,8 +5,8 @@
 Network Working Group                                            M. Orrù
 Internet-Draft                                                      CNRS
 Intended status: Informational                                    C. Yun
-Expires: 14 October 2025                                     Apple, Inc.
-                                                           12 April 2025
+Expires: 16 October 2025                                     Apple, Inc.
+                                                           14 April 2025
 
 
                             Sigma Protocols
@@ -48,7 +48,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 14 October 2025.
+   This Internet-Draft will expire on 16 October 2025.
 
 Copyright Notice
 
@@ -86,14 +86,16 @@ Table of Contents
      3.7.  Example: Pedersen commitments
        3.7.1.  Verifier procedure
        3.7.2.  Statement generation
-   4.  Ciphersuites
-     4.1.  P-384
-       4.1.1.  Elliptic curve group of P-384 (secp384r1) NISTCurves
-       4.1.2.  Scalar Field of P-384 (secp384r1)
-   5.  Acknowledgments
-   6.  References
-     6.1.  Normative References
-     6.2.  Informative References
+     3.8.  Ciphersuites
+       3.8.1.  P-384
+     3.9.  Security Considerations
+     3.10. Post-Quantum Security Considerations
+       3.10.1.  Privacy Considerations
+       3.10.2.  Soundness Considerations
+   4.  Acknowledgments
+   5.  References
+     5.1.  Normative References
+     5.2.  Informative References
    Authors' Addresses
 
 1.  Introduction
@@ -310,7 +312,7 @@ Constants:
    counterparts over residue classes.
 
    We detail the functions that can be invoked on these objects.
-   Example choices can be found in Section 4.
+   Example choices can be found in Section 3.8.
 
 3.2.1.  Group
 
@@ -584,13 +586,13 @@ Procedure:
    random group element - random is a random seed obtained from the
    operating system memory
 
-4.  Ciphersuites
+3.8.  Ciphersuites
 
-4.1.  P-384
+3.8.1.  P-384
 
    This ciphersuite uses P-384 [NISTCurves] for the Group.
 
-4.1.1.  Elliptic curve group of P-384 (secp384r1) [NISTCurves]
+3.8.1.1.  Elliptic curve group of P-384 (secp384r1) [NISTCurves]
 
    *  order(): Return 0xffffffffffffffffffffffffffffffffffffffffffffffff
       c7634d81f4372ddf581a0db248b0a77aecec196accc52973.
@@ -607,7 +609,7 @@ Procedure:
       that the point is on the curve, and that the point is not the
       point at infinity.
 
-4.1.2.  Scalar Field of P-384 (secp384r1)
+3.8.1.2.  Scalar Field of P-384 (secp384r1)
 
    *  serialize(s): Relies on the Field-Element-to-Octet-String
       conversion according to [SEC1]; Ns = 48.
@@ -617,15 +619,68 @@ Procedure:
       can fail if the input does not represent a Scalar in the range [0,
       G.Order() - 1].
 
-5.  Acknowledgments
+3.9.  Security Considerations
+
+3.10.  Post-Quantum Security Considerations
+
+   The zero-knowledge proofs described in this document provide
+   statistical zero-knowledge and statistical soundness properties when
+   modeled in the random oracle model.
+
+3.10.1.  Privacy Considerations
+
+   These proofs offer zero-knowledge guarantees, meaning they do not
+   leak any information about the prover's witness beyond what can be
+   inferred from the proven statement itself.  This property holds even
+   against quantum adversaries with unbounded computational power.
+
+   Specifically, these proofs CAN be used to protect privacy against
+   post-quantum adversaries, in applications demanding:
+
+   *  Post-quantum anonymity
+
+   *  Post-quantum unlinkability
+
+   *  Post-quantum blindness
+
+   *  Protection against "harvest now, decrypt later" attacks
+
+3.10.2.  Soundness Considerations
+
+   While the proofs themselves offer privacy protections against quantum
+   adversaries, the hardness of the relation being proven depends (at
+   best) on the hardness of the discrete logarithm problem over the
+   elliptic curves specified in Section 3.8.  Since this problem is
+   known to be efficiently solvable by quantum computers using Shor's
+   algorithm, these proofs MUST NOT be relied upon for post-quantum
+   soundness guarantees.
+
+   Implementations requiring post-quantum soundness SHOULD transition to
+   alternative proof systems such as:
+
+   *  MPC-in-the-Head approaches as described in [GiacomelliMO16]
+
+   *  Lattice-based approaches as described in [AttemaCK21]
+
+   Implementations should consider the timeline for quantum computing
+   advances when planning migration to post-quantum sound alternatives.
+   Implementers MAY adopt a hybrid approach during migration to post-
+   quantum security by using AND composition of proofs.  This approach
+   enables gradual migration while maintaining security against
+   classical adversaries.  This composition retains soundness if *both*
+   problem remains hard.  AND composition of proofs is NOT described in
+   this specification, but examples may be found in the proof-of-concept
+   implementation and in [BonehS23].
+
+4.  Acknowledgments
 
    The authors thank Jan Bobolz, Stephan Krenn, Mary Maller, Ivan
    Visconti, Yuwen Zhang for reviewing a previous edition of this
    specification.
 
-6.  References
+5.  References
 
-6.1.  Normative References
+5.1.  Normative References
 
    [KEYAGREEMENT]
               Barker, E., Chen, L., Roginsky, A., Vassilev, A., and R.
@@ -635,12 +690,25 @@ Procedure:
               DOI 10.6028/nist.sp.800-56ar3, April 2018,
               <https://doi.org/10.6028/nist.sp.800-56ar3>.
 
-6.2.  Informative References
+5.2.  Informative References
+
+   [AttemaCK21]
+              Attema, T., Cramer, R., and L. Kohl, "A Compressed Sigma-
+              Protocol Theory for Lattices",
+              <https://dl.acm.org/doi/10.1007/978-3-030-84245-1_19>.
+
+   [BonehS23] Boneh, D. and V. Schoup, "A Graduate Course in Applied
+              Cryptography", n.d., <https://toc.cryptobook.us/>.
 
    [fiat-shamir]
               "draft-orru-zkproofs-fiat-shamir",
               <https://mmaker.github.io/spfs/draft-orru-zkproof-fiat-
               shamir.html>.
+
+   [GiacomelliMO16]
+              Giacomelli, I., Madsen, J., and C. Orlandi, "ZKBoo: Faster
+              Zero-Knowledge for Boolean Circuits",
+              <https://eprint.iacr.org/2016/163.pdf>.
 
    [NISTCurves]
               "Digital signature standard (DSS)", National Institute of
