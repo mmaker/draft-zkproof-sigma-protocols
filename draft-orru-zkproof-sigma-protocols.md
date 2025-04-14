@@ -44,6 +44,36 @@ informative:
     author:
       -
         ins: Standards for Efficient Cryptography Group (SECG)
+  GiacomelliMO16:
+    title: "ZKBoo: Faster Zero-Knowledge for Boolean Circuits"
+    target: https://eprint.iacr.org/2016/163.pdf
+    date: false
+    author:
+    -
+      fullname: "Irene Giacomelli"
+    -
+      fullname: "Jesper Madsen"
+    -
+      fullname: "Claudio Orlandi"
+  AttemaCK21:
+    title: "A Compressed Sigma-Protocol Theory for Lattices"
+    target: https://dl.acm.org/doi/10.1007/978-3-030-84245-1_19
+    date: false
+    author:
+    -
+      fullname: Thomas Attema
+    -
+      fullname: Ronald Cramer
+    -
+      fullname: Lisa Kohl
+  BonehS23:
+      title: "A Graduate Course in Applied Cryptography"
+      target: https://toc.cryptobook.us/
+      author:
+      -
+        fullname: Dan Boneh
+      -
+        fullname: Victor Schoup
 
 --- abstract
 
@@ -439,23 +469,54 @@ Where:
     - `scalar_bytes` is the number of bytes required to produce a uniformly random group element
     - `random` is a random seed obtained from the operating system memory
 
-# Ciphersuites
+## Ciphersuites {#ciphersuites}
 
-## P-384
+### P-384
 
 This ciphersuite uses P-384 {{NISTCurves}} for the Group.
 
-### Elliptic curve group of P-384 (secp384r1) {{NISTCurves}}
+#### Elliptic curve group of P-384 (secp384r1) {{NISTCurves}}
 
 - `order()`: Return 0xffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973.
 - `serialize([A])`: Implemented using the compressed Elliptic-Curve-Point-to-Octet-String method according to {{SEC1}}; `Ng = 49`.
 - `deserialize(buf)`: Implemented by attempting to read `buf` into chunks of 49-byte arrays and convert them using the compressed Octet-String-to-Elliptic-Curve-Point method according to {{SEC1}}, and then performs partial public-key validation as defined in section 5.6.2.3.4 of {{!KEYAGREEMENT=DOI.10.6028/NIST.SP.800-56Ar3}}. This includes checking that the coordinates of the resulting point are in the correct range, that the point is on the curve, and that the point is not the point at infinity.
 
-### Scalar Field of P-384 (secp384r1)
+#### Scalar Field of P-384 (secp384r1)
 
 - `serialize(s)`: Relies on the Field-Element-to-Octet-String conversion according to {{SEC1}}; `Ns = 48`.
-- `deserialize(buf)`: Reads the byte array `buf` in chunks of 48 bytes using Octet-String-to-Field-Element from {{SEC1}}. This function can fail if the input does not represent a Scalar in the range [0, G.Order() - 1].
+- `deserialize(buf)`: Reads the byte array `buf` in chunks of 48 bytes using Octet-String-to-Field-Element from {{SEC1}}. This function can fail if the input does not represent a Scalar in the range `[0, G.Order() - 1]`.
 
+## Security Considerations
+
+
+## Post-Quantum Security Considerations
+
+The zero-knowledge proofs described in this document provide statistical zero-knowledge and statistical soundness properties when modeled in the random oracle model.
+
+### Privacy Considerations
+
+These proofs offer zero-knowledge guarantees, meaning they do not leak any information about the prover's witness beyond what can be inferred from the proven statement itself. This property holds even against quantum adversaries with unbounded computational power.
+
+Specifically, these proofs CAN be used to protect privacy against post-quantum adversaries, in applications demanding:
+
+- Post-quantum anonymity
+- Post-quantum unlinkability
+- Post-quantum blindness
+- Protection against "harvest now, decrypt later" attacks
+
+### Soundness Considerations
+
+While the proofs themselves offer privacy protections against quantum adversaries, the hardness of the relation being proven depends (at best) on the hardness of the discrete logarithm problem over the elliptic curves specified in {{ciphersuites}}.
+Since this problem is known to be efficiently solvable by quantum computers using Shor's algorithm, these proofs MUST NOT be relied upon for post-quantum soundness guarantees.
+
+Implementations requiring post-quantum soundness SHOULD transition to alternative proof systems such as:
+
+- MPC-in-the-Head approaches as described in {{GiacomelliMO16}}
+- Lattice-based approaches as described in {{AttemaCK21}}
+
+Implementations should consider the timeline for quantum computing advances when planning migration to post-quantum sound alternatives.
+Implementers MAY adopt a hybrid approach during migration to post-quantum security by using AND composition of proofs. This approach enables gradual migration while maintaining security against classical adversaries.
+This composition retains soundness if **both** problem remains hard. AND composition of proofs is NOT described in this specification, but examples may be found in the proof-of-concept implementation and in {{BonehS23}}.
 
 # Acknowledgments
 {:numbered ="false"}
