@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-04-13T02:41:25.990964+00:00",
+  "timestamp": "2025-04-15T01:16:04.895836+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -240,11 +240,13 @@
       "state": "OPEN",
       "author": "mmaker",
       "authorAssociation": "OWNER",
-      "assignees": [],
+      "assignees": [
+        "vishady721"
+      ],
       "labels": [],
       "body": "The file https://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/test_sigma_protocols.sage should contain an example showing how sigma protocols can be composed using AND composition.  \n\n For now, a \"sketch\" is available in `test_and_composition`, and a previously-reviewed algorithm is available in  https://sigma.zkproof.org/tex-spec.pdf section 2.5.1 ",
       "createdAt": "2025-04-01T12:41:57Z",
-      "updatedAt": "2025-04-10T08:22:51Z",
+      "updatedAt": "2025-04-13T03:43:35Z",
       "closedAt": null,
       "comments": []
     },
@@ -256,11 +258,13 @@
       "state": "OPEN",
       "author": "mmaker",
       "authorAssociation": "OWNER",
-      "assignees": [],
+      "assignees": [
+        "vishady721"
+      ],
       "labels": [],
       "body": "The file https://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/test_sigma_protocols.sage should contain an example showing how sigma protocols can be composed using OR composition.   \n\n\nA previously-reviewed algorithm is described in  https://sigma.zkproof.org/tex-spec.pdf section 2.5.2 ",
       "createdAt": "2025-04-01T12:42:50Z",
-      "updatedAt": "2025-04-01T12:42:50Z",
+      "updatedAt": "2025-04-13T03:43:43Z",
       "closedAt": null,
       "comments": []
     },
@@ -443,14 +447,40 @@
       "id": "I_kwDONyiw_86x9cMQ",
       "title": "Add section evaluating the post-quantum guarantees of sigma protocols in the DL setting.",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/28",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "mmaker"
+      ],
+      "labels": [],
+      "body": "Add the following sections to the draft (blatantly stolen from the VOPRF spec)\n\n``` \n  7.  Security Considerations . . . . . . . . . . . . . . . . . . .  42\n     7.1.  Security Properties . . . . . . . . . . . . . . . . . . .  42\n     7.2.  Security Assumptions  . . . . . . . . . . . . . . . . . .  44\n```",
+      "createdAt": "2025-04-10T13:20:21Z",
+      "updatedAt": "2025-04-14T08:16:46Z",
+      "closedAt": "2025-04-14T08:10:29Z",
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Fixed in [7fedd62](https://github.com/mmaker/draft-zkproof-sigma-protocols/commit/7fedd6276cc2e0dcd2bd28710b8a71613953c114)",
+          "createdAt": "2025-04-14T08:10:29Z",
+          "updatedAt": "2025-04-14T08:10:29Z"
+        }
+      ]
+    },
+    {
+      "number": 30,
+      "id": "I_kwDONyiw_86yWlE6",
+      "title": "Add \"Security Considerations\" section",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/30",
       "state": "OPEN",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
-      "body": "Add the following sections to the draft (blatantly stolen from the VOPRF spec)\n\n``` \n  7.  Security Considerations . . . . . . . . . . . . . . . . . . .  42\n     7.1.  Security Properties . . . . . . . . . . . . . . . . . . .  42\n     7.2.  Security Assumptions  . . . . . . . . . . . . . . . . . .  44\n```",
-      "createdAt": "2025-04-10T13:20:21Z",
-      "updatedAt": "2025-04-10T13:20:21Z",
+      "body": "Fill in section \"Security Considerations\" currently empty. \n\nThis section is intended to guide the reader through the different soundness and privacy\nnotions for sigma protocols. In particular it should have a sub-section on: \n\n- Security Assumptions\n- Security Properties\n\nPlus an overview of common attacks on sigma protocols, some of which can be found in https://sigma.zkproof.org/history.\nAdd a note on replay attacks and the meaning of the `IV` when starting the protocol.\n\nIt should also mention the UC security guarantees, and cite previous works like: \n\n- https://eprint.iacr.org/2022/290\n\n",
+      "createdAt": "2025-04-14T08:16:33Z",
+      "updatedAt": "2025-04-14T08:18:01Z",
       "closedAt": null,
       "comments": []
     }
@@ -669,6 +699,32 @@
       "mergeCommit": {
         "oid": "478bc278f68444c003d83ec81a11f1a11068ffed"
       },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 29,
+      "id": "PR_kwDONyiw_86SYQyD",
+      "title": "AND composition example",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/29",
+      "state": "OPEN",
+      "author": "vishady721",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "NOTE: there seems to be a bug in scalar multiplication for GroupP384, i.e. (G * x * y) != ((G * x) * y). Changed the test to use P256 instead.",
+      "createdAt": "2025-04-13T03:40:28Z",
+      "updatedAt": "2025-04-13T03:40:28Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "5efa56367362d201334f8c2abd39aeb6a2628bbf",
+      "headRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "headRefName": "vishady/AND-composition",
+      "headRefOid": "09103832a0186dc8db2128d6e1973c5e1432ef28",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
       "comments": [],
       "reviews": []
     }
