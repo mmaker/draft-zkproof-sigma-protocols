@@ -96,7 +96,6 @@ class Morphism:
                             for i in linear_combination.scalar_indices]
             elements = [self.group_elements[i]
                         for i in linear_combination.element_indices]
-
             image.append(self.Group.msm(coefficients, elements))
         return image
 
@@ -161,6 +160,7 @@ class SchnorrProof(SigmaProtocol):
         return (prover_state, commitment)
 
     def prover_response(self, prover_state: ProverState, challenge):
+        G = self.instance.morphism.group_elements[0]
         witness, nonces = prover_state
         return [
             nonces[i] + witness[i] * challenge
@@ -170,7 +170,6 @@ class SchnorrProof(SigmaProtocol):
     def verifier(self, commitment, challenge, response):
         assert len(commitment) == self.instance.morphism.num_statements
         assert len(response) == self.instance.morphism.num_scalars
-
         expected = self.instance.morphism(response)
         got = [
             commitment[i] + self.instance.image[i] * challenge
