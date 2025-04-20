@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-04-15T01:16:04.895836+00:00",
+  "timestamp": "2025-04-20T01:19:48.860018+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -237,7 +237,7 @@
       "id": "I_kwDONyiw_86woNml",
       "title": "Example: AND composition of sigma protocols",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/15",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -246,8 +246,8 @@
       "labels": [],
       "body": "The file https://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/test_sigma_protocols.sage should contain an example showing how sigma protocols can be composed using AND composition.  \n\n For now, a \"sketch\" is available in `test_and_composition`, and a previously-reviewed algorithm is available in  https://sigma.zkproof.org/tex-spec.pdf section 2.5.1 ",
       "createdAt": "2025-04-01T12:41:57Z",
-      "updatedAt": "2025-04-13T03:43:35Z",
-      "closedAt": null,
+      "updatedAt": "2025-04-17T20:27:55Z",
+      "closedAt": "2025-04-17T20:27:55Z",
       "comments": []
     },
     {
@@ -312,7 +312,7 @@
       "labels": [],
       "body": "Considering as target [ARC](https://github.com/chris-wood/draft-arc) presentation proofs, @chris-wood  requested support for P-384 within our ciphersuite. \n\nTo close this issue: add test vectors to the specification.\n\n",
       "createdAt": "2025-04-01T12:57:37Z",
-      "updatedAt": "2025-04-09T20:09:40Z",
+      "updatedAt": "2025-04-17T20:28:49Z",
       "closedAt": null,
       "comments": [
         {
@@ -321,6 +321,13 @@
           "body": "FYI we are actually adding P256 to the curves for ARC, and will default to P256 for Privacy Pass. So it would be good to support both P256 (for performance) and P384, though if we have to choose between the two, I would prefer P256 since that is the choice for Privacy Pass deployment.",
           "createdAt": "2025-04-09T20:09:39Z",
           "updatedAt": "2025-04-09T20:09:39Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "cf. #29 -- maybe something is wrong with P384?",
+          "createdAt": "2025-04-17T20:28:48Z",
+          "updatedAt": "2025-04-17T20:28:48Z"
         }
       ]
     },
@@ -481,6 +488,38 @@
       "body": "Fill in section \"Security Considerations\" currently empty. \n\nThis section is intended to guide the reader through the different soundness and privacy\nnotions for sigma protocols. In particular it should have a sub-section on: \n\n- Security Assumptions\n- Security Properties\n\nPlus an overview of common attacks on sigma protocols, some of which can be found in https://sigma.zkproof.org/history.\nAdd a note on replay attacks and the meaning of the `IV` when starting the protocol.\n\nIt should also mention the UC security guarantees, and cite previous works like: \n\n- https://eprint.iacr.org/2022/290\n\n",
       "createdAt": "2025-04-14T08:16:33Z",
       "updatedAt": "2025-04-14T08:18:01Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 31,
+      "id": "I_kwDONyiw_86zBCBm",
+      "title": "Correct citations for MPCitH approaches",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/31",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "In the current spec we refer to ZKBoo as sigma protocol based on MPCitH. Is this the first appearance of the two? \nDo some bibliography work and review this part of the literature in the spec.",
+      "createdAt": "2025-04-17T20:30:51Z",
+      "updatedAt": "2025-04-17T20:30:51Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 32,
+      "id": "I_kwDONyiw_86zKsLT",
+      "title": "BBS and proof serialization",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/32",
+      "state": "OPEN",
+      "author": "BasileiosKal",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Hey all,\n\nThere seems to be an issue when trying to use the current drafts to implement [BBS Signatures](https://datatracker.ietf.org/doc/draft-irtf-cfrg-bbs-signatures/).\n\nIn the current draft, when serializing the proof, the challenge will be the first element, consistent with academic literature.\n\nFor the BBS, the challenge is at the end (see below for reasoning).\n\nWould hate to introduce breaking changes at this point in any of the drafts. Was wondering if the function for serialising the proof could be made more general, for example, as a ciphersuite constant (different curves would need their own serialization operations either way).\n\nThe current draft could define a default one to be used with the NIST curves and one of the BBS drafts could define a BLS12-381 suite with a proof serialization that would not break the current BBS draft.\n\n\n##\n\n### BBS challenge placement explanation\n\nA BBS proof is not just a Schnorr proof, but a set of points `(A1, A2, A3)` and then a Schnorr proof (`\\pi`). In the literature this was serialised as the points first and the proof after, so it would be `BBS_proof = (A1, A2, A3, \\pi)`.\n\nIf the Schnorr proof serialization convention was to be followed, the challenge would end up at the middle of the `BBS_proof`. This would make it harder to \u201cparse\u201d the challenge out, when multiple BBS proofs were generated in parallel (sharing the same challenge). A diversion from the literature was required and we decided to move the challenge at the end of the Schnorr proof.",
+      "createdAt": "2025-04-18T23:18:35Z",
+      "updatedAt": "2025-04-18T23:18:35Z",
       "closedAt": null,
       "comments": []
     }
@@ -707,25 +746,35 @@
       "id": "PR_kwDONyiw_86SYQyD",
       "title": "AND composition example",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/29",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "vishady721",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "NOTE: there seems to be a bug in scalar multiplication for GroupP384, i.e. (G * x * y) != ((G * x) * y). Changed the test to use P256 instead.",
       "createdAt": "2025-04-13T03:40:28Z",
-      "updatedAt": "2025-04-13T03:40:28Z",
+      "updatedAt": "2025-04-17T20:28:05Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
       "baseRefOid": "5efa56367362d201334f8c2abd39aeb6a2628bbf",
       "headRepository": "mmaker/draft-zkproof-sigma-protocols",
       "headRefName": "vishady/AND-composition",
       "headRefOid": "09103832a0186dc8db2128d6e1973c5e1432ef28",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "closedAt": "2025-04-17T20:27:54Z",
+      "mergedAt": "2025-04-17T20:27:54Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "80ce25fbebf0d7ba30c36b69d59c6d6d30720c2f"
+      },
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "thank you so much!",
+          "createdAt": "2025-04-17T20:28:04Z",
+          "updatedAt": "2025-04-17T20:28:04Z"
+        }
+      ],
       "reviews": []
     }
   ]
