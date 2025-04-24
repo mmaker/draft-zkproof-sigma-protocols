@@ -160,7 +160,6 @@ class SchnorrProof(SigmaProtocol):
         return (prover_state, commitment)
 
     def prover_response(self, prover_state: ProverState, challenge):
-        G = self.instance.morphism.group_elements[0]
         witness, nonces = prover_state
         return [
             nonces[i] + witness[i] * challenge

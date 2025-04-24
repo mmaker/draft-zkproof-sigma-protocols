@@ -305,6 +305,85 @@ def test_and_composition():
     hex_narg_string = [narg_string.hex() for narg_string in narg_strings]
     print(f"test_and_composition narg_string: {hex_narg_string}\n")
 
+def test_or_composition():
+    from sagelib.sigma_protocols import SigmaProtocol, SchnorrProof
+    from sagelib.sigma_protocols import NISigmaProtocol
+    from sagelib.sigma_protocols import NISchnorrProofKeccakDuplexSpongeP256, KeccakDuplexSpongeP256
+    from sagelib.fiat_shamir import KeccakDuplexSponge
+    from sagelib import groups
+
+    class OrProof(SchnorrProof):
+        ProverState: list[SchnorrProof.ProverState]
+
+        def __init__(self, instances: list[GroupMorphismPreimage]):
+            self.protocols = [SchnorrProof(instance) for instance in instances]
+
+        def prover_commit(self, witnesses, rng):
+            prover_states = []
+            commitments = []
+
+            unknown_witnesses = []
+            unknown_protocols = []
+
+            for protocol, witness in zip(self.protocols, witnesses):
+                if not witness is None:
+                    prover_state, commitment = protocol.prover_commit(witness, rng)
+                    commitments.append(commitment)
+                    prover_states.append(prover_state)
+                else:
+                    unknown_witnesses.append(witness)
+                    unknown_protocols.append(protocol)
+            
+            for (unknown_witness, protocol) in zip(unknown_witnesses, unknown_protocols):
+                simulated_responses = [protocol.instance.Domain.random(rng) for i in protocol.instance.morphism.num_scalars]
+                prover_challenge = protocol.instance.Domain.random(rng)
+                simulated_commitment = protocol.instance.morphism(simulated_response).inverse
+
+
+            return (prover_states, commitments)
+
+        def prover_response(self, prover_states, challenge):
+            responses = []
+            for prover_state, protocol in zip(prover_states, self.protocols):
+                response = protocol.prover_response(prover_state, challenge)
+                responses.append(response)
+            return responses
+
+        def verifier(self, commitments, challenge, responses):
+            assert len(commitments) == len(responses)
+            assert all(
+                protocol.verifier(commitment, challenge, response)
+                for protocol, commitment, response in zip(self.protocols, commitments, responses)
+            )
+            return True
+
+    class NIOrProof(NISigmaProtocol):
+        Protocol = AndProof
+        Codec = KeccakDuplexSpongeP256
+
+        def __init__(self, iv, instances):
+            self.hash_state = self.Codec(iv)
+            self.sp = self.Protocol(instances)
+
+        def prove(self, witnesses, rng):
+            (prover_states, commitments) = self.sp.prover_commit(witnesses, rng)
+            flattened_commitments = [commitment_elem for commitment in commitments for commitment_elem in commitment]
+            challenge = self.hash_state.prover_message(flattened_commitments).verifier_challenge()
+            responses = self.sp.prover_response(prover_states, challenge)
+            assert self.sp.verifier(commitments, challenge, responses)
+            return [protocol.serialize_batchable(commitment, challenge, response) for protocol, commitment, response in zip(self.sp.protocols, commitments, responses)]
+
+        def verify(self, proofs):
+            commitments = []
+            responses = []
+            for (proof, protocol) in zip(proofs, self.sp.protocols):
+                commitment, response = protocol.deserialize_batchable(proof)
+                commitments.append(commitment)
+                responses.append(response)
+            flattened_commitments = [commitment_elem for commitment in commitments for commitment_elem in commitment]
+            challenge = self.hash_state.prover_message(flattened_commitments).verifier_challenge()
+            return self.sp.verifier(commitments, challenge, responses)
+
 def main(path="vectors"):
     vectors = {}
     test_vectors = [
