@@ -334,7 +334,7 @@ def test_or_composition():
                     simulated_responses = [protocol.instance.Domain.random(rng) for i in range(protocol.instance.morphism.num_scalars)]
                     prover_challenge = protocol.instance.Domain.random(rng)
                     h_c_values = [protocol.instance.image[i] * prover_challenge for i in range(protocol.instance.morphism.num_statements)]
-                    simulated_commitments = [h_c_value.inverse() * protocol.instance.morphism(response) for (h_c_value, response) in zip(h_c_values, simulated_responses)]
+                    simulated_commitments = [protocol.instance.morphism([response])[0] - h_c_value for (h_c_value, response) in zip(h_c_values, simulated_responses)]
                     commitments.append(simulated_commitments)
                     unknown_witness_prover_states.append((prover_challenge, simulated_responses))
             
@@ -352,13 +352,10 @@ def test_or_composition():
                 responses.append(sim_responses)
                 challenges.append(challenge_share)
             
-            (known_index, known_prover_state) = known_prover_states[0]
+            (known_prover_state, known_index) = known_prover_states[0]
             known_response = self.protocols[known_index].prover_response(known_prover_state, known_state_challenge)
 
-            for prover_state, protocol in zip(prover_states, self.protocols):
-                response = protocol.prover_response(prover_state, challenge)
-
-            responses.insert(known_index, response)
+            responses.insert(known_index, known_response)
             challenges.insert(known_index, known_state_challenge)
 
             return (responses, challenges[:-1])
