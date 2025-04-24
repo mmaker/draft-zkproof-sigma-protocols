@@ -320,45 +320,66 @@ def test_or_composition():
 
         def prover_commit(self, witnesses, rng):
             prover_states = []
+            unknown_witness_prover_states = []
             commitments = []
-
-            unknown_witnesses = []
-            unknown_protocols = []
+            known_index = 0
 
             for protocol, witness in zip(self.protocols, witnesses):
                 if not witness is None:
                     prover_state, commitment = protocol.prover_commit(witness, rng)
                     commitments.append(commitment)
-                    prover_states.append(prover_state)
+                    prover_states.append((prover_state, known_index))
                 else:
-                    unknown_witnesses.append(witness)
-                    unknown_protocols.append(protocol)
+                    known_index += 1
+                    simulated_responses = [protocol.instance.Domain.random(rng) for i in range(protocol.instance.morphism.num_scalars)]
+                    prover_challenge = protocol.instance.Domain.random(rng)
+                    h_c_values = [protocol.instance.image[i] * prover_challenge for i in range(protocol.instance.morphism.num_statements)]
+                    simulated_commitments = [h_c_value.inverse() * protocol.instance.morphism(response) for (h_c_value, response) in zip(h_c_values, simulated_responses)]
+                    commitments.append(simulated_commitments)
+                    unknown_witness_prover_states.append((prover_challenge, simulated_responses))
             
-            for (unknown_witness, protocol) in zip(unknown_witnesses, unknown_protocols):
-                simulated_responses = [protocol.instance.Domain.random(rng) for i in protocol.instance.morphism.num_scalars]
-                prover_challenge = protocol.instance.Domain.random(rng)
-                simulated_commitment = protocol.instance.morphism(simulated_response).inverse
-
-
-            return (prover_states, commitments)
+            assert len(prover_states) == 1
+            return ((prover_states, unknown_witness_prover_states), commitments)
 
         def prover_response(self, prover_states, challenge):
+            (known_prover_states, unknown_witness_prover_states) = prover_states
+            known_state_challenge = challenge
             responses = []
+            challenges = []
+            for elem in unknown_witness_prover_states:
+                (challenge_share, sim_responses) = elem
+                known_state_challenge += challenge_share
+                responses.append(sim_responses)
+                challenges.append(challenge_share)
+            
+            (known_index, known_prover_state) = known_prover_states[0]
+            known_response = self.protocols[known_index].prover_response(known_prover_state, known_state_challenge)
+
             for prover_state, protocol in zip(prover_states, self.protocols):
                 response = protocol.prover_response(prover_state, challenge)
-                responses.append(response)
-            return responses
+
+            responses.insert(known_index, response)
+            challenges.insert(known_index, known_state_challenge)
+
+            return (responses, challenges[:-1])
 
         def verifier(self, commitments, challenge, responses):
             assert len(commitments) == len(responses)
+            last_challenge = challenge
+            (prover_responses, challenges) = responses
+            for challenge_share in challenges:
+                last_challenge += challenge_share
+            challenges.append(last_challenge)
+
             assert all(
                 protocol.verifier(commitment, challenge, response)
-                for protocol, commitment, response in zip(self.protocols, commitments, responses)
+                for protocol, commitment, challenge, response in zip(self.protocols, commitments, challenges, responses)
             )
+            
             return True
 
     class NIOrProof(NISigmaProtocol):
-        Protocol = AndProof
+        Protocol = OrProof
         Codec = KeccakDuplexSpongeP256
 
         def __init__(self, iv, instances):
