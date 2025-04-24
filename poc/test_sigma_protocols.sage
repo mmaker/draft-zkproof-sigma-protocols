@@ -375,7 +375,7 @@ def test_or_composition():
                 protocol.verifier(commitment, challenge, response)
                 for protocol, commitment, challenge, response in zip(self.protocols, commitments, challenges, responses)
             )
-            
+
             return True
 
     class NIOrProof(NISigmaProtocol):
@@ -404,6 +404,41 @@ def test_or_composition():
             flattened_commitments = [commitment_elem for commitment in commitments for commitment_elem in commitment]
             challenge = self.hash_state.prover_message(flattened_commitments).verifier_challenge()
             return self.sp.verifier(commitments, challenge, responses)
+    
+    rng = TestDRNG("test vector seed".encode('utf-8'))
+    group = NISchnorrProofKeccakDuplexSpongeP256.Codec.GG
+    
+    statement_1 = GroupMorphismPreimage(group)
+    [var_x] = statement_1.allocate_scalars(1)
+    [var_G, var_X] = statement_1.allocate_elements(2)
+    statement_1.append_equation(var_X, [(var_x, var_G)])
+    G = group.generator()
+    statement_1.set_elements([(var_G, G)])
+    x = group.ScalarField.random(rng)
+    X = G * x
+    assert [X] == statement_1.morphism([x])
+    statement_1.set_elements([(var_X, X)])
+    witness_1 = [x]
+
+    statement_2 = GroupMorphismPreimage(group)
+    [var_y] = statement_2.allocate_scalars(1)
+    [var_H, var_Y] = statement_2.allocate_elements(2)
+    statement_2.append_equation(var_Y, [(var_y, var_H)])
+    H = group.generator()
+    statement_2.set_elements([(var_H, H)])
+    y = group.ScalarField.random(rng)
+    Y = H * y
+    assert [Y] == statement_2.morphism([y])
+    statement_2.set_elements([(var_Y, Y)]) 
+    witness_2 = None
+
+    instances = [statement_1, statement_2]
+    witnesses = [witness_1, witness_2]
+
+    narg_strings = NIOrProof(CONTEXT_STRING, instances).prove(witnesses, rng)
+    assert NIOrProof(CONTEXT_STRING, instances).verify(narg_strings)
+    hex_narg_string = [narg_string.hex() for narg_string in narg_strings]
+    print(f"test_and_composition narg_string: {hex_narg_string}\n")
 
 def main(path="vectors"):
     vectors = {}
@@ -418,6 +453,7 @@ def main(path="vectors"):
         test_vector(vectors)
 
     test_and_composition()
+    test_or_composition()
 
     with open(path + "/allVectors.json", 'wt') as f:
         json.dump(vectors, f, sort_keys=True, indent=2)
