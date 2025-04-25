@@ -64,26 +64,26 @@ A duplex sponge has the following interface:
       type Unit
 
       def new(iv: bytes) -> hash_state
-      def absorb(self, x: [Unit])
-      def squeeze(self, length: int) -> [Unit]
+      def absorb(self, x: list[Unit])
+      def squeeze(self, length: int) -> list[Unit]
       def finalize(self)
 
 where
 
-- `DuplexSpongeInterface.init(label) -> hash_state`, creates a new `hash_state` object with a description label `label`;
-- `DuplexSpongeInterface.absorb(hash_state, values)`, absorbs a list of native elements (that is, of type `Unit`);
-- `DuplexSpongeInterface.squeeze(hash_state, length)`, squeezes from the `hash_state` object a list of `Unit` elements.
-- `DuplexSpongeInterface.finalize(hash_state)`, deletes the hash object safely.
+- `init(label)`, creates a new `hash_state` object with a description label `label`;
+- `absorb(hash_state, values)`, absorbs a list of native elements (that is, of type `Unit`);
+- `squeeze(hash_state, length)`, squeezes from the `hash_state` object a list of `Unit` elements.
+- `finalize(hash_state)`, deletes the hash object safely.
 
 The above can be extended to support absorption and squeeze from different domains than the domain in which the hash function is initialized over. Such extensions are called codecs.
 
-# Duplex Sponges
+# Overwrite mode implementation from permutation functions
 
-A duplex sponge in overwrite mode is based on a permutation function `P` that maps a vector of `r + c` elements of type `Unit` elements.
+A duplex sponge in overwrite mode is based on a permutation function `P` that maps a vector of `r + c` elements of type `Unit` elements. It implements the `DuplexSpongeInterface`.
 
-## Implementation
+## Initialization
 
-### Initialization
+This is the constructor for a duplex sponge object. It is initialized with a 32-byte value that initializes the sponge state.
 
     new(iv)
 
@@ -93,61 +93,73 @@ A duplex sponge in overwrite mode is based on a permutation function `P` that ma
     self.rate = self.state.R
     self.capacity = self.state.N - self.state.R
 
-### Absorb
+## Absorb
 
-    absorb(input)
+The absorb function incorporates data into the duplex sponge state.
+
+    absorb(self, input)
 
     Inputs:
-        self
+
+    -  self, the current duplex sponge object
+    -  input, the input to be absorbed
+
+    Constants:
+        permutation
+
+        self.squeeze_index = self.rate
+
+    Procedure:
+
+    1. while len(input) != 0:
+    2.   if self.absorb_index == self.rate:
+    3.     self.permutation_state.permute()
+    4.     self.absorb_index = 0
+    5.   chunk_size = min(self.rate - self.absorb_index, len(input))
+    6.   next_chunk = input[:chunk_size]
+    7.   self.permutation_state[self.absorb_index : self.absorb_index + chunk_size] = next_chunk
+    8.   self.absorb_index += chunk_size
+    9.   input = input[chunk_size:]
+
+## Squeeze
+
+The squeeze operation extracts output elements from the sponge state, which are uniformly distributed and can be used as a digest, a key stream, or other cryptographic material.
+
+    squeeze(self, length)
+
+    Inputs:
+
+    - self, the current duplex sponge object
+    - length, the number of bytes to be squeezed out of the sponge
 
     Outputs:
 
-    Constants:
-        permutation,
+    - digest, a byte array of `length` elements uniformly distributed
 
+    Procedure:
 
-    self.squeeze_index = self.rate
-    if len(input) == 0:
-        return
-    if 0 <= self.absorb_index < self.rate:
-        self.state[self.absorb_index] = input[0]
-        self.absorb_index += 1
-        input = input[1:]
-        return self.absorb(input)
-    if self.absorb_index == self.rate:
-        self.state.permute()
-        self.absorb_index = 0
-        return self.absorb(input)
-
-### Squeeze
-
-    def squeeze(self, length: int):
-        self.absorb_index = self.rate
-
-        output = b''
-        if length == 0:
-            return output
-
-        if 0 <= self.squeeze_index < self.rate:
-            output += bytes(self.state[self.squeeze_index:self.squeeze_index+1])
-            self.squeeze_index += 1
-            length -= 1
-            return output + self.squeeze(length)
-
-        if self.squeeze_index == self.rate:
-            self.state.permute()
-            self.squeeze_index = 0
-            return output + self.squeeze(length)
+    1. output = b''
+    2. while length != 0:
+    3.     if self.squeeze_index == self.rate:
+    4.         self.permutation_state.permute()
+    5.         self.squeeze_index = 0
+    6.     chunk_size = min(self.rate - self.squeeze_index, length)
+    7.     self.squeeze_index += chunk_size
+    8.     length -= chunk_size
+    9.     output += bytes(self.permutation_state[self.squeeze_index:self.squeeze_index+chunk_size])
+    10. return output
 
 ## Ciphersuites
 
-## Keccak f-1600
+## Keccak
 
-## SHAKE128 compatibility [WIP]
+`Keccak-f` is the permutation function underlying~{{SHA3}}. We instantiate `DuplexSponge` with `Keccak-f[1600]`, using rate `R = 136` and capacity `C = 64`.
 
-SHAKE128 is a variable-length hash function based on the Keccak sponge construction [SHA3]. It belongs to the SHA-3 family but offers a flexible output length, and provides 128 bits of security against collision attacks, regardless of the output length requested.
+# SHAKE128 compatibility [WIP]
 
-### Initialization
+SHAKE128 is a variable-length hash function based on the Keccak sponge construction {{SHA3}}. It belongs to the SHA-3 family but offers a flexible output length, and provides 128 bits of security against collision attacks, regardless of the output length requested.
+
+## Initialization
 
     new(self, label)
 
@@ -162,7 +174,7 @@ SHAKE128 is a variable-length hash function based on the Keccak sponge construct
     1. h = shake_128(label)
     2. return h
 
-### Absorb
+## SHAKE128 Absorb
 
     absorb(hash_state, x)
 
@@ -175,7 +187,7 @@ SHAKE128 is a variable-length hash function based on the Keccak sponge construct
 
 This method is also re-exported as `absorb_bytes`.
 
-### Squeeze
+## SHAKE128 Squeeze
 
     squeeze(hash_state, length)
 
