@@ -336,8 +336,6 @@ def test_or_composition():
                         known_index += 1
                     simulated_responses = [protocol.instance.Domain.random(rng) for i in range(protocol.instance.morphism.num_scalars)]
                     prover_challenge = protocol.instance.Domain.random(rng)
-                    print("prover challenge unknown")
-                    print(prover_challenge)
                     h_c_values = [protocol.instance.image[i] * prover_challenge for i in range(protocol.instance.morphism.num_statements)]
                     simulated_commitments = [protocol.instance.morphism([response])[0] - h_c_value for (h_c_value, response) in zip(h_c_values, simulated_responses)]
                     commitments.append(simulated_commitments)
@@ -357,16 +355,12 @@ def test_or_composition():
                 known_state_challenge -= challenge_share
                 responses.append(sim_responses)
                 challenges.append(challenge_share)
-            print("prover challenge known")
-            print(known_state_challenge)
             
             (known_prover_state, known_index) = known_prover_states[0]
             known_response = self.protocols[known_index].prover_response(known_prover_state, known_state_challenge)
 
             responses.insert(known_index, known_response)
             challenges.insert(known_index, known_state_challenge)
-            print("challenges prover makes", challenges)
-            print(responses)
 
             return (responses, challenges[:-1])
 
@@ -374,12 +368,9 @@ def test_or_composition():
             assert len(commitments) == len(responses)
             last_challenge = challenge
             (prover_responses, challenges) = responses
-            print(challenges)
             for challenge_share in challenges:
                 last_challenge -= challenge_share
             challenges.append(last_challenge)
-            print("verifier side challenges")
-            print(challenges)
             assert all(
                 protocol.verifier(commitment, challenge, response)
                 for protocol, commitment, challenge, response in zip(self.protocols, commitments, challenges, prover_responses)
@@ -399,7 +390,6 @@ def test_or_composition():
             (prover_states, commitments) = self.sp.prover_commit(witnesses, rng)
             flattened_commitments = [commitment_elem for commitment in commitments for commitment_elem in commitment]
             challenge = self.hash_state.prover_message(flattened_commitments).verifier_challenge()
-            print("prover ni challenge", challenge)
             responses = self.sp.prover_response(prover_states, challenge)
             assert self.sp.verifier(commitments, challenge, responses)
             return [protocol.serialize_batchable(commitment, challenge, response) for protocol, commitment, response in zip(self.sp.protocols, commitments, responses)]
