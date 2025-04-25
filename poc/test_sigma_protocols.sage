@@ -323,21 +323,25 @@ def test_or_composition():
             unknown_witness_prover_states = []
             commitments = []
             known_index = 0
+            known_value_hit = False
+            known_commitment = None
 
             for protocol, witness in zip(self.protocols, witnesses):
                 if not witness is None:
-                    prover_state, commitment = protocol.prover_commit(witness, rng)
-                    commitments.append(commitment)
+                    known_value_hit = True
+                    prover_state, known_commitment = protocol.prover_commit(witness, rng)
                     prover_states.append((prover_state, known_index))
                 else:
-                    known_index += 1
+                    if not known_value_hit:
+                        known_index += 1
                     simulated_responses = [protocol.instance.Domain.random(rng) for i in range(protocol.instance.morphism.num_scalars)]
                     prover_challenge = protocol.instance.Domain.random(rng)
                     h_c_values = [protocol.instance.image[i] * prover_challenge for i in range(protocol.instance.morphism.num_statements)]
                     simulated_commitments = [protocol.instance.morphism([response])[0] - h_c_value for (h_c_value, response) in zip(h_c_values, simulated_responses)]
                     commitments.append(simulated_commitments)
                     unknown_witness_prover_states.append((prover_challenge, simulated_responses))
-            
+            assert(not known_commitment is None)
+            commitments.insert(known_index, known_commitment)
             assert len(prover_states) == 1
             return ((prover_states, unknown_witness_prover_states), commitments)
 
@@ -357,6 +361,7 @@ def test_or_composition():
 
             responses.insert(known_index, known_response)
             challenges.insert(known_index, known_state_challenge)
+            print(responses)
 
             return (responses, challenges[:-1])
 
@@ -367,10 +372,9 @@ def test_or_composition():
             for challenge_share in challenges:
                 last_challenge += challenge_share
             challenges.append(last_challenge)
-
             assert all(
                 protocol.verifier(commitment, challenge, response)
-                for protocol, commitment, challenge, response in zip(self.protocols, commitments, challenges, responses)
+                for protocol, commitment, challenge, response in zip(self.protocols, commitments, challenges, prover_responses)
             )
 
             return True
