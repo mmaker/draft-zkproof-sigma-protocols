@@ -168,9 +168,6 @@ class SchnorrProof(SigmaProtocol):
 
     def verifier(self, commitment, challenge, response):
         assert len(commitment) == self.instance.morphism.num_statements
-        print("hi")
-        print(response)
-        print(self.instance.morphism.num_scalars)
         assert len(response) == self.instance.morphism.num_scalars
         expected = self.instance.morphism(response)
         got = [
