@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-04-20T01:19:48.860018+00:00",
+  "timestamp": "2025-05-04T01:23:31.646398+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -520,6 +520,38 @@
       "body": "Hey all,\n\nThere seems to be an issue when trying to use the current drafts to implement [BBS Signatures](https://datatracker.ietf.org/doc/draft-irtf-cfrg-bbs-signatures/).\n\nIn the current draft, when serializing the proof, the challenge will be the first element, consistent with academic literature.\n\nFor the BBS, the challenge is at the end (see below for reasoning).\n\nWould hate to introduce breaking changes at this point in any of the drafts. Was wondering if the function for serialising the proof could be made more general, for example, as a ciphersuite constant (different curves would need their own serialization operations either way).\n\nThe current draft could define a default one to be used with the NIST curves and one of the BBS drafts could define a BLS12-381 suite with a proof serialization that would not break the current BBS draft.\n\n\n##\n\n### BBS challenge placement explanation\n\nA BBS proof is not just a Schnorr proof, but a set of points `(A1, A2, A3)` and then a Schnorr proof (`\\pi`). In the literature this was serialised as the points first and the proof after, so it would be `BBS_proof = (A1, A2, A3, \\pi)`.\n\nIf the Schnorr proof serialization convention was to be followed, the challenge would end up at the middle of the `BBS_proof`. This would make it harder to \u201cparse\u201d the challenge out, when multiple BBS proofs were generated in parallel (sharing the same challenge). A diversion from the literature was required and we decided to move the challenge at the end of the Schnorr proof.",
       "createdAt": "2025-04-18T23:18:35Z",
       "updatedAt": "2025-04-18T23:18:35Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 33,
+      "id": "I_kwDONyiw_861DNJO",
+      "title": "Remove mentions of operator overloading",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/33",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Feedback from Dennis Jackson: \n> I'm not sure the draft needs to be opinionated on whether to use operator overloading or not, it's a bit of an implementation detail. \n",
+      "createdAt": "2025-05-03T17:14:51Z",
+      "updatedAt": "2025-05-03T17:14:51Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 34,
+      "id": "I_kwDONyiw_861DNLw",
+      "title": "Add more information in security sections",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/34",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "> Some text sprinkled around the user/implementor pitfalls in the security considerations helps people appreciate the importance of standardising a thing (e.g. proof reuse, constant-time, dealing with the mod bias via the extra bytes, etc). \n",
+      "createdAt": "2025-05-03T17:15:13Z",
+      "updatedAt": "2025-05-03T17:15:13Z",
       "closedAt": null,
       "comments": []
     }
