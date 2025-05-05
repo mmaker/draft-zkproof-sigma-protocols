@@ -322,6 +322,10 @@ def test_or_composition():
             prover_states = []
             unknown_witness_prover_states = []
             commitments = []
+
+            # We want to keep track of the commitment of the known protocol,
+            # as well as which index it occurs in in order to insert it in
+            # the correct spot in the array.
             known_index = 0
             known_value_hit = False
             known_commitment = None
@@ -342,6 +346,7 @@ def test_or_composition():
                     unknown_witness_prover_states.append((prover_challenge, simulated_responses))
             assert(not known_commitment is None)
             commitments.insert(known_index, known_commitment)
+            # We assume there is only one protocol the prover knows the witness to.
             assert len(prover_states) == 1
             return ((prover_states, unknown_witness_prover_states), commitments)
 
@@ -364,20 +369,19 @@ def test_or_composition():
 
             return (responses, challenges[:-1])
 
-        def verifier(self, commitments, challenge, responses):
+        def verifier(self, commitments, verifier_challenge, responses, challenges):
             assert len(commitments) == len(responses)
-            last_challenge = challenge
-            (prover_responses, challenges) = responses
+            last_challenge = verifier_challenge
             for challenge_share in challenges:
                 last_challenge -= challenge_share
             challenges.append(last_challenge)
             assert all(
                 protocol.verifier(commitment, challenge, response)
-                for protocol, commitment, challenge, response in zip(self.protocols, commitments, challenges, prover_responses)
+                for protocol, commitment, challenge, response in zip(self.protocols, commitments, challenges, responses)
             )
 
             return True
-
+        
     class NIOrProof(NISigmaProtocol):
         Protocol = OrProof
         Codec = KeccakDuplexSpongeP256
@@ -390,20 +394,21 @@ def test_or_composition():
             (prover_states, commitments) = self.sp.prover_commit(witnesses, rng)
             flattened_commitments = [commitment_elem for commitment in commitments for commitment_elem in commitment]
             challenge = self.hash_state.prover_message(flattened_commitments).verifier_challenge()
-            responses = self.sp.prover_response(prover_states, challenge)
-            assert self.sp.verifier(commitments, challenge, responses)
-            return [protocol.serialize_batchable(commitment, challenge, response) for protocol, commitment, response in zip(self.sp.protocols, commitments, responses)]
+            (responses, challenges) = self.sp.prover_response(prover_states, challenge)
+            assert self.sp.verifier(commitments, challenge, responses, challenges)
+            return ([protocol.serialize_batchable(commitment, challenge, response) for protocol, commitment, response in zip(self.sp.protocols, commitments, responses)], [self.sp.protocols[0].instance.Domain.serialize([challenge]) for challenge in challenges])
 
-        def verify(self, proofs):
+        def verify(self, proofs, challenges):
             commitments = []
             responses = []
+            challenges = [self.sp.protocols[0].instance.Domain.deserialize(challenge)[0] for challenge in challenges]
             for (proof, protocol) in zip(proofs, self.sp.protocols):
                 commitment, response = protocol.deserialize_batchable(proof)
                 commitments.append(commitment)
                 responses.append(response)
             flattened_commitments = [commitment_elem for commitment in commitments for commitment_elem in commitment]
-            challenge = self.hash_state.prover_message(flattened_commitments).verifier_challenge()
-            return self.sp.verifier(commitments, challenge, responses)
+            verifier_challenge = self.hash_state.prover_message(flattened_commitments).verifier_challenge()
+            return self.sp.verifier(commitments, verifier_challenge, responses, challenges)
     
     rng = TestDRNG("test vector seed".encode('utf-8'))
     group = NISchnorrProofKeccakDuplexSpongeP256.Codec.GG
@@ -435,10 +440,12 @@ def test_or_composition():
     instances = [statement_1, statement_2]
     witnesses = [witness_1, witness_2]
 
-    narg_strings = NIOrProof(CONTEXT_STRING, instances).prove(witnesses, rng)
-    assert NIOrProof(CONTEXT_STRING, instances).verify(narg_strings)
+    (narg_strings, challenges) = NIOrProof(CONTEXT_STRING, instances).prove(witnesses, rng)
+    assert NIOrProof(CONTEXT_STRING, instances).verify(narg_strings, challenges)
     hex_narg_string = [narg_string.hex() for narg_string in narg_strings]
-    print(f"test_and_composition narg_string: {hex_narg_string}\n")
+    hex_challenges = [challenge.hex() for challenge in challenges]
+    print(f"test_or_composition narg_string: {hex_narg_string}")
+    print(f"prover shares of challenges string for or composition: {hex_challenges}\n")
 
 def main(path="vectors"):
     vectors = {}
