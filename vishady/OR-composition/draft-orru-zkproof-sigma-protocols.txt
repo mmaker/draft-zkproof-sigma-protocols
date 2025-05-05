@@ -5,8 +5,8 @@
 Network Working Group                                            M. Orrù
 Internet-Draft                                                      CNRS
 Intended status: Informational                                    C. Yun
-Expires: 27 October 2025                                     Apple, Inc.
-                                                           25 April 2025
+Expires: 6 November 2025                                     Apple, Inc.
+                                                              5 May 2025
 
 
                             Sigma Protocols
@@ -48,7 +48,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 27 October 2025.
+   This Internet-Draft will expire on 6 November 2025.
 
 Copyright Notice
 
