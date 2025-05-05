@@ -338,9 +338,13 @@ def test_or_composition():
                 else:
                     if not known_value_hit:
                         known_index += 1
+                    # We perform the simulator for the prover in order to generate valid commitments
+                    # for the unknown witnesses, assuming the prover starts with a random response.
                     simulated_responses = [protocol.instance.Domain.random(rng) for i in range(protocol.instance.morphism.num_scalars)]
+                    # Also pick a random value for the challenge
                     prover_challenge = protocol.instance.Domain.random(rng)
                     h_c_values = [protocol.instance.image[i] * prover_challenge for i in range(protocol.instance.morphism.num_statements)]
+                    # Generate what the correct commitment would be based on the random response and challenge.
                     simulated_commitments = [protocol.instance.morphism([response])[0] - h_c_value for (h_c_value, response) in zip(h_c_values, simulated_responses)]
                     commitments.append(simulated_commitments)
                     unknown_witness_prover_states.append((prover_challenge, simulated_responses))
@@ -355,12 +359,17 @@ def test_or_composition():
             known_state_challenge = challenge
             responses = []
             challenges = []
+            # The sum of all of the challenges for each of the protocols should be
+            # the verifier challenge. Therefore find the unknown challenge by 
+            # subtracting the prover's shares from the verifier challenge.
             for elem in unknown_witness_prover_states:
                 (challenge_share, sim_responses) = elem
                 known_state_challenge -= challenge_share
                 responses.append(sim_responses)
                 challenges.append(challenge_share)
             
+            # Include the response for the known protocol at the correct index
+            # (i.e., the index of the protocol in the original list of protocols)
             (known_prover_state, known_index) = known_prover_states[0]
             known_response = self.protocols[known_index].prover_response(known_prover_state, known_state_challenge)
 
