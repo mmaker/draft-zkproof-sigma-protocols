@@ -269,10 +269,10 @@ def test_and_composition():
             flattened_commitments = [commitment_elem for commitment in commitments for commitment_elem in commitment]
             challenge = self.hash_state.prover_message(flattened_commitments).verifier_challenge()
             return self.sp.verifier(commitments, challenge, responses)
-    
+
     rng = TestDRNG("test vector seed".encode('utf-8'))
     group = NISchnorrProofKeccakDuplexSpongeP256.Codec.GG
-    
+
     statement_1 = GroupMorphismPreimage(group)
     [var_x] = statement_1.allocate_scalars(1)
     [var_G, var_X] = statement_1.allocate_elements(2)
@@ -294,7 +294,7 @@ def test_and_composition():
     y = group.ScalarField.random(rng)
     Y = H * y
     assert [Y] == statement_2.morphism([y])
-    statement_2.set_elements([(var_Y, Y)]) 
+    statement_2.set_elements([(var_Y, Y)])
     witness_2 = [y]
 
     instances = [statement_1, statement_2]
@@ -319,6 +319,8 @@ def test_or_composition():
             self.protocols = [SchnorrProof(instance) for instance in instances]
 
         def prover_commit(self, witnesses, rng):
+            assert witnesses.count(None) == len(self.protocols) - 1
+
             prover_states = []
             unknown_witness_prover_states = []
             commitments = []
@@ -359,15 +361,15 @@ def test_or_composition():
             known_state_challenge = challenge
             responses = []
             challenges = []
+
             # The sum of all of the challenges for each of the protocols should be
-            # the verifier challenge. Therefore find the unknown challenge by 
+            # the verifier challenge. Therefore find the unknown challenge by
             # subtracting the prover's shares from the verifier challenge.
-            for elem in unknown_witness_prover_states:
-                (challenge_share, sim_responses) = elem
+            for challenge_share, sim_responses in unknown_witness_prover_states:
                 known_state_challenge -= challenge_share
                 responses.append(sim_responses)
                 challenges.append(challenge_share)
-            
+
             # Include the response for the known protocol at the correct index
             # (i.e., the index of the protocol in the original list of protocols)
             (known_prover_state, known_index) = known_prover_states[0]
@@ -390,7 +392,7 @@ def test_or_composition():
             )
 
             return True
-        
+
     class NIOrProof(NISigmaProtocol):
         Protocol = OrProof
         Codec = KeccakDuplexSpongeP256
@@ -418,10 +420,10 @@ def test_or_composition():
             flattened_commitments = [commitment_elem for commitment in commitments for commitment_elem in commitment]
             verifier_challenge = self.hash_state.prover_message(flattened_commitments).verifier_challenge()
             return self.sp.verifier(commitments, verifier_challenge, responses, challenges)
-    
+
     rng = TestDRNG("test vector seed".encode('utf-8'))
     group = NISchnorrProofKeccakDuplexSpongeP256.Codec.GG
-    
+
     statement_1 = GroupMorphismPreimage(group)
     [var_x] = statement_1.allocate_scalars(1)
     [var_G, var_X] = statement_1.allocate_elements(2)
@@ -443,7 +445,7 @@ def test_or_composition():
     y = group.ScalarField.random(rng)
     Y = H * y
     assert [Y] == statement_2.morphism([y])
-    statement_2.set_elements([(var_Y, Y)]) 
+    statement_2.set_elements([(var_Y, Y)])
     witness_2 = None
 
     instances = [statement_1, statement_2]
