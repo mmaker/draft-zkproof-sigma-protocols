@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-05-04T01:23:31.646398+00:00",
+  "timestamp": "2025-05-06T01:16:57.178402+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -807,6 +807,32 @@
           "updatedAt": "2025-04-17T20:28:04Z"
         }
       ],
+      "reviews": []
+    },
+    {
+      "number": 35,
+      "id": "PR_kwDONyiw_86U3lD_",
+      "title": "Test vector + scaffolding for or composition",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/35",
+      "state": "OPEN",
+      "author": "vishady721",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-05-05T00:44:58Z",
+      "updatedAt": "2025-05-05T00:44:59Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "2b78efed3d9b032770d29ad8dda216c693cf7a73",
+      "headRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "headRefName": "vishady/OR-composition",
+      "headRefOid": "c4f243129bceffb2ce78a7ce1615207b46d9b5ab",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
       "reviews": []
     }
   ]
