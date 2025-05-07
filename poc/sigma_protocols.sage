@@ -111,7 +111,11 @@ class GroupMorphismPreimage:
 
     @property
     def commit_bytes_len(self):
-        return self.morphism.num_statements * self.group.element_byte_length()
+        return self.morphism.num_statements * self.Image.element_byte_length()
+
+    @property
+    def response_bytes_len(self):
+        return self.morphism.num_scalars * self.Domain.scalar_byte_length()
 
     def append_equation(self, lhs, rhs):
         linear_combination = Morphism.LinearCombination(
@@ -186,6 +190,7 @@ class SchnorrProof(SigmaProtocol):
         )
 
     def deserialize_batchable(self, encoded):
+        assert len(encoded) == self.instance.commit_bytes_len + self.instance.response_bytes_len
         commitment_bytes = encoded[: self.instance.commit_bytes_len]
         commitment = self.instance.Image.deserialize(commitment_bytes)
 
