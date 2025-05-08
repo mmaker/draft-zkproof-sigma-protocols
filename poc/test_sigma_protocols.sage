@@ -396,7 +396,7 @@ def test_or_composition():
             challenges, responses = _response
             return b''.join(
                     [protocol.serialize_batchable(commitment, challenge, response) for protocol, commitment, response in zip(self.protocols, commitments, responses)] +
-                    [protocol.instance.Domain.serialize([challenge]) for (protocol, challenge) in zip(self.protocols, challenges)]
+                    [protocol.instance.Domain.serialize([challenge]) for (protocol, challenge) in zip(self.protocols[:-1], challenges)]
                 )
 
         def deserialize_batchable(self, proof_string):
@@ -407,17 +407,17 @@ def test_or_composition():
             start = 0
             for protocol in self.protocols:
                 proof_len = protocol.instance.commit_bytes_len + protocol.instance.response_bytes_len
-                commitment, response = protocol.deserialize_batchable(proof_string[start: proof_len])
+                commitment, response = protocol.deserialize_batchable(proof_string[start : start + proof_len])
                 start += proof_len
                 commitments.append(commitment)
                 responses.append(response)
 
             # The last part of the proof string is the challenges
-            for protocol in self.protocols:
+            for protocol in self.protocols[:-1]:
                 # we should not be needing to inspect Domain here
                 challenge_len = protocol.instance.Domain.scalar_byte_length()
-                challenge, = protocol.instance.Domain.deserialize(proof_string[start: start + challenge_len])
-                challenges.append(challenge)
+                challenge = protocol.instance.Domain.deserialize(proof_string[start : start + challenge_len])
+                challenges.append(challenge[0])
                 start += challenge_len
 
             return (commitments, challenges, responses)
@@ -440,10 +440,10 @@ def test_or_composition():
             return self.sp.serialize_batchable(commitments, challenge, (challenges, responses))
 
         def verify(self, proof_string):
-            commitment, response = self.sp.deserialize_batchable(proof_string)
-            for commitment in commitment: self.hash_state.prover_message(commitment)
+            commitments, challenges, responses = self.sp.deserialize_batchable(proof_string)
+            for commitment in commitments: self.hash_state.prover_message(commitment)
             challenge = self.hash_state.verifier_challenge()
-            return self.sp.verifier(commitment, challenge, response)
+            return self.sp.verifier(commitments, challenge, (challenges, responses))
 
     rng = TestDRNG("test vector seed".encode('utf-8'))
     group = NISchnorrProofKeccakDuplexSpongeP256.Codec.GG
@@ -475,9 +475,9 @@ def test_or_composition():
     instances = [statement_1, statement_2]
     witnesses = [witness_1, witness_2]
 
-    narg_strings = NIOrProof(CONTEXT_STRING, instances).prove(witnesses, rng)
-    assert NIOrProof(CONTEXT_STRING, instances).verify(narg_strings)
-    hex_narg_string = [narg_string.hex() for narg_string in narg_strings]
+    narg_string = NIOrProof(CONTEXT_STRING, instances).prove(witnesses, rng)
+    assert NIOrProof(CONTEXT_STRING, instances).verify(narg_string)
+    hex_narg_string = narg_string.hex()
     print(f"test_or_composition narg_string: {hex_narg_string}")
 
 def main(path="vectors"):
