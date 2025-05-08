@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-05-06T01:16:57.178402+00:00",
+  "timestamp": "2025-05-08T01:17:54.464932+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -483,11 +483,13 @@
       "state": "OPEN",
       "author": "mmaker",
       "authorAssociation": "OWNER",
-      "assignees": [],
+      "assignees": [
+        "mmaker"
+      ],
       "labels": [],
       "body": "Fill in section \"Security Considerations\" currently empty. \n\nThis section is intended to guide the reader through the different soundness and privacy\nnotions for sigma protocols. In particular it should have a sub-section on: \n\n- Security Assumptions\n- Security Properties\n\nPlus an overview of common attacks on sigma protocols, some of which can be found in https://sigma.zkproof.org/history.\nAdd a note on replay attacks and the meaning of the `IV` when starting the protocol.\n\nIt should also mention the UC security guarantees, and cite previous works like: \n\n- https://eprint.iacr.org/2022/290\n\n",
       "createdAt": "2025-04-14T08:16:33Z",
-      "updatedAt": "2025-04-14T08:18:01Z",
+      "updatedAt": "2025-05-07T09:07:08Z",
       "closedAt": null,
       "comments": []
     },
@@ -552,6 +554,22 @@
       "body": "> Some text sprinkled around the user/implementor pitfalls in the security considerations helps people appreciate the importance of standardising a thing (e.g. proof reuse, constant-time, dealing with the mod bias via the extra bytes, etc). \n",
       "createdAt": "2025-05-03T17:15:13Z",
       "updatedAt": "2025-05-03T17:15:13Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 36,
+      "id": "I_kwDONyiw_861g2GN",
+      "title": "Fix re-use of hash state across proofs",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/36",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Currently the hash state of an (initialized) non-interactive proof is affected by the `prove` and `verify` functions.\nhttps://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/sigma_protocols.sage#L55\n\nIn the non-interactive proof we re-instantiate the hash state for each prove and verify, which doesn't make sense. \nhttps://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/test_sigma_protocols.sage#L303\n\nWe should be copying the state upon proving time and proceed from there.",
+      "createdAt": "2025-05-07T09:10:45Z",
+      "updatedAt": "2025-05-07T09:10:59Z",
       "closedAt": null,
       "comments": []
     }
@@ -821,18 +839,33 @@
       "labels": [],
       "body": "",
       "createdAt": "2025-05-05T00:44:58Z",
-      "updatedAt": "2025-05-05T00:44:59Z",
+      "updatedAt": "2025-05-07T16:28:10Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
       "baseRefOid": "2b78efed3d9b032770d29ad8dda216c693cf7a73",
       "headRepository": "mmaker/draft-zkproof-sigma-protocols",
       "headRefName": "vishady/OR-composition",
-      "headRefOid": "c4f243129bceffb2ce78a7ce1615207b46d9b5ab",
+      "headRefOid": "65bd867490bbece3e45e1313b2fa3fcdf795a406",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Hi @vishady721 ! \r\nI tried to fix some inconsistencies with the function signature of the API, and the serialization function. \r\nMore specifically, the serialization function must return bytes, and not data structures such as lists or tuples. \r\n\r\nI have unfortunately not managed to complete the function and there's still a small bug in the message length. \r\nCan you please have a look and take it from here? It should be clear what I'm trying to do. \r\nFeel free to revert the commitment is you want to start from scratch, but the bottom line is: keep the template functions signature",
+          "createdAt": "2025-05-07T08:53:29Z",
+          "updatedAt": "2025-05-07T08:55:16Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Note for later: the implementation should reject and not compile if the same witness is used in two branches of the or proof. Some notes on different ways to implement OR from a discussion with Ian Goldberg: \r\n\r\n```example OR statement: \r\n\r\n    attr1 == attr2 OR attr1 == attr3\r\n    attr1 == attr4 + attr5\r\n\r\nsilly way: \r\n\r\n    attr1 == attr4 + attr5\r\n    attr1 == attr2\r\n    OR \r\n    attr1 == attr3\r\n    attr1 == attr4 + attr5\r\n\r\nbetter way: \r\n\r\n    instance:\r\n    X1 = r1*A + a1*(A-3A) = morphism(),  \r\n    X2 = r2*A + a2*B\r\n    ..\r\n\r\n    commit:\r\n    SigmaProtocol(X1, X4, X5){ \r\n    a1'' == attr4 + attr5 \r\n    \r\n    morphism(r1, a1) = X1, morphism(r2, a1) = X2 \r\n    OR\r\n    morphism(r1', a1') = X1, morphism(r3, a1') = X3\r\n    }\r\n\r\nanother way: \r\n\r\n    (attr1 - attr2)(attr1 - attr3) == 0\r\n    attr1 == attr4 + attr5\r\n```",
+          "createdAt": "2025-05-07T16:28:09Z",
+          "updatedAt": "2025-05-07T16:28:09Z"
+        }
+      ],
       "reviews": []
     }
   ]
