@@ -342,12 +342,10 @@ def test_or_composition():
                         known_index += 1
                     # We perform the simulator for the prover in order to generate valid commitments
                     # for the unknown witnesses, assuming the prover starts with a random response.
-                    simulated_responses = [protocol.instance.Domain.random(rng) for i in range(protocol.instance.morphism.num_scalars)]
+                    simulated_responses = protocol.simulate_response(rng)
                     # Also pick a random value for the challenge
                     prover_challenge = protocol.instance.Domain.random(rng)
-                    h_c_values = [protocol.instance.image[i] * prover_challenge for i in range(protocol.instance.morphism.num_statements)]
-                    # Generate what the correct commitment would be based on the random response and challenge.
-                    simulated_commitments = [protocol.instance.morphism([response])[0] - h_c_value for (h_c_value, response) in zip(h_c_values, simulated_responses)]
+                    simulated_commitments = protocol.simulate_commitment(simulated_responses, prover_challenge)
                     commitments.append(simulated_commitments)
                     unknown_witness_prover_states.append((prover_challenge, simulated_responses))
             assert(not known_commitment is None)
@@ -421,6 +419,8 @@ def test_or_composition():
                 start += challenge_len
 
             return (commitments, challenges, responses)
+
+        
 
     class NIOrProof(NISigmaProtocol):
         Protocol = OrProof
