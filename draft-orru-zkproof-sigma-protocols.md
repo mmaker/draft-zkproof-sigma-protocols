@@ -16,8 +16,8 @@ venue:
 #  type: Working Group
 #  mail: WG@examplecom
 #  arch: https://examplecom/WG
-  github: "mmaker/stdsigma"
-  latest: "https://mmaker.github.io/stdsigma/draft-orru-zkproof-sigma-protocols.html"
+  github: "mmaker/draft-zkproof-sigma-protocols"
+  latest: "https://mmaker.github.io/draft-zkproof-sigma-protocols/draft-orru-zkproof-sigma-protocols.html"
 
 author:
  -

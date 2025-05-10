@@ -18,8 +18,8 @@ venue:
   type: ""
   mail: "cfrg@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/cfrg"
-  github: "mmaker/stdsigma"
-  latest: "https://mmaker.github.io/stdsigma/draft-orru-zkproof-fiat-shamir.html"
+  github: "mmaker/draft-zkproof-sigma-protocols"
+  latest: "https://mmaker.github.io/draft-zkproof-sigma-protocols/draft-orru-zkproof-fiat-shamir.html"
 
 author:
 -
