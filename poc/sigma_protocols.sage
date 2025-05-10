@@ -111,7 +111,11 @@ class GroupMorphismPreimage:
 
     @property
     def commit_bytes_len(self):
-        return self.morphism.num_statements * self.group.element_byte_length()
+        return self.morphism.num_statements * self.Image.element_byte_length()
+
+    @property
+    def response_bytes_len(self):
+        return self.morphism.num_scalars * self.Domain.scalar_byte_length()
 
     def append_equation(self, lhs, rhs):
         linear_combination = Morphism.LinearCombination(
@@ -160,7 +164,6 @@ class SchnorrProof(SigmaProtocol):
         return (prover_state, commitment)
 
     def prover_response(self, prover_state: ProverState, challenge):
-        G = self.instance.morphism.group_elements[0]
         witness, nonces = prover_state
         return [
             nonces[i] + witness[i] * challenge
@@ -187,6 +190,7 @@ class SchnorrProof(SigmaProtocol):
         )
 
     def deserialize_batchable(self, encoded):
+        assert len(encoded) == self.instance.commit_bytes_len + self.instance.response_bytes_len
         commitment_bytes = encoded[: self.instance.commit_bytes_len]
         commitment = self.instance.Image.deserialize(commitment_bytes)
 
@@ -194,6 +198,14 @@ class SchnorrProof(SigmaProtocol):
         response = self.instance.Domain.deserialize(response_bytes)
 
         return (commitment, response)
+    
+    def simulate_response(self, rng):
+        return [self.instance.Domain.random(rng) for i in range(self.instance.morphism.num_scalars)]
+
+    def simulate_commitment(self, response, challenge):
+        h_c_values = [self.instance.image[i] * challenge for i in range(self.instance.morphism.num_statements)]
+        # Generate what the correct commitment would be based on the random response and challenge.
+        return [self.instance.morphism([response])[0] - h_c_value for (h_c_value, response) in zip(h_c_values, response)]
 
 
 class ByteSchnorrCodec:

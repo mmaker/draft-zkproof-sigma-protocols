@@ -269,10 +269,10 @@ def test_and_composition():
             flattened_commitments = [commitment_elem for commitment in commitments for commitment_elem in commitment]
             challenge = self.hash_state.prover_message(flattened_commitments).verifier_challenge()
             return self.sp.verifier(commitments, challenge, responses)
-    
+
     rng = TestDRNG("test vector seed".encode('utf-8'))
     group = NISchnorrProofKeccakDuplexSpongeP256.Codec.GG
-    
+
     statement_1 = GroupMorphismPreimage(group)
     [var_x] = statement_1.allocate_scalars(1)
     [var_G, var_X] = statement_1.allocate_elements(2)
@@ -294,7 +294,7 @@ def test_and_composition():
     y = group.ScalarField.random(rng)
     Y = H * y
     assert [Y] == statement_2.morphism([y])
-    statement_2.set_elements([(var_Y, Y)]) 
+    statement_2.set_elements([(var_Y, Y)])
     witness_2 = [y]
 
     instances = [statement_1, statement_2]
@@ -304,6 +304,181 @@ def test_and_composition():
     assert NIAndProof(CONTEXT_STRING, instances).verify(narg_strings)
     hex_narg_string = [narg_string.hex() for narg_string in narg_strings]
     print(f"test_and_composition narg_string: {hex_narg_string}\n")
+
+def test_or_composition():
+    from sagelib.sigma_protocols import SigmaProtocol, SchnorrProof
+    from sagelib.sigma_protocols import NISigmaProtocol
+    from sagelib.sigma_protocols import NISchnorrProofKeccakDuplexSpongeP256, KeccakDuplexSpongeP256
+    from sagelib.fiat_shamir import KeccakDuplexSponge
+    from sagelib import groups
+
+    class OrProof(SchnorrProof):
+        ProverState: list[SchnorrProof.ProverState]
+
+        def __init__(self, instances: list[GroupMorphismPreimage]):
+            self.protocols = [SchnorrProof(instance) for instance in instances]
+
+        def prover_commit(self, witnesses, rng):
+            assert witnesses.count(None) == len(self.protocols) - 1
+
+            prover_states = []
+            unknown_witness_prover_states = []
+            commitments = []
+
+            # We want to keep track of the commitment of the known protocol,
+            # as well as which index it occurs in in order to insert it in
+            # the correct spot in the array.
+            known_index = 0
+            known_value_hit = False
+            known_commitment = None
+
+            for protocol, witness in zip(self.protocols, witnesses):
+                if not witness is None:
+                    known_value_hit = True
+                    prover_state, known_commitment = protocol.prover_commit(witness, rng)
+                    prover_states.append((prover_state, known_index))
+                else:
+                    if not known_value_hit:
+                        known_index += 1
+                    # We perform the simulator for the prover in order to generate valid commitments
+                    # for the unknown witnesses, assuming the prover starts with a random response.
+                    simulated_responses = protocol.simulate_response(rng)
+                    # Also pick a random value for the challenge
+                    prover_challenge = protocol.instance.Domain.random(rng)
+                    simulated_commitments = protocol.simulate_commitment(simulated_responses, prover_challenge)
+                    commitments.append(simulated_commitments)
+                    unknown_witness_prover_states.append((prover_challenge, simulated_responses))
+            assert(not known_commitment is None)
+            commitments.insert(known_index, known_commitment)
+            # We assume there is only one protocol the prover knows the witness to.
+            assert len(prover_states) == 1
+            return ((prover_states, unknown_witness_prover_states), commitments)
+
+        def prover_response(self, prover_states, challenge):
+            (known_prover_states, unknown_witness_prover_states) = prover_states
+            known_state_challenge = challenge
+            responses = []
+            challenges = []
+
+            # The sum of all of the challenges for each of the protocols should be
+            # the verifier challenge. Therefore find the unknown challenge by
+            # subtracting the prover's shares from the verifier challenge.
+            for challenge_share, sim_responses in unknown_witness_prover_states:
+                known_state_challenge -= challenge_share
+                responses.append(sim_responses)
+                challenges.append(challenge_share)
+
+            # Include the response for the known protocol at the correct index
+            # (i.e., the index of the protocol in the original list of protocols)
+            (known_prover_state, known_index) = known_prover_states[0]
+            known_response = self.protocols[known_index].prover_response(known_prover_state, known_state_challenge)
+
+            responses.insert(known_index, known_response)
+            challenges.insert(known_index, known_state_challenge)
+
+            return (challenges[:-1], responses)
+
+        def verifier(self, commitments, challenge, _response):
+            challenges, responses = _response
+            assert len(commitments) == len(responses)
+            last_challenge = challenge - sum(challenges)
+            challenges.append(last_challenge)
+            assert all(
+                protocol.verifier(commitment, challenge, response)
+                for protocol, commitment, challenge, response in zip(self.protocols, commitments, challenges, responses)
+            )
+
+            return True
+
+        def serialize_batchable(self, commitments, challenge, _response):
+            challenges, responses = _response
+            return b''.join(
+                    [protocol.serialize_batchable(commitment, challenge, response) for protocol, commitment, response in zip(self.protocols, commitments, responses)] +
+                    [protocol.instance.Domain.serialize([challenge]) for (protocol, challenge) in zip(self.protocols[:-1], challenges)]
+                )
+
+        def deserialize_batchable(self, proof_string):
+            commitments = []
+            challenges = []
+            responses = []
+
+            start = 0
+            for protocol in self.protocols:
+                proof_len = protocol.instance.commit_bytes_len + protocol.instance.response_bytes_len
+                commitment, response = protocol.deserialize_batchable(proof_string[start : start + proof_len])
+                start += proof_len
+                commitments.append(commitment)
+                responses.append(response)
+
+            # The last part of the proof string is the challenges
+            for protocol in self.protocols[:-1]:
+                # we should not be needing to inspect Domain here
+                challenge_len = protocol.instance.Domain.scalar_byte_length()
+                challenge = protocol.instance.Domain.deserialize(proof_string[start : start + challenge_len])
+                challenges.append(challenge[0])
+                start += challenge_len
+
+            return (commitments, challenges, responses)
+
+        
+
+    class NIOrProof(NISigmaProtocol):
+        Protocol = OrProof
+        Codec = KeccakDuplexSpongeP256
+
+        def __init__(self, iv, instances):
+            self.hash_state = self.Codec(iv)
+            self.sp = self.Protocol(instances)
+
+        def prove(self, witnesses, rng):
+            # XXX. you shouldn't be able to call prove multiple times without refreshing the state.
+            (prover_states, commitments) = self.sp.prover_commit(witnesses, rng)
+            for commitment in commitments: self.hash_state.prover_message(commitment)
+            challenge = self.hash_state.verifier_challenge()
+            (challenges, responses) = self.sp.prover_response(prover_states, challenge)
+            assert self.sp.verifier(commitments, challenge, (challenges, responses))
+            return self.sp.serialize_batchable(commitments, challenge, (challenges, responses))
+
+        def verify(self, proof_string):
+            commitments, challenges, responses = self.sp.deserialize_batchable(proof_string)
+            for commitment in commitments: self.hash_state.prover_message(commitment)
+            challenge = self.hash_state.verifier_challenge()
+            return self.sp.verifier(commitments, challenge, (challenges, responses))
+
+    rng = TestDRNG("test vector seed".encode('utf-8'))
+    group = NISchnorrProofKeccakDuplexSpongeP256.Codec.GG
+
+    statement_1 = GroupMorphismPreimage(group)
+    [var_x] = statement_1.allocate_scalars(1)
+    [var_G, var_X] = statement_1.allocate_elements(2)
+    statement_1.append_equation(var_X, [(var_x, var_G)])
+    G = group.generator()
+    statement_1.set_elements([(var_G, G)])
+    x = group.ScalarField.random(rng)
+    X = G * x
+    assert [X] == statement_1.morphism([x])
+    statement_1.set_elements([(var_X, X)])
+    witness_1 = [x]
+
+    statement_2 = GroupMorphismPreimage(group)
+    [var_y] = statement_2.allocate_scalars(1)
+    [var_H, var_Y] = statement_2.allocate_elements(2)
+    statement_2.append_equation(var_Y, [(var_y, var_H)])
+    H = group.generator()
+    statement_2.set_elements([(var_H, H)])
+    y = group.ScalarField.random(rng)
+    Y = H * y
+    assert [Y] == statement_2.morphism([y])
+    statement_2.set_elements([(var_Y, Y)])
+    witness_2 = None
+
+    instances = [statement_1, statement_2]
+    witnesses = [witness_1, witness_2]
+
+    narg_string = NIOrProof(CONTEXT_STRING, instances).prove(witnesses, rng)
+    assert NIOrProof(CONTEXT_STRING, instances).verify(narg_string)
+    hex_narg_string = narg_string.hex()
+    print(f"test_or_composition narg_string: {hex_narg_string}")
 
 def main(path="vectors"):
     vectors = {}
@@ -318,6 +493,7 @@ def main(path="vectors"):
         test_vector(vectors)
 
     test_and_composition()
+    test_or_composition()
 
     with open(path + "/allVectors.json", 'wt') as f:
         json.dump(vectors, f, sort_keys=True, indent=2)
