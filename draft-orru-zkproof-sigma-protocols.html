@@ -1049,7 +1049,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Orrù &amp; Yun</td>
-<td class="center">Expires 4 November 2025</td>
+<td class="center">Expires 11 November 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1062,12 +1062,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-orru-zkproof-sigma-protocols-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-05-03" class="published">3 May 2025</time>
+<time datetime="2025-05-10" class="published">10 May 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-11-04">4 November 2025</time></dd>
+<dd class="expires"><time datetime="2025-11-11">11 November 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1116,7 +1116,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 November 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 11 November 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1211,7 +1211,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
                 <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-ciphersuites" class="internal xref">Ciphersuites</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.1">
-                    <p id="section-toc.1-1.4.2.2.2.1.1"><a href="#section-4.2.1" class="auto internal xref">4.2.1</a>.  <a href="#name-p-384" class="internal xref">P-384</a></p>
+                    <p id="section-toc.1-1.4.2.2.2.1.1"><a href="#section-4.2.1" class="auto internal xref">4.2.1</a>.  <a href="#name-p-256-secp256r1" class="internal xref">P-256 (secp256r1)</a></p>
 </li>
                 </ul>
 </li>
@@ -1415,10 +1415,10 @@ Finally, line 3 states that the constraints (the equations) that need to be prov
               <p id="section-3.1.1-1.4.1"><code>random()</code>: outputs a random element in the group.<a href="#section-3.1.1-1.4.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.1.1-1.5">
-              <p id="section-3.1.1-1.5.1"><code>serialize(elements: [Group; N])</code>, serializes a list of group elements and returns a canonical byte array <code>buf</code> of fixed length <code>Ng * N</code>.<a href="#section-3.1.1-1.5.1" class="pilcrow">¶</a></p>
+              <p id="section-3.1.1-1.5.1"><code>serialize(elements: [Group; N])</code>, serializes a list of group elements and returns a canonical byte array <code>buf</code> of fixed length <code>Ne * N</code>.<a href="#section-3.1.1-1.5.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.1.1-1.6">
-              <p id="section-3.1.1-1.6.1"><code>deserialize(buffer)</code>, attempts to map a byte array <code>buffer</code> of size <code>Ng * N</code> into <code>[Group; N]</code>, and fails if the input is not the valid canonical byte representation of an element of the group. This function can raise a <code>DeserializeError</code> if deserialization fails.<a href="#section-3.1.1-1.6.1" class="pilcrow">¶</a></p>
+              <p id="section-3.1.1-1.6.1"><code>deserialize(buffer)</code>, attempts to map a byte array <code>buffer</code> of size <code>Ne * N</code> into <code>[Group; N]</code>, and fails if the input is not the valid canonical byte representation of an element of the group. This function can raise a <code>DeserializeError</code> if deserialization fails.<a href="#section-3.1.1-1.6.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.1.1-1.7">
               <p id="section-3.1.1-1.7.1"><code>add(element: Group)</code>, implements elliptic curve addition for the two group elements.<a href="#section-3.1.1-1.7.1" class="pilcrow">¶</a></p>
@@ -1898,41 +1898,41 @@ nonces = [int(bin_nonce[i*scalar_bytes: i*(scalar_bytes+1)]) % p
         <h3 id="name-ciphersuites">
 <a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-ciphersuites" class="section-name selfRef">Ciphersuites</a>
         </h3>
-<div id="p-384">
+<div id="p-256-secp256r1">
 <section id="section-4.2.1">
-          <h4 id="name-p-384">
-<a href="#section-4.2.1" class="section-number selfRef">4.2.1. </a><a href="#name-p-384" class="section-name selfRef">P-384</a>
+          <h4 id="name-p-256-secp256r1">
+<a href="#section-4.2.1" class="section-number selfRef">4.2.1. </a><a href="#name-p-256-secp256r1" class="section-name selfRef">P-256 (secp256r1)</a>
           </h4>
-<p id="section-4.2.1-1">This ciphersuite uses P-384 <span>[<a href="#NISTCurves" class="cite xref">NISTCurves</a>]</span> for the Group.<a href="#section-4.2.1-1" class="pilcrow">¶</a></p>
-<div id="elliptic-curve-group-of-p-384-secp384r1-nistcurves">
+<p id="section-4.2.1-1">This ciphersuite uses P-256 <span>[<a href="#NISTCurves" class="cite xref">NISTCurves</a>]</span> for the Group.<a href="#section-4.2.1-1" class="pilcrow">¶</a></p>
+<div id="elliptic-curve-group-of-p-256-secp384r1-nistcurves">
 <section id="section-4.2.1.1">
-            <h5 id="name-elliptic-curve-group-of-p-3">
-<a href="#section-4.2.1.1" class="section-number selfRef">4.2.1.1. </a><a href="#name-elliptic-curve-group-of-p-3" class="section-name selfRef">Elliptic curve group of P-384 (secp384r1) <span class="cite xref">[NISTCurves]</span></a>
+            <h5 id="name-elliptic-curve-group-of-p-2">
+<a href="#section-4.2.1.1" class="section-number selfRef">4.2.1.1. </a><a href="#name-elliptic-curve-group-of-p-2" class="section-name selfRef">Elliptic curve group of P-256 (secp384r1) <span class="cite xref">[NISTCurves]</span></a>
             </h5>
 <ul class="normal">
 <li class="normal" id="section-4.2.1.1-1.1">
-                <p id="section-4.2.1.1-1.1.1"><code>order()</code>: Return the integer <code>0xffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973</code>.<a href="#section-4.2.1.1-1.1.1" class="pilcrow">¶</a></p>
+                <p id="section-4.2.1.1-1.1.1"><code>order()</code>: Return the integer <code>115792089237316195423570985008687907852837564279074904382605163141518161494337</code>.<a href="#section-4.2.1.1-1.1.1" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-4.2.1.1-1.2">
-                <p id="section-4.2.1.1-1.2.1"><code>serialize([A])</code>: Implemented using the compressed Elliptic-Curve-Point-to-Octet-String method according to <span>[<a href="#SEC1" class="cite xref">SEC1</a>]</span>; <code>Ng = 49</code>.<a href="#section-4.2.1.1-1.2.1" class="pilcrow">¶</a></p>
+                <p id="section-4.2.1.1-1.2.1"><code>serialize([A])</code>: Implemented using the compressed Elliptic-Curve-Point-to-Octet-String method according to <span>[<a href="#SEC1" class="cite xref">SEC1</a>]</span>; <code>Ne = 33</code>.<a href="#section-4.2.1.1-1.2.1" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-4.2.1.1-1.3">
-                <p id="section-4.2.1.1-1.3.1"><code>deserialize(buf)</code>: Implemented by attempting to read <code>buf</code> into chunks of 49-byte arrays and convert them using the compressed Octet-String-to-Elliptic-Curve-Point method according to <span>[<a href="#SEC1" class="cite xref">SEC1</a>]</span>, and then performs partial public-key validation as defined in section 5.6.2.3.4 of <span>[<a href="#KEYAGREEMENT" class="cite xref">KEYAGREEMENT</a>]</span>. This includes checking that the coordinates of the resulting point are in the correct range, that the point is on the curve, and that the point is not the point at infinity.<a href="#section-4.2.1.1-1.3.1" class="pilcrow">¶</a></p>
+                <p id="section-4.2.1.1-1.3.1"><code>deserialize(buf)</code>: Implemented by attempting to read <code>buf</code> into chunks of 32-byte arrays and convert them using the compressed Octet-String-to-Elliptic-Curve-Point method according to <span>[<a href="#SEC1" class="cite xref">SEC1</a>]</span>, and then performs partial public-key validation as defined in section 5.6.2.3.4 of <span>[<a href="#KEYAGREEMENT" class="cite xref">KEYAGREEMENT</a>]</span>. This includes checking that the coordinates of the resulting point are in the correct range, that the point is on the curve, and that the point is not the point at infinity.<a href="#section-4.2.1.1-1.3.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
 </section>
 </div>
-<div id="scalar-field-of-p-384-secp384r1">
+<div id="scalar-field-of-p-256">
 <section id="section-4.2.1.2">
-            <h5 id="name-scalar-field-of-p-384-secp3">
-<a href="#section-4.2.1.2" class="section-number selfRef">4.2.1.2. </a><a href="#name-scalar-field-of-p-384-secp3" class="section-name selfRef">Scalar Field of P-384 (secp384r1)</a>
+            <h5 id="name-scalar-field-of-p-256">
+<a href="#section-4.2.1.2" class="section-number selfRef">4.2.1.2. </a><a href="#name-scalar-field-of-p-256" class="section-name selfRef">Scalar Field of P-256</a>
             </h5>
 <ul class="normal">
 <li class="normal" id="section-4.2.1.2-1.1">
-                <p id="section-4.2.1.2-1.1.1"><code>serialize(s)</code>: Relies on the Field-Element-to-Octet-String conversion according to <span>[<a href="#SEC1" class="cite xref">SEC1</a>]</span>; <code>Ns = 48</code>.<a href="#section-4.2.1.2-1.1.1" class="pilcrow">¶</a></p>
+                <p id="section-4.2.1.2-1.1.1"><code>serialize(s)</code>: Relies on the Field-Element-to-Octet-String conversion according to <span>[<a href="#SEC1" class="cite xref">SEC1</a>]</span>; <code>Ns = 32</code>.<a href="#section-4.2.1.2-1.1.1" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-4.2.1.2-1.2">
-                <p id="section-4.2.1.2-1.2.1"><code>deserialize(buf)</code>: Reads the byte array <code>buf</code> in chunks of 48 bytes using Octet-String-to-Field-Element from <span>[<a href="#SEC1" class="cite xref">SEC1</a>]</span>. This function can fail if the input does not represent a Scalar in the range <code>[0, G.Order() - 1]</code>.<a href="#section-4.2.1.2-1.2.1" class="pilcrow">¶</a></p>
+                <p id="section-4.2.1.2-1.2.1"><code>deserialize(buf)</code>: Reads the byte array <code>buf</code> in chunks of 32 bytes using Octet-String-to-Field-Element from <span>[<a href="#SEC1" class="cite xref">SEC1</a>]</span>. This function can fail if the input does not represent a Scalar in the range <code>[0, G.Order() - 1]</code>.<a href="#section-4.2.1.2-1.2.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
 </section>

@@ -5,8 +5,8 @@
 Network Working Group                                            M. Orrù
 Internet-Draft                                                      CNRS
 Intended status: Informational                                    C. Yun
-Expires: 4 November 2025                                     Apple, Inc.
-                                                              3 May 2025
+Expires: 11 November 2025                                    Apple, Inc.
+                                                             10 May 2025
 
 
                             Sigma Protocols
@@ -48,7 +48,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 November 2025.
+   This Internet-Draft will expire on 11 November 2025.
 
 Copyright Notice
 
@@ -84,7 +84,7 @@ Table of Contents
        4.1.10. Serializing the statement for the Fiat-Shamir
                transformation
      4.2.  Ciphersuites
-       4.2.1.  P-384
+       4.2.1.  P-256 (secp256r1)
      4.3.  Security Considerations
      4.4.  Post-Quantum Security Considerations
        4.4.1.  Privacy Considerations
@@ -279,11 +279,11 @@ class SigmaProtocol:
    *  random(): outputs a random element in the group.
 
    *  serialize(elements: [Group; N]), serializes a list of group
-      elements and returns a canonical byte array buf of fixed length Ng
+      elements and returns a canonical byte array buf of fixed length Ne
       * N.
 
    *  deserialize(buffer), attempts to map a byte array buffer of size
-      Ng * N into [Group; N], and fails if the input is not the valid
+      Ne * N into [Group; N], and fails if the input is not the valid
       canonical byte representation of an element of the group.  This
       function can raise a DeserializeError if deserialization fails.
 
@@ -641,20 +641,20 @@ Procedure:
 
 4.2.  Ciphersuites
 
-4.2.1.  P-384
+4.2.1.  P-256 (secp256r1)
 
-   This ciphersuite uses P-384 [NISTCurves] for the Group.
+   This ciphersuite uses P-256 [NISTCurves] for the Group.
 
-4.2.1.1.  Elliptic curve group of P-384 (secp384r1) [NISTCurves]
+4.2.1.1.  Elliptic curve group of P-256 (secp384r1) [NISTCurves]
 
-   *  order(): Return the integer 0xffffffffffffffffffffffffffffffffffff
-      ffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973.
+   *  order(): Return the integer 11579208923731619542357098500868790785
+      2837564279074904382605163141518161494337.
 
    *  serialize([A]): Implemented using the compressed Elliptic-Curve-
-      Point-to-Octet-String method according to [SEC1]; Ng = 49.
+      Point-to-Octet-String method according to [SEC1]; Ne = 33.
 
    *  deserialize(buf): Implemented by attempting to read buf into
-      chunks of 49-byte arrays and convert them using the compressed
+      chunks of 32-byte arrays and convert them using the compressed
       Octet-String-to-Elliptic-Curve-Point method according to [SEC1],
       and then performs partial public-key validation as defined in
       section 5.6.2.3.4 of [KEYAGREEMENT].  This includes checking that
@@ -662,12 +662,12 @@ Procedure:
       that the point is on the curve, and that the point is not the
       point at infinity.
 
-4.2.1.2.  Scalar Field of P-384 (secp384r1)
+4.2.1.2.  Scalar Field of P-256
 
    *  serialize(s): Relies on the Field-Element-to-Octet-String
-      conversion according to [SEC1]; Ns = 48.
+      conversion according to [SEC1]; Ns = 32.
 
-   *  deserialize(buf): Reads the byte array buf in chunks of 48 bytes
+   *  deserialize(buf): Reads the byte array buf in chunks of 32 bytes
       using Octet-String-to-Field-Element from [SEC1].  This function
       can fail if the input does not represent a Scalar in the range [0,
       G.Order() - 1].
