@@ -420,7 +420,7 @@ def test_or_composition():
                 challenges.append(challenge[0])
                 start += challenge_len
 
-            return (commitments, challenges, responses)
+            return (commitments, (challenges, responses))
 
     class NIOrProof(NISigmaProtocol):
         Protocol = OrProof
@@ -432,6 +432,7 @@ def test_or_composition():
 
         def prove(self, witnesses, rng):
             # XXX. you shouldn't be able to call prove multiple times without refreshing the state.
+            hash_state = self.hash_state.copy()
             (prover_states, commitments) = self.sp.prover_commit(witnesses, rng)
             for commitment in commitments: self.hash_state.prover_message(commitment)
             challenge = self.hash_state.verifier_challenge()
@@ -440,7 +441,7 @@ def test_or_composition():
             return self.sp.serialize_batchable(commitments, challenge, (challenges, responses))
 
         def verify(self, proof_string):
-            commitments, challenges, responses = self.sp.deserialize_batchable(proof_string)
+            commitments, (challenges, responses) = self.sp.deserialize_batchable(proof_string)
             for commitment in commitments: self.hash_state.prover_message(commitment)
             challenge = self.hash_state.verifier_challenge()
             return self.sp.verifier(commitments, challenge, (challenges, responses))
