@@ -1,4 +1,4 @@
-# [zkproof Σ-protocols Standard](https://sigma.zkproof.org)
+# [Specification for Sigma Protocols](https://sigma.zkproof.org)
 
 ## Introduction
 
