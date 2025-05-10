@@ -165,9 +165,9 @@ class SigmaProtocol:
    def prover_response(self, prover_state, challenge) -> response
    def verifier(self, commitment, challenge, response) -> bool
    # optional
-   def simulate_response() -> response
+   def simulate_response(self, rng) -> response
    # optional
-   def simulate_commitment(response, challenge) -> commitment
+   def simulate_commitment(self, response, challenge) -> commitment
 
    Where:
 
@@ -214,14 +214,14 @@ class SigmaProtocol:
    needed for verifying short proofs and for or-composition, where a
    witness is not known and thus has to be simulated.  We have:
 
-   *  simulate_response() -> response, denoting the first stage of the
-      simulator.  It is an algorithm drawing a random response that
-      follows the same output distribution of the algorithm
-      prover_response.
+   *  simulate_response(self, rng) -> response, denoting the first stage
+      of the simulator.  It is an algorithm drawing a random response
+      given a specified cryptographically secure RNG that follows the
+      same output distribution of the algorithm prover_response.
 
-   *  simulate_commitment(response, challenge) -> commitment, returning
-      a simulated commitment -- the second phase of the zero-knowledge
-      simulator.
+   *  simulate_commitment(self, response, challenge) -> commitment,
+      returning a simulated commitment -- the second phase of the zero-
+      knowledge simulator.
 
    Together, these zero-knowledge simulators provide a transcript that
    should be computationally indistinguishable from the transcript
