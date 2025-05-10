@@ -191,8 +191,8 @@ We detail the functions that can be invoked on these objects. Example choices ca
 - `generator()`, returns the generator of the prime-order elliptic-curve subgroup used for cryptographic operations.
 - `order()`: Outputs the order of the group `p`.
 - `random()`: outputs a random element in the group.
-- `serialize(elements: [Group; N])`, serializes a list of group elements and returns a canonical byte array `buf` of fixed length `Ng * N`.
-- `deserialize(buffer)`, attempts to map a byte array `buffer` of size `Ng * N` into `[Group; N]`, and fails if the input is not the valid canonical byte representation of an element of the group. This function can raise a `DeserializeError` if deserialization fails.
+- `serialize(elements: [Group; N])`, serializes a list of group elements and returns a canonical byte array `buf` of fixed length `Ne * N`.
+- `deserialize(buffer)`, attempts to map a byte array `buffer` of size `Ne * N` into `[Group; N]`, and fails if the input is not the valid canonical byte representation of an element of the group. This function can raise a `DeserializeError` if deserialization fails.
 - `add(element: Group)`, implements elliptic curve addition for the two group elements.
 - `equal(element: Group)`, returns `true` if the two elements are the same and false` otherwise.
 - `scalar_mul(scalar: Scalar)`, implements scalar multiplication for a group element by an element in its respective scalar field.
@@ -509,20 +509,20 @@ Where:
 
 ## Ciphersuites {#ciphersuites}
 
-### P-384
+### P-256 (secp256r1)
 
-This ciphersuite uses P-384 {{NISTCurves}} for the Group.
+This ciphersuite uses P-256 {{NISTCurves}} for the Group.
 
-#### Elliptic curve group of P-384 (secp384r1) {{NISTCurves}}
+#### Elliptic curve group of P-256 (secp384r1) {{NISTCurves}}
 
-- `order()`: Return the integer `0xffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973`.
-- `serialize([A])`: Implemented using the compressed Elliptic-Curve-Point-to-Octet-String method according to {{SEC1}}; `Ng = 49`.
-- `deserialize(buf)`: Implemented by attempting to read `buf` into chunks of 49-byte arrays and convert them using the compressed Octet-String-to-Elliptic-Curve-Point method according to {{SEC1}}, and then performs partial public-key validation as defined in section 5.6.2.3.4 of {{!KEYAGREEMENT=DOI.10.6028/NIST.SP.800-56Ar3}}. This includes checking that the coordinates of the resulting point are in the correct range, that the point is on the curve, and that the point is not the point at infinity.
+- `order()`: Return the integer `115792089237316195423570985008687907852837564279074904382605163141518161494337`.
+- `serialize([A])`: Implemented using the compressed Elliptic-Curve-Point-to-Octet-String method according to {{SEC1}}; `Ne = 33`.
+- `deserialize(buf)`: Implemented by attempting to read `buf` into chunks of 32-byte arrays and convert them using the compressed Octet-String-to-Elliptic-Curve-Point method according to {{SEC1}}, and then performs partial public-key validation as defined in section 5.6.2.3.4 of {{!KEYAGREEMENT=DOI.10.6028/NIST.SP.800-56Ar3}}. This includes checking that the coordinates of the resulting point are in the correct range, that the point is on the curve, and that the point is not the point at infinity.
 
-#### Scalar Field of P-384 (secp384r1)
+#### Scalar Field of P-256
 
-- `serialize(s)`: Relies on the Field-Element-to-Octet-String conversion according to {{SEC1}}; `Ns = 48`.
-- `deserialize(buf)`: Reads the byte array `buf` in chunks of 48 bytes using Octet-String-to-Field-Element from {{SEC1}}. This function can fail if the input does not represent a Scalar in the range `[0, G.Order() - 1]`.
+- `serialize(s)`: Relies on the Field-Element-to-Octet-String conversion according to {{SEC1}}; `Ns = 32`.
+- `deserialize(buf)`: Reads the byte array `buf` in chunks of 32 bytes using Octet-String-to-Field-Element from {{SEC1}}. This function can fail if the input does not represent a Scalar in the range `[0, G.Order() - 1]`.
 
 ## Security Considerations
 
