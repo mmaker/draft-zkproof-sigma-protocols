@@ -45,14 +45,17 @@ class NISigmaProtocol:
     """
     Protocol: SigmaProtocol = None
     Codec = None
+    Hash = None
 
     def __init__(self, iv, instance):
-        self.hash_state = self.Codec(iv)
+        self.hash_state = self.Hash(iv)
         self.sp = self.Protocol(instance)
+        self.codec = self.Codec()
 
     def prove(self, witness, rng):
         (prover_state, commitment) = self.sp.prover_commit(witness, rng)
-        challenge = self.hash_state.prover_message(commitment).verifier_challenge()
+        self.codec.prover_message(self.hash_state, commitment)
+        challenge = self.codec.verifier_challenge(self.hash_state)
         response = self.sp.prover_response(prover_state, challenge)
 
         assert self.sp.verifier(commitment, challenge, response)
@@ -60,7 +63,8 @@ class NISigmaProtocol:
 
     def verify(self, proof):
         commitment, response = self.sp.deserialize_batchable(proof)
-        challenge = self.hash_state.prover_message(commitment).verifier_challenge()
+        self.codec.prover_message(self.hash_state, commitment)
+        challenge = self.codec.verifier_challenge(self.hash_state)
         return self.sp.verifier(commitment, challenge, response)
 
 
@@ -198,7 +202,7 @@ class SchnorrProof(SigmaProtocol):
         response = self.instance.Domain.deserialize(response_bytes)
 
         return (commitment, response)
-    
+
     def simulate_response(self, rng):
         return [self.instance.Domain.random(rng) for i in range(self.instance.morphism.num_scalars)]
 
@@ -210,20 +214,14 @@ class SchnorrProof(SigmaProtocol):
 
 class ByteSchnorrCodec:
     GG: groups.Group = None
-    Hash: DuplexSpongeInterface = None
 
-    def __init__(self, iv: bytes):
-        self.hash_state = self.Hash(iv)
+    def prover_message(self, hash_state, elements: list):
+        hash_state.absorb(self.GG.serialize(elements))
 
-    def prover_message(self, elements: list):
-        self.hash_state.absorb(self.GG.serialize(elements))
-        # calls can be chained
-        return self
-
-    def verifier_challenge(self):
+    def verifier_challenge(self, hash_state):
         from hash_to_field import OS2IP
 
-        uniform_bytes = self.hash_state.squeeze(
+        uniform_bytes = hash_state.squeeze(
             self.GG.ScalarField.scalar_byte_length() + 16
         )
         scalar = OS2IP(uniform_bytes) % self.GG.ScalarField.order
@@ -232,32 +230,35 @@ class ByteSchnorrCodec:
 
 ### Codecs for the different groups
 
-class KeccakDuplexSpongeP384(ByteSchnorrCodec):
+class P384Codec(ByteSchnorrCodec):
     GG = groups.GroupP384()
-    Hash = KeccakDuplexSponge
 
-
-class KeccakDuplexSpongeBls12381(ByteSchnorrCodec):
+class Bls12381Codec(ByteSchnorrCodec):
     GG = groups.BLS12_381_G1
-    Hash = KeccakDuplexSponge
 
-class KeccakDuplexSpongeP256(ByteSchnorrCodec):
+class P256Codec(ByteSchnorrCodec):
     GG = groups.GroupP256()
-    Hash = KeccakDuplexSponge
 
 
 ### Ciphersuite instantiation
+
 class NISchnorrProofKeccakDuplexSpongeP256(NISigmaProtocol):
     Protocol = SchnorrProof
-    Codec = KeccakDuplexSpongeP256
+    Codec = P256Codec
+    Hash = KeccakDuplexSponge
+
 
 class NISchnorrProofKeccakDuplexSpongeP384(NISigmaProtocol):
     Protocol = SchnorrProof
-    Codec = KeccakDuplexSpongeP384
+    Codec = P384Codec
+    Hash = KeccakDuplexSponge
+
 
 class NISchnorrProofKeccakDuplexSpongeBls12381(NISigmaProtocol):
     Protocol = SchnorrProof
-    Codec = KeccakDuplexSpongeBls12381
+    Codec = Bls12381Codec
+    Hash = KeccakDuplexSponge
+
 
 CIPHERSUITE = {
     "sigma/OWKeccak1600+P256": NISchnorrProofKeccakDuplexSpongeP256,
