@@ -198,6 +198,14 @@ class SchnorrProof(SigmaProtocol):
         response = self.instance.Domain.deserialize(response_bytes)
 
         return (commitment, response)
+    
+    def simulate_response(self, rng):
+        return [self.instance.Domain.random(rng) for i in range(self.instance.morphism.num_scalars)]
+
+    def simulate_commitment(self, response, challenge):
+        h_c_values = [self.instance.image[i] * challenge for i in range(self.instance.morphism.num_statements)]
+        # Generate what the correct commitment would be based on the random response and challenge.
+        return [self.instance.morphism([response])[0] - h_c_value for (h_c_value, response) in zip(h_c_values, response)]
 
 
 class ByteSchnorrCodec:

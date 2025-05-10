@@ -10,7 +10,7 @@ where $A \in \mathbb{G}^{m \times n}$ and $B \in \mathbb{G}^m$ are public. These
 
 This specification will focus on ciphersuites in elliptic curve groups.
 This specification will **NOT** include:
-- Proofs over prime-order groups, RSA groups, or lattices;
+- Proofs over RSA groups, multiplicative group of integers modulo a prime number, or lattices;
 - AND and OR composition of sigma protocols;
 - Compressed Sigma protocols;
 - Recursive arguments via algebraic hash functions;
