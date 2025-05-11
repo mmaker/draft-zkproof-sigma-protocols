@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-05-08T01:17:54.464932+00:00",
+  "timestamp": "2025-05-11T01:22:03.942800+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -264,9 +264,17 @@
       "labels": [],
       "body": "The file https://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/test_sigma_protocols.sage should contain an example showing how sigma protocols can be composed using OR composition.   \n\n\nA previously-reviewed algorithm is described in  https://sigma.zkproof.org/tex-spec.pdf section 2.5.2 ",
       "createdAt": "2025-04-01T12:42:50Z",
-      "updatedAt": "2025-04-13T03:43:43Z",
+      "updatedAt": "2025-05-10T19:04:50Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Thanks @vishady721 !",
+          "createdAt": "2025-05-10T19:04:49Z",
+          "updatedAt": "2025-05-10T19:04:49Z"
+        }
+      ]
     },
     {
       "number": 17,
@@ -429,9 +437,24 @@
       "labels": [],
       "body": "In preimage morphism proofs you can also give proof outputs as `(challenge, response)` instead of `(commitment, response)`. ",
       "createdAt": "2025-04-03T13:50:20Z",
-      "updatedAt": "2025-04-03T13:50:20Z",
+      "updatedAt": "2025-05-10T19:05:11Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Related: #32.\nMight be useful for this issue to have separate `serialize_commit` and `serialize_response` functions",
+          "createdAt": "2025-05-10T19:02:39Z",
+          "updatedAt": "2025-05-10T19:02:39Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Related: #5 ",
+          "createdAt": "2025-05-10T19:05:10Z",
+          "updatedAt": "2025-05-10T19:05:10Z"
+        }
+      ]
     },
     {
       "number": 27,
@@ -480,7 +503,7 @@
       "id": "I_kwDONyiw_86yWlE6",
       "title": "Add \"Security Considerations\" section",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/30",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -489,8 +512,8 @@
       "labels": [],
       "body": "Fill in section \"Security Considerations\" currently empty. \n\nThis section is intended to guide the reader through the different soundness and privacy\nnotions for sigma protocols. In particular it should have a sub-section on: \n\n- Security Assumptions\n- Security Properties\n\nPlus an overview of common attacks on sigma protocols, some of which can be found in https://sigma.zkproof.org/history.\nAdd a note on replay attacks and the meaning of the `IV` when starting the protocol.\n\nIt should also mention the UC security guarantees, and cite previous works like: \n\n- https://eprint.iacr.org/2022/290\n\n",
       "createdAt": "2025-04-14T08:16:33Z",
-      "updatedAt": "2025-05-07T09:07:08Z",
-      "closedAt": null,
+      "updatedAt": "2025-05-10T13:51:34Z",
+      "closedAt": "2025-05-10T13:51:34Z",
       "comments": []
     },
     {
@@ -549,11 +572,14 @@
       "state": "OPEN",
       "author": "mmaker",
       "authorAssociation": "OWNER",
-      "assignees": [],
+      "assignees": [
+        "mmaker",
+        "cathieyun"
+      ],
       "labels": [],
       "body": "> Some text sprinkled around the user/implementor pitfalls in the security considerations helps people appreciate the importance of standardising a thing (e.g. proof reuse, constant-time, dealing with the mod bias via the extra bytes, etc). \n",
       "createdAt": "2025-05-03T17:15:13Z",
-      "updatedAt": "2025-05-03T17:15:13Z",
+      "updatedAt": "2025-05-10T13:51:42Z",
       "closedAt": null,
       "comments": []
     },
@@ -570,6 +596,63 @@
       "body": "Currently the hash state of an (initialized) non-interactive proof is affected by the `prove` and `verify` functions.\nhttps://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/sigma_protocols.sage#L55\n\nIn the non-interactive proof we re-instantiate the hash state for each prove and verify, which doesn't make sense. \nhttps://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/test_sigma_protocols.sage#L303\n\nWe should be copying the state upon proving time and proceed from there.",
       "createdAt": "2025-05-07T09:10:45Z",
       "updatedAt": "2025-05-07T09:10:59Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 37,
+      "id": "I_kwDONyiw_862CtQ6",
+      "title": "Editorial comment: fix typo.",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/37",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "mmaker",
+        "cathieyun"
+      ],
+      "labels": [],
+      "body": "From @wbl: \n\n> I think in 2.3 for the commitment you want to map the nonces in prover_commit, not the witness. \"generators\" appears exactly once, which is probably a typo.",
+      "createdAt": "2025-05-10T13:53:08Z",
+      "updatedAt": "2025-05-10T13:53:08Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 38,
+      "id": "I_kwDONyiw_862CtXE",
+      "title": "Editorial: set expectations correctly in intro",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/38",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "mmaker",
+        "cathieyun"
+      ],
+      "labels": [],
+      "body": "From @wbl: \n\n> More broadly I think there introduction seems to promise a bit much.\n> It discusses OR proofs, t out of n, and ultimately a degree of\n> composibility (maybe), but I think a bit more needs to be said here to\n> make that work. If we just want to do it for linear equations over\n> prime order groups, fine, but then the intro should be revised to make\n> that clear. Ideally we'd include some degree of composibility via the\n> auxilliary data passed in or at least warnings about when and when not\n> to compose. ",
+      "createdAt": "2025-05-10T13:53:54Z",
+      "updatedAt": "2025-05-10T13:54:05Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 39,
+      "id": "I_kwDONyiw_862CuIT",
+      "title": "Editorial: explain where elements are tested for being in the EC subgroup",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/39",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "mmaker",
+        "cathieyun"
+      ],
+      "labels": [],
+      "body": "From @wbl:\n\n> We might also need to tackle not-prime order points: verifying order is\n> expensive, but there are some tricks on BLS 12 to speed it up, but\n> when doing a batched proof cofactor clearing is comparatively cheap.\n\nThis is already discussed in the TeX specification -- perhaps one can just test that the instance is in the group, and not the commitment?",
+      "createdAt": "2025-05-10T13:56:59Z",
+      "updatedAt": "2025-05-10T13:56:59Z",
       "closedAt": null,
       "comments": []
     }
@@ -832,24 +915,26 @@
       "id": "PR_kwDONyiw_86U3lD_",
       "title": "Test vector + scaffolding for or composition",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/35",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "vishady721",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2025-05-05T00:44:58Z",
-      "updatedAt": "2025-05-07T16:28:10Z",
+      "updatedAt": "2025-05-10T18:25:48Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
       "baseRefOid": "2b78efed3d9b032770d29ad8dda216c693cf7a73",
       "headRepository": "mmaker/draft-zkproof-sigma-protocols",
       "headRefName": "vishady/OR-composition",
-      "headRefOid": "65bd867490bbece3e45e1313b2fa3fcdf795a406",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "41a5bb61318cc00254949890c2a067ea620fddfc",
+      "closedAt": "2025-05-10T18:25:48Z",
+      "mergedAt": "2025-05-10T18:25:48Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "cf9806929f8c8bf04338e60b20bfcafc0228e6eb"
+      },
       "comments": [
         {
           "author": "mmaker",
@@ -866,6 +951,55 @@
           "updatedAt": "2025-05-07T16:28:09Z"
         }
       ],
+      "reviews": [
+        {
+          "id": "PRR_kwDONyiw_86oegF3",
+          "commit": {
+            "abbreviatedOid": "41a5bb6"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-08T23:05:14Z",
+          "updatedAt": "2025-05-08T23:06:18Z",
+          "comments": [
+            {
+              "originalPosition": 139,
+              "body": "I would expect `deserialize_batchable` to be the inverse of `serialize_batchable`, and that (by correctness) its output verifies. Can you pack again `challenges` with `responses`?",
+              "createdAt": "2025-05-08T23:05:15Z",
+              "updatedAt": "2025-05-08T23:06:18Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 40,
+      "id": "PR_kwDONyiw_86VtV13",
+      "title": "Vishady/spec changes",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/40",
+      "state": "MERGED",
+      "author": "vishady721",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-05-10T18:42:00Z",
+      "updatedAt": "2025-05-10T18:43:32Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "d7b0879f89613bdbaa2da1de9b5ef1b6c6999771",
+      "headRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "headRefName": "vishady/spec-changes",
+      "headRefOid": "b5723e8f8e75879ac0f2a4e7618d798184f88c9a",
+      "closedAt": "2025-05-10T18:43:32Z",
+      "mergedAt": "2025-05-10T18:43:32Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "83e16b70ad0d85cde2e4e4a88d952bd140cd0f62"
+      },
+      "comments": [],
       "reviews": []
     }
   ]
