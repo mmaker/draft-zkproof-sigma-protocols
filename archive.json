@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-05-11T01:22:03.942800+00:00",
+  "timestamp": "2025-05-13T01:18:36.288816+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -255,7 +255,7 @@
       "id": "I_kwDONyiw_86woOJ2",
       "title": "Example: OR composition of sigma protocols",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/16",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -264,8 +264,8 @@
       "labels": [],
       "body": "The file https://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/test_sigma_protocols.sage should contain an example showing how sigma protocols can be composed using OR composition.   \n\n\nA previously-reviewed algorithm is described in  https://sigma.zkproof.org/tex-spec.pdf section 2.5.2 ",
       "createdAt": "2025-04-01T12:42:50Z",
-      "updatedAt": "2025-05-10T19:04:50Z",
-      "closedAt": null,
+      "updatedAt": "2025-05-11T04:40:01Z",
+      "closedAt": "2025-05-11T04:40:01Z",
       "comments": [
         {
           "author": "mmaker",
