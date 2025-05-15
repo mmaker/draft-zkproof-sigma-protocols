@@ -345,7 +345,7 @@ The group morphism `GroupMorphism` is initialized with
 
 A witness can be mapped to a group element via:
 
-    map(self, witness: [Scalar; num_scalars])
+    map(self, nonces: [Scalar; num_scalars])
 
     Inputs:
 
@@ -484,7 +484,7 @@ Let `H` be a hash object. The statement is encoded in a stateful hash object as 
     hasher.update_usize([cs.num_statements, cs.num_scalars])
     for equation in cs.equations:
       hasher.update_usize([equation.lhs, equation.rhs[0], equation.rhs[1]])
-    hasher.update(generators)
+    hasher.update(group_elements)
     iv = hasher.digest()
 
 In simpler terms, without stateful hash objects, this should correspond to the following:
