@@ -4,6 +4,7 @@ import struct
 from keccak import Keccak
 from sagelib.groups import Group
 from sagelib import groups
+import copy
 
 
 class DuplexSpongeInterface(ABC):
@@ -106,3 +107,6 @@ class KeccakDuplexSponge(DuplexSponge):
     def __init__(self, iv: bytes):
         self.permutation_state = KeccakPermutationState()
         super().__init__(iv)
+
+    def clone(self):
+        return copy.deepcopy(self)

@@ -227,18 +227,22 @@ class NISigmaProtocol:
         self.codec = self.Codec()
 
     def prove(self, witness, rng):
+        hash_state = self.hash_state.clone()
+
         (prover_state, commitment) = self.sp.prover_commit(witness, rng)
-        self.codec.prover_message(self.hash_state, commitment)
-        challenge = self.codec.verifier_challenge(self.hash_state)
+        self.codec.prover_message(hash_state, commitment)
+        challenge = self.codec.verifier_challenge(hash_state)
         response = self.sp.prover_response(prover_state, challenge)
 
         assert self.sp.verifier(commitment, challenge, response)
         return self.sp.serialize_batchable(commitment, challenge, response)
 
     def verify(self, proof):
+        hash_state = self.hash_state.clone()
+
         commitment, response = self.sp.deserialize_batchable(proof)
-        self.codec.prover_message(self.hash_state, commitment)
-        challenge = self.codec.verifier_challenge(self.hash_state)
+        self.codec.prover_message(hash_state, commitment)
+        challenge = self.codec.verifier_challenge(hash_state)
         return self.sp.verifier(commitment, challenge, response)
 
 ### Codecs for the byte-oriented hash functions and elliptic curve groups
