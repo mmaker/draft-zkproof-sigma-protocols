@@ -345,7 +345,7 @@ The group morphism `GroupMorphism` is initialized with
 
 A witness can be mapped to a group element via:
 
-    map(self, witness: [Scalar; num_scalars])
+    map(self, scalars: [Scalar; num_scalars])
 
     Inputs:
 
