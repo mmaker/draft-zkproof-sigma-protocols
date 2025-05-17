@@ -4,8 +4,8 @@
 
 Zkproof                                                          M. Orrù
 Internet-Draft                                                      CNRS
-Intended status: Informational                               10 May 2025
-Expires: 11 November 2025
+Intended status: Informational                               17 May 2025
+Expires: 18 November 2025
 
 
                        Fiat-Shamir Transformation
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 11 November 2025.
+   This Internet-Draft will expire on 18 November 2025.
 
 Copyright Notice
 
