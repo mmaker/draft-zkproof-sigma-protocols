@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-05-13T01:18:36.288816+00:00",
+  "timestamp": "2025-05-18T01:23:06.135592+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -588,15 +588,15 @@
       "id": "I_kwDONyiw_861g2GN",
       "title": "Fix re-use of hash state across proofs",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/36",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Currently the hash state of an (initialized) non-interactive proof is affected by the `prove` and `verify` functions.\nhttps://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/sigma_protocols.sage#L55\n\nIn the non-interactive proof we re-instantiate the hash state for each prove and verify, which doesn't make sense. \nhttps://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/test_sigma_protocols.sage#L303\n\nWe should be copying the state upon proving time and proceed from there.",
       "createdAt": "2025-05-07T09:10:45Z",
-      "updatedAt": "2025-05-07T09:10:59Z",
-      "closedAt": null,
+      "updatedAt": "2025-05-17T09:47:05Z",
+      "closedAt": "2025-05-17T09:47:05Z",
       "comments": []
     },
     {
@@ -604,7 +604,7 @@
       "id": "I_kwDONyiw_862CtQ6",
       "title": "Editorial comment: fix typo.",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/37",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -614,8 +614,8 @@
       "labels": [],
       "body": "From @wbl: \n\n> I think in 2.3 for the commitment you want to map the nonces in prover_commit, not the witness. \"generators\" appears exactly once, which is probably a typo.",
       "createdAt": "2025-05-10T13:53:08Z",
-      "updatedAt": "2025-05-10T13:53:08Z",
-      "closedAt": null,
+      "updatedAt": "2025-05-17T09:50:35Z",
+      "closedAt": "2025-05-17T09:50:35Z",
       "comments": []
     },
     {
@@ -1001,6 +1001,83 @@
       },
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 41,
+      "id": "PR_kwDONyiw_86WVO7q",
+      "title": "docs(spec): - clarify that prover_commit maps nonces, not witness - c\u2026",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/41",
+      "state": "MERGED",
+      "author": "Chausseaumoine",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "- update the prover commitment step to correctly use nonces rather than witness\r\n- update the associate hashing procedure to use group_elements that is defined in the document as the rhs of the proof statement\r\n\r\nCloses #37",
+      "createdAt": "2025-05-15T13:41:51Z",
+      "updatedAt": "2025-05-17T09:50:34Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "622fad939d433490e0f28deed846a6c8f53b2e97",
+      "headRepository": "Chausseaumoine/draft-zkproof-sigma-protocols",
+      "headRefName": "gouriou/IEFTspecs",
+      "headRefOid": "c6afc08fa2a3f05fd0419b4a8023fdecadd0a4c7",
+      "closedAt": "2025-05-17T09:50:34Z",
+      "mergedAt": "2025-05-17T09:50:34Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "8194e690951bf00fff69234bb42fa6216e010b83"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 42,
+      "id": "PR_kwDONyiw_86WcQ0y",
+      "title": "refactor(fiat-shamir): clone hash state in prove/verify instead of resetting",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/42",
+      "state": "MERGED",
+      "author": "Chausseaumoine",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This prevents mutation of the base transcript state in `NISigmaProtocol`.\r\nNow, `prove()` and `verify()` operate on a cloned `hash_state`, preserving\r\ntranscript determinism across multiple uses.\r\n\r\nAlso adds `.clone()` method to `KeccakDuplexSponge` using `copy.deepcopy`.\r\n\r\nFixes #36 ",
+      "createdAt": "2025-05-16T08:53:00Z",
+      "updatedAt": "2025-05-17T09:47:04Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "622fad939d433490e0f28deed846a6c8f53b2e97",
+      "headRepository": "Chausseaumoine/draft-zkproof-sigma-protocols",
+      "headRefName": "gouriou/fix-transcript-clone",
+      "headRefOid": "e2977076dfd6bd432a8e1ee51baca478fb31ccdc",
+      "closedAt": "2025-05-17T09:47:04Z",
+      "mergedAt": "2025-05-17T09:47:04Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "6320bade38682215a06f0bd86cc64c93cf7d4001"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDONyiw_86pxDLe",
+          "commit": {
+            "abbreviatedOid": "dad7dcd"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "mostly good thank you! just one minor change to be integrated.",
+          "createdAt": "2025-05-17T09:42:22Z",
+          "updatedAt": "2025-05-17T09:42:45Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "can we call this scalars instead?",
+              "createdAt": "2025-05-17T09:42:22Z",
+              "updatedAt": "2025-05-17T09:42:46Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
