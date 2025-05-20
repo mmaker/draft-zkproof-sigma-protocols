@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-05-18T01:23:06.135592+00:00",
+  "timestamp": "2025-05-20T01:19:17.169656+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -417,11 +417,13 @@
       "state": "OPEN",
       "author": "mmaker",
       "authorAssociation": "OWNER",
-      "assignees": [],
+      "assignees": [
+        "vishady721"
+      ],
       "labels": [],
       "body": "Currently, a sigma protocol is instantiated using an \"initialization vector\" (a label, a domain separator) of 32 bytes, and does not absorb the statement (the instance). \n\n\n## Instance \n\nTo prove soundness (and thus stronger notions of soundness), the instance must be put in the Fiat-Shamir transformation. This has been called \"strong FS\" in the literature, and the case of Schnorr proofs, these generally consist of the generators used -- in the case of Maurer proofs, of the morphism used. \n\nThe easy way out from this is to take inspiration from libsignal's statement generation process here:\nhttps://github.com/signalapp/libsignal/blob/main/rust/poksho/src/statement.rs#L44-L88\nand check in the **[latex specification](https://sigma.zkproof.org/tex-spec.pdf)** for references to scientific literature.\n\n## Domain Separator\n\nThe way in which these 32 bytes are generated is discretionary but a standard should take a stance here and produce guidelines on how they should be generated. \n\nFrom a theoretical security standpoint, the IV should incorporate: \n- a protocol identifier, \n- a session identifier.\n\nA way to describe how the user should pick a protocol identifier and a session identifier is desirable but not stricly needed, so for now this part can be perhaps be left to the user.\n",
       "createdAt": "2025-04-01T22:33:48Z",
-      "updatedAt": "2025-04-01T22:34:13Z",
+      "updatedAt": "2025-05-18T23:12:07Z",
       "closedAt": null,
       "comments": []
     },
