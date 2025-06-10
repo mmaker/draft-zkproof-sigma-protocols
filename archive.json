@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-05-29T01:18:50.180359+00:00",
+  "timestamp": "2025-06-10T01:20:50.725491+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -1184,6 +1184,32 @@
           ]
         }
       ]
+    },
+    {
+      "number": 48,
+      "id": "PR_kwDONyiw_86ZnBPx",
+      "title": "24 statement serialization",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/48",
+      "state": "OPEN",
+      "author": "vishady721",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "A draft of what statement serialization could look like!!",
+      "createdAt": "2025-06-09T01:40:44Z",
+      "updatedAt": "2025-06-09T01:40:55Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "8194e690951bf00fff69234bb42fa6216e010b83",
+      "headRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "headRefName": "24-statement-serialiation",
+      "headRefOid": "7f6163aabae22faeeb5ed36bd3212a45c816218f",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
