@@ -45,6 +45,14 @@ class SigmaProtocol(ABC):
     def deserialize_response(self, data):
         raise NotImplementedError
 
+    @abstractmethod
+    def serialize_challenge(self, challenge):
+        raise NotImplementedError
+
+    @abstractmethod
+    def deserialize_challenge(self, data):
+        raise NotImplementedError
+
     # optional
     def simulate_response(self, rng):
         raise NotImplementedError
