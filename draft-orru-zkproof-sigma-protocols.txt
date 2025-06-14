@@ -89,7 +89,7 @@ Table of Contents
    4.  Security Considerations
    5.  Post-Quantum Security Considerations
      5.1.  Privacy Considerations
-       5.1.1.  Soundness Considerations
+     5.2.  Soundness Considerations
    6.  Generation of the initialization vector
    7.  Acknowledgments
    8.  References
@@ -102,8 +102,8 @@ Table of Contents
    A Sigma Protocol is a simple zero-knowledge proof of knowledge.  Any
    sigma protocol must define three objects:
 
-   *  A commitment, sometimes also called a nonce.  This message is
-      computed by the prover.
+   *  A commitment.  This message is computed by the prover using secret
+      nonces.
 
    *  A challenge, computed using the Fiat-Shamir transformation using a
       hash function.
@@ -241,7 +241,7 @@ class SigmaProtocol:
    Valid choices of elliptic curves and hash functions can be found in
    Section 3.4.
 
-   Traditionally, sigma protocols are defined in Camenish-Stadtler
+   Traditionally, sigma protocols are defined in Camenisch-Stadler
    notation as (for example):
 
    1. DLEQ(G, H, X, Y) = PoK{
@@ -253,8 +253,8 @@ class SigmaProtocol:
    public information (the *instance*) consists of the group elements
    (G, X, H, Y) denoted in upper-case.  Line 2 states that the private
    information (the *witness*) consists of the scalar x.  Finally, line
-   3 states that the constraints (the equations) that need to be proven
-   are x * G = X and x * H = Y.
+   3 states that the linear relation that need to be proven is x * G = X
+   and x * H = Y.
 
 3.1.  Group abstraction
 
@@ -720,7 +720,7 @@ Procedure:
 
    *  Protection against "harvest now, decrypt later" attacks.
 
-5.1.1.  Soundness Considerations
+5.2.  Soundness Considerations
 
    While the proofs themselves offer privacy protections against quantum
    adversaries, the hardness of the relation being proven depends (at
@@ -793,10 +793,10 @@ Procedure:
               <https://eprint.iacr.org/2016/163.pdf>.
 
    [NISTCurves]
-              "Digital signature standard (DSS)", National Institute of
+              "Digital Signature Standard (DSS)", National Institute of
               Standards and Technology (U.S.),
-              DOI 10.6028/nist.fips.186-4, 2013,
-              <https://doi.org/10.6028/nist.fips.186-4>.
+              DOI 10.6028/nist.fips.186-5, February 2023,
+              <https://doi.org/10.6028/nist.fips.186-5>.
 
    [SEC1]     Standards for Efficient Cryptography Group (SECG), "SEC 1:
               Elliptic Curve Cryptography",

@@ -1223,11 +1223,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
                 <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-privacy-considerations" class="internal xref">Privacy Considerations</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1.2.1">
-                    <p id="section-toc.1-1.5.2.1.2.1.1"><a href="#section-5.1.1" class="auto internal xref">5.1.1</a>.  <a href="#name-soundness-considerations" class="internal xref">Soundness Considerations</a></p>
 </li>
-                </ul>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-soundness-considerations" class="internal xref">Soundness Considerations</a></p>
 </li>
             </ul>
 </li>
@@ -1264,7 +1262,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 Any sigma protocol must define three objects:<a href="#section-1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-1-2.1">
-          <p id="section-1-2.1.1">A commitment, sometimes also called a nonce. This message is computed by the prover.<a href="#section-1-2.1.1" class="pilcrow">¶</a></p>
+          <p id="section-1-2.1.1">A commitment. This message is computed by the prover using secret nonces.<a href="#section-1-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-2.2">
           <p id="section-1-2.2.1">A challenge, computed using the Fiat-Shamir transformation using a hash function.<a href="#section-1-2.2.1" class="pilcrow">¶</a></p>
@@ -1376,7 +1374,7 @@ It relies on two components:
 - a prime-order elliptic-curve group as described in <a href="#group-abstraction" class="auto internal xref">Section 3.1</a>,
 - a hash function.<a href="#section-3-1" class="pilcrow">¶</a></p>
 <p id="section-3-2">Valid choices of elliptic curves and hash functions can be found in <a href="#ciphersuites" class="auto internal xref">Section 3.4</a>.<a href="#section-3-2" class="pilcrow">¶</a></p>
-<p id="section-3-3">Traditionally, sigma protocols are defined in Camenish-Stadtler notation as (for example):<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-3">Traditionally, sigma protocols are defined in Camenisch-Stadler notation as (for example):<a href="#section-3-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3-4">
 <pre>
 1. DLEQ(G, H, X, Y) = PoK{
@@ -1387,7 +1385,7 @@ It relies on two components:
 </div>
 <p id="section-3-5">In the above, line 1 declares that the proof name is "DLEQ", the public information (the <strong>instance</strong>) consists of the group elements <code>(G, X, H, Y)</code> denoted in upper-case.
 Line 2 states that the private information (the <strong>witness</strong>) consists of the scalar <code>x</code>.
-Finally, line 3 states that the constraints (the equations) that need to be proven are
+Finally, line 3 states that the linear relation that need to be proven is
 <code>x * G  = X</code> and <code>x * H = Y</code>.<a href="#section-3-5" class="pilcrow">¶</a></p>
 <div id="group-abstraction">
 <section id="section-3.1">
@@ -1987,27 +1985,27 @@ nonces = [int(bin_nonce[i*scalar_bytes: i*(scalar_bytes+1)]) % p
             <p id="section-5.1-3.4.1">Protection against "harvest now, decrypt later" attacks.<a href="#section-5.1-3.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<div id="soundness-considerations">
-<section id="section-5.1.1">
-          <h4 id="name-soundness-considerations">
-<a href="#section-5.1.1" class="section-number selfRef">5.1.1. </a><a href="#name-soundness-considerations" class="section-name selfRef">Soundness Considerations</a>
-          </h4>
-<p id="section-5.1.1-1">While the proofs themselves offer privacy protections against quantum adversaries, the hardness of the relation being proven depends (at best) on the hardness of the discrete logarithm problem over the elliptic curves specified in <a href="#ciphersuites" class="auto internal xref">Section 3.4</a>.
-Since this problem is known to be efficiently solvable by quantum computers using Shor's algorithm, these proofs MUST NOT be relied upon for post-quantum soundness guarantees.<a href="#section-5.1.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.1.1-2">Implementations requiring post-quantum soundness SHOULD transition to alternative proof systems such as:<a href="#section-5.1.1-2" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-5.1.1-3.1">
-              <p id="section-5.1.1-3.1.1">MPC-in-the-Head approaches as described in <span>[<a href="#GiacomelliMO16" class="cite xref">GiacomelliMO16</a>]</span><a href="#section-5.1.1-3.1.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-5.1.1-3.2">
-              <p id="section-5.1.1-3.2.1">Lattice-based approaches as described in <span>[<a href="#AttemaCK21" class="cite xref">AttemaCK21</a>]</span><a href="#section-5.1.1-3.2.1" class="pilcrow">¶</a></p>
-</li>
-          </ul>
-<p id="section-5.1.1-4">Implementations should consider the timeline for quantum computing advances when planning migration to post-quantum sound alternatives.
-Implementers MAY adopt a hybrid approach during migration to post-quantum security by using AND composition of proofs. This approach enables gradual migration while maintaining security against classical adversaries.
-This composition retains soundness if <strong>both</strong> problem remains hard. AND composition of proofs is NOT described in this specification, but examples may be found in the proof-of-concept implementation and in <span>[<a href="#BonehS23" class="cite xref">BonehS23</a>]</span>.<a href="#section-5.1.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
+<div id="soundness-considerations">
+<section id="section-5.2">
+        <h3 id="name-soundness-considerations">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-soundness-considerations" class="section-name selfRef">Soundness Considerations</a>
+        </h3>
+<p id="section-5.2-1">While the proofs themselves offer privacy protections against quantum adversaries, the hardness of the relation being proven depends (at best) on the hardness of the discrete logarithm problem over the elliptic curves specified in <a href="#ciphersuites" class="auto internal xref">Section 3.4</a>.
+Since this problem is known to be efficiently solvable by quantum computers using Shor's algorithm, these proofs MUST NOT be relied upon for post-quantum soundness guarantees.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">Implementations requiring post-quantum soundness SHOULD transition to alternative proof systems such as:<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.2-3.1">
+            <p id="section-5.2-3.1.1">MPC-in-the-Head approaches as described in <span>[<a href="#GiacomelliMO16" class="cite xref">GiacomelliMO16</a>]</span><a href="#section-5.2-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.2-3.2">
+            <p id="section-5.2-3.2.1">Lattice-based approaches as described in <span>[<a href="#AttemaCK21" class="cite xref">AttemaCK21</a>]</span><a href="#section-5.2-3.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-5.2-4">Implementations should consider the timeline for quantum computing advances when planning migration to post-quantum sound alternatives.
+Implementers MAY adopt a hybrid approach during migration to post-quantum security by using AND composition of proofs. This approach enables gradual migration while maintaining security against classical adversaries.
+This composition retains soundness if <strong>both</strong> problem remains hard. AND composition of proofs is NOT described in this specification, but examples may be found in the proof-of-concept implementation and in <span>[<a href="#BonehS23" class="cite xref">BonehS23</a>]</span>.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2070,7 +2068,7 @@ This composition retains soundness if <strong>both</strong> problem remains hard
 <dd class="break"></dd>
 <dt id="NISTCurves">[NISTCurves]</dt>
         <dd>
-<span class="refTitle">"Digital signature standard (DSS)"</span>, <span class="refContent">National Institute of Standards and Technology (U.S.)</span>, <span class="seriesInfo">DOI 10.6028/nist.fips.186-4</span>, <time datetime="2013" class="refDate">2013</time>, <span>&lt;<a href="https://doi.org/10.6028/nist.fips.186-4">https://doi.org/10.6028/nist.fips.186-4</a>&gt;</span>. </dd>
+<span class="refTitle">"Digital Signature Standard (DSS)"</span>, <span class="refContent">National Institute of Standards and Technology (U.S.)</span>, <span class="seriesInfo">DOI 10.6028/nist.fips.186-5</span>, <time datetime="2023-02" class="refDate">February 2023</time>, <span>&lt;<a href="https://doi.org/10.6028/nist.fips.186-5">https://doi.org/10.6028/nist.fips.186-5</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="SEC1">[SEC1]</dt>
       <dd>
