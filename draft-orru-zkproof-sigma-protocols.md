@@ -139,7 +139,7 @@ The public functions are obtained relying on an internal structure containing th
 
 Where:
 
-- `new(domain_separator: [u8; 32], cs: GroupMorphismPreimage) -> SigmaProtocol`, denoting the initialization function. This function takes as input a label identifying local context information (such as: session identifiers, to avoid replay attacks; protocol metadata, to avoid hijacking; optionally, a timestamp and some pre-shared randomness, to guarantee freshness of the proof) and an instance generated via the `GroupMorphismPreimage`, the public information shared between prover and verifier.
+- `new(domain_separator: [u8; 32], cs: LinearRelation) -> SigmaProtocol`, denoting the initialization function. This function takes as input a label identifying local context information (such as: session identifiers, to avoid replay attacks; protocol metadata, to avoid hijacking; optionally, a timestamp and some pre-shared randomness, to guarantee freshness of the proof) and an instance generated via the `LinearRelation`, the public information shared between prover and verifier.
 This function should pre-compute parts of the statement, or initialize the state of the hash function.
 
 - `prover_commit(self, witness: Witness) -> (commitment, prover_state)`, denoting the **commitment phase**, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover and the statement to be proven. This step generally requires access to a high-quality entropy source to perform the commitment. Leakage of even just of a few bits of the commitment could allow for the complete recovery of the witness. The commitment is meant to be shared, while `prover_state` must be kept secret.
@@ -235,7 +235,7 @@ We describe a codec for Schnorr proofs over groups of prime order `p` that is in
             scalar = OS2IP(uniform_bytes) % self.Group.ScalarField.order
             return scalar
 
-## Proofs of preimage of a group morphism
+## Proofs of preimage of a linear map
 
 ### Core protocol
 
@@ -256,13 +256,13 @@ The prover of a sigma protocol is stateful and will send two message, a "commitm
     Outputs:
 
     - A (private) prover state, holding the information of the interactive prover necessary for producing the protocol response
-    - A (public) commitment message, an element of the morphism image, that is, a vector of group elements.
+    - A (public) commitment message, an element of the linear map image, that is, a vector of group elements.
 
     Procedure:
 
-    1. nonces = [self.instance.Domain.random(rng) for _ in range(self.instance.morphism.num_scalars)]
+    1. nonces = [self.instance.Domain.random(rng) for _ in range(self.instance.linear_map.num_scalars)]
     2. prover_state = self.ProverState(witness, nonces)
-    3. commitment = self.instance.morphism(nonces)
+    3. commitment = self.instance.linear_map(nonces)
     4. return (prover_state, commitment)
 
 #### Prover response
@@ -281,7 +281,7 @@ The prover of a sigma protocol is stateful and will send two message, a "commitm
     Procedure:
 
     1. witness, nonces = prover_state
-    2. return [nonces[i] + witness[i] * challenge for i in range(self.instance.morphism.num_scalars)]
+    2. return [nonces[i] + witness[i] * challenge for i in range(self.instance.linear_map.num_scalars)]
 
 ### Verifier procedure
 
@@ -300,9 +300,9 @@ The prover of a sigma protocol is stateful and will send two message, a "commitm
 
     Procedure:
 
-    1. assert len(commitment) == self.instance.morphism.num_statements and len(response) == self.instance.morphism.num_scalars
-    2. expected = self.instance.morphism(response)
-    3. got = [commitment[i] + self.instance.image[i] * challenge for i in range(self.instance.morphism.num_statements)]
+    1. assert len(commitment) == self.instance.linear_map.num_constraints and len(response) == self.instance.linear_map.num_scalars
+    2. expected = self.instance.linear_map(response)
+    3. got = [commitment[i] + self.instance.image[i] * challenge for i in range(self.instance.linear_map.num_constraints)]
     4. return got == expected
 
 ### Witness representation {#witness}
@@ -311,9 +311,9 @@ A witness is simply a list of `num_scalars` elements.
 
     Witness = [Scalar; num_scalars]
 
-### Group morphism {#morphism}
+### Linear map {#linear-map}
 
-A `GroupMorphism` represents a function (a _group morphism_ from the scalar field to the elliptic curve group) that, given as input an array of `Scalar` elements, outputs an array of `Group` element. This can be represented as matrix-vector (scalar) product using group multi-scalar multiplication. However, since the matrix is often times sparse, it is often more convenient to store the matrix in Yale sparse matrix.
+A `LinearMap` represents a function (a _linear map_ from the scalar field to the elliptic curve group) that, given as input an array of `Scalar` elements, outputs an array of `Group` element. This can be represented as matrix-vector (scalar) product using group multi-scalar multiplication. However, since the matrix is often times sparse, it is often more convenient to store the matrix in Yale sparse matrix.
 
 Here is an example:
 
@@ -321,9 +321,9 @@ Here is an example:
         scalar_indices: list[int]
         element_indices: list[int]
 
-The morphism can then be presented as:
+The linear map can then be presented as:
 
-    class GroupMorphism:
+    class LinearMap:
         Group: groups.Group
         linear_combinations: list[LinearCombination]
         group_elements: list[Group]
@@ -334,14 +334,14 @@ The morphism can then be presented as:
 
 #### Initialization
 
-The group morphism `GroupMorphism` is initialized with
+The linear map `LinearMap` is initialized with
 
     linear_combinations = []
     group_elements = []
     num_scalars = 0
     num_elements = 0
 
-#### Morphism map
+#### Linear map evaluation
 
 A witness can be mapped to a group element via:
 
@@ -359,15 +359,15 @@ A witness can be mapped to a group element via:
     5.     image.append(self.Group.msm(coefficients, elements))
     6. return image
 
-### Statements for the preimage of a group morphism
+### Statements for linear relations
 
-The object `GroupMorphismPreimage` has two attributes: a morphism `morphism`, which will be defined in {{morphism}}, and `image`, the morphism image of which the prover wants to show the pre-image of.
+The object `LinearRelation` has two attributes: a linear map `linear_map`, which will be defined in {{linear-map}}, and `image`, the linear map image of which the prover wants to show the pre-image of.
 
-class GroupMorphismPreimage:
+class LinearRelation:
         Domain = group.ScalarField
         Image = group.Group
 
-        morphism = Morphism
+        linear_map = LinearMap
         image = list[group.Group]
 
     def allocate_scalars(self, n: int) -> list[int]
@@ -382,7 +382,7 @@ Two function allow two allocate the new scalars (the witness) and group elements
     allocate_scalars(self, n)
 
     Inputs:
-        - self, the current state of the GroupMorphismPreimage
+        - self, the current state of the LinearRelation
         - n, the number of scalars to allocate
     Outputs:
         - indices, a list of integers each pointing to the new allocated scalars
@@ -397,8 +397,8 @@ and below the allocation of group elements
 
     allocate_elements(self, n)
 
-    1. linear_combination = Morphism.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
-    2. self.morphism.append(linear_combination)
+    1. linear_combination = LinearMap.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
+    2. self.linear_map.append(linear_combination)
     3. self._image.append(lhs)
 
 Group elements, being part of the instance, can later be set using the function `set_elements`
@@ -406,13 +406,13 @@ Group elements, being part of the instance, can later be set using the function 
     set_elements(self, elements)
 
     Inputs:
-        - self, the current state of the GroupMorphismPreimage
+        - self, the current state of the LinearRelation
         - elements, a list of pairs of indices and group elements to be set
 
     Procedure:
 
     1. for index, element in elements:
-    2.   self.morphism.group_elements[index] = element
+    2.   self.linear_map.group_elements[index] = element
 
 #### Constraint enforcing
 
@@ -430,15 +430,15 @@ Group elements, being part of the instance, can later be set using the function 
 
     Procedure:
 
-    1. linear_combination = Morphism.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
-    2. self.morphism.append(linear_combination)
+    1. linear_combination = LinearMap.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
+    2. self.linear_map.append(linear_combination)
     3. self._image.append(lhs)
 
 ### Example: Schnorr proofs
 
 The statement represented in {{sigma-protocol-group}} can be written as:
 
-    statement = GroupMorphismPreimage(group)
+    statement = LinearRelation(group)
     [var_x] = statement.allocate_scalars(1)
     [var_G, var_X] = statement.allocate_elements(2)
     statement.append_equation(var_X, [(var_x, var_G)])
@@ -448,7 +448,7 @@ At which point it is possible to set `var_G` and `var_X` whenever the group elem
     G = group.generator()
     statement.set_elements([(var_G, G), (var_X, X)])
 
-It is worth noting that in the above example, `[X] == statement.morphism.map([x])`.
+It is worth noting that in the above example, `[X] == statement.linear_map.map([x])`.
 
 ### Example: DLEQ proofs
 
@@ -458,7 +458,7 @@ A DLEQ proof proves a statement:
 
 Given group elements `G`, `H` and `X`, `Y` such that `x * G = X` and `x * H = Y`, then the statement is generated as:
 
-    1. statement = GroupMorphismPreimage()
+    1. statement = LinearRelation()
     2. [var_x] = statement.allocate_scalars(1)
     3. statement.append_equation(X, [(var_x, G)])
     4. statement.append_equation(Y, [(var_x, H)])
@@ -471,7 +471,7 @@ A representation proof proves a statement
 
 Given group elements `G`, `H` such that `C = x * G + r * H`, then the statement is generated as:
 
-    statement = GroupMorphismPreimage()
+    statement = LinearRelation()
     var_x, var_r = statement.allocate_scalars(2)
     statement.append_equation(C, [(var_x, G), (var_r, H)])
 
