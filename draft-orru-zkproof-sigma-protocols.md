@@ -36,7 +36,7 @@ informative:
     title: "draft-orru-zkproofs-fiat-shamir"
     date: false
     target: https://mmaker.github.io/spfs/draft-orru-zkproof-fiat-shamir.html
-  NISTCurves: DOI.10.6028/NIST.FIPS.186-4
+  NISTCurves: DOI.10.6028/NIST.FIPS.186-5
   SEC1:
     title: "SEC 1: Elliptic Curve Cryptography"
     target: https://www.secg.org/sec1-v2.pdf
@@ -86,7 +86,7 @@ This document describes Sigma protocols, a secure, general-purpose non-interacti
 A Sigma Protocol is a simple zero-knowledge proof of knowledge.
 Any sigma protocol must define three objects:
 
-- A commitment, sometimes also called a nonce. This message is computed by the prover.
+- A commitment. This message is computed by the prover using secret nonces.
 - A challenge, computed using the Fiat-Shamir transformation using a hash function.
 - A response, computed by the prover, which depends on the commitment and the challenge.
 
@@ -167,7 +167,7 @@ It relies on two components:
 
 Valid choices of elliptic curves and hash functions can be found in {{ciphersuites}}.
 
-Traditionally, sigma protocols are defined in Camenish-Stadtler notation as (for example):
+Traditionally, sigma protocols are defined in Camenisch-Stadler notation as (for example):
 
     1. DLEQ(G, H, X, Y) = PoK{
     2.   (x):        // Secret variables
@@ -176,7 +176,7 @@ Traditionally, sigma protocols are defined in Camenish-Stadtler notation as (for
 
 In the above, line 1 declares that the proof name is "DLEQ", the public information (the **instance**) consists of the group elements `(G, X, H, Y)` denoted in upper-case.
 Line 2 states that the private information (the **witness**) consists of the scalar `x`.
-Finally, line 3 states that the constraints (the equations) that need to be proven are
+Finally, line 3 states that the linear relation that need to be proven is
 `x * G  = X` and `x * H = Y`.
 
 ## Group abstraction {#group-abstraction}
@@ -538,7 +538,7 @@ While theoretical analysis demonstrates that both soundness and zero-knowledge p
 
 The zero-knowledge proofs described in this document provide statistical zero-knowledge and statistical soundness properties when modeled in the random oracle model.
 
-### Privacy Considerations
+## Privacy Considerations
 
 These proofs offer zero-knowledge guarantees, meaning they do not leak any information about the prover's witness beyond what can be inferred from the proven statement itself. This property holds even against quantum adversaries with unbounded computational power.
 
@@ -549,7 +549,7 @@ Specifically, these proofs can be used to protect privacy against post-quantum a
 - Post-quantum blindness
 - Protection against "harvest now, decrypt later" attacks.
 
-### Soundness Considerations
+## Soundness Considerations
 
 While the proofs themselves offer privacy protections against quantum adversaries, the hardness of the relation being proven depends (at best) on the hardness of the discrete logarithm problem over the elliptic curves specified in {{ciphersuites}}.
 Since this problem is known to be efficiently solvable by quantum computers using Shor's algorithm, these proofs MUST NOT be relied upon for post-quantum soundness guarantees.
@@ -568,6 +568,7 @@ This composition retains soundness if **both** problem remains hard. AND composi
 As of now, it is responsibility of the user to pick a unique initialization vector that identifies the proof system and the session being used. This will be expanded in future versions of this specification.
 
 # Acknowledgments
+
 {:numbered ="false"}
 
 The authors thank Jan Bobolz, Stephan Krenn, Mary Maller, Ivan Visconti, Yuwen Zhang for reviewing a previous edition of this specification.
