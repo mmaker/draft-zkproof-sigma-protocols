@@ -1171,7 +1171,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
                 <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-codec-for-non-interactive-p" class="internal xref">Codec for non-interactive proofs</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
-                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-proofs-of-preimage-of-a-gro" class="internal xref">Proofs of preimage of a group morphism</a></p>
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-proofs-of-preimage-of-a-lin" class="internal xref">Proofs of preimage of a linear map</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.1">
                     <p id="section-toc.1-1.3.2.3.2.1.1"><a href="#section-3.3.1" class="auto internal xref">3.3.1</a>.  <a href="#name-core-protocol" class="internal xref">Core protocol</a></p>
@@ -1186,10 +1186,10 @@ svg :is([fill="white"], [fill^="#fff"]) {
                     <p id="section-toc.1-1.3.2.3.2.4.1"><a href="#section-3.3.4" class="auto internal xref">3.3.4</a>.  <a href="#name-witness-representation" class="internal xref">Witness representation</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.5">
-                    <p id="section-toc.1-1.3.2.3.2.5.1"><a href="#section-3.3.5" class="auto internal xref">3.3.5</a>.  <a href="#name-group-morphism" class="internal xref">Group morphism</a></p>
+                    <p id="section-toc.1-1.3.2.3.2.5.1"><a href="#section-3.3.5" class="auto internal xref">3.3.5</a>.  <a href="#name-linear-map" class="internal xref">Linear map</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.6">
-                    <p id="section-toc.1-1.3.2.3.2.6.1"><a href="#section-3.3.6" class="auto internal xref">3.3.6</a>.  <a href="#name-statements-for-the-preimage" class="internal xref">Statements for the preimage of a group morphism</a></p>
+                    <p id="section-toc.1-1.3.2.3.2.6.1"><a href="#section-3.3.6" class="auto internal xref">3.3.6</a>.  <a href="#name-statements-for-linear-relat" class="internal xref">Statements for linear relations</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.7">
                     <p id="section-toc.1-1.3.2.3.2.7.1"><a href="#section-3.3.7" class="auto internal xref">3.3.7</a>.  <a href="#name-example-schnorr-proofs" class="internal xref">Example: Schnorr proofs</a></p>
@@ -1338,7 +1338,7 @@ class SigmaProtocol:
 <p id="section-2.1-3">Where:<a href="#section-2.1-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-2.1-4.1">
-            <p id="section-2.1-4.1.1"><code>new(domain_separator: [u8; 32], cs: GroupMorphismPreimage) -&gt; SigmaProtocol</code>, denoting the initialization function. This function takes as input a label identifying local context information (such as: session identifiers, to avoid replay attacks; protocol metadata, to avoid hijacking; optionally, a timestamp and some pre-shared randomness, to guarantee freshness of the proof) and an instance generated via the <code>GroupMorphismPreimage</code>, the public information shared between prover and verifier.
+            <p id="section-2.1-4.1.1"><code>new(domain_separator: [u8; 32], cs: LinearRelation) -&gt; SigmaProtocol</code>, denoting the initialization function. This function takes as input a label identifying local context information (such as: session identifiers, to avoid replay attacks; protocol metadata, to avoid hijacking; optionally, a timestamp and some pre-shared randomness, to guarantee freshness of the proof) and an instance generated via the <code>LinearRelation</code>, the public information shared between prover and verifier.
 This function should pre-compute parts of the statement, or initialize the state of the hash function.<a href="#section-2.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-4.2">
@@ -1495,10 +1495,10 @@ class ByteSchnorrCodec:
 </div>
 </section>
 </div>
-<div id="proofs-of-preimage-of-a-group-morphism">
+<div id="proofs-of-preimage-of-a-linear-map">
 <section id="section-3.3">
-        <h3 id="name-proofs-of-preimage-of-a-gro">
-<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-proofs-of-preimage-of-a-gro" class="section-name selfRef">Proofs of preimage of a group morphism</a>
+        <h3 id="name-proofs-of-preimage-of-a-lin">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-proofs-of-preimage-of-a-lin" class="section-name selfRef">Proofs of preimage of a linear map</a>
         </h3>
 <div id="core-protocol">
 <section id="section-3.3.1">
@@ -1530,13 +1530,13 @@ Inputs:
 Outputs:
 
 - A (private) prover state, holding the information of the interactive prover necessary for producing the protocol response
-- A (public) commitment message, an element of the morphism image, that is, a vector of group elements.
+- A (public) commitment message, an element of the linear map image, that is, a vector of group elements.
 
 Procedure:
 
-1. nonces = [self.instance.Domain.random(rng) for _ in range(self.instance.morphism.num_scalars)]
+1. nonces = [self.instance.Domain.random(rng) for _ in range(self.instance.linear_map.num_scalars)]
 2. prover_state = self.ProverState(witness, nonces)
-3. commitment = self.instance.morphism(nonces)
+3. commitment = self.instance.linear_map(nonces)
 4. return (prover_state, commitment)
 </pre><a href="#section-3.3.2.1-1" class="pilcrow">¶</a>
 </div>
@@ -1563,7 +1563,7 @@ Outputs:
 Procedure:
 
 1. witness, nonces = prover_state
-2. return [nonces[i] + witness[i] * challenge for i in range(self.instance.morphism.num_scalars)]
+2. return [nonces[i] + witness[i] * challenge for i in range(self.instance.linear_map.num_scalars)]
 </pre><a href="#section-3.3.2.2-1" class="pilcrow">¶</a>
 </div>
 </section>
@@ -1592,9 +1592,9 @@ Outputs:
 
 Procedure:
 
-1. assert len(commitment) == self.instance.morphism.num_statements and len(response) == self.instance.morphism.num_scalars
-2. expected = self.instance.morphism(response)
-3. got = [commitment[i] + self.instance.image[i] * challenge for i in range(self.instance.morphism.num_statements)]
+1. assert len(commitment) == self.instance.linear_map.num_constraints and len(response) == self.instance.linear_map.num_scalars
+2. expected = self.instance.linear_map(response)
+3. got = [commitment[i] + self.instance.image[i] * challenge for i in range(self.instance.linear_map.num_constraints)]
 4. return got == expected
 </pre><a href="#section-3.3.3-1" class="pilcrow">¶</a>
 </div>
@@ -1613,12 +1613,12 @@ Witness = [Scalar; num_scalars]
 </div>
 </section>
 </div>
-<div id="morphism">
+<div id="linear-map">
 <section id="section-3.3.5">
-          <h4 id="name-group-morphism">
-<a href="#section-3.3.5" class="section-number selfRef">3.3.5. </a><a href="#name-group-morphism" class="section-name selfRef">Group morphism</a>
+          <h4 id="name-linear-map">
+<a href="#section-3.3.5" class="section-number selfRef">3.3.5. </a><a href="#name-linear-map" class="section-name selfRef">Linear map</a>
           </h4>
-<p id="section-3.3.5-1">A <code>GroupMorphism</code> represents a function (a <em>group morphism</em> from the scalar field to the elliptic curve group) that, given as input an array of <code>Scalar</code> elements, outputs an array of <code>Group</code> element. This can be represented as matrix-vector (scalar) product using group multi-scalar multiplication. However, since the matrix is often times sparse, it is often more convenient to store the matrix in Yale sparse matrix.<a href="#section-3.3.5-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.5-1">A <code>LinearMap</code> represents a function (a <em>linear map</em> from the scalar field to the elliptic curve group) that, given as input an array of <code>Scalar</code> elements, outputs an array of <code>Group</code> element. This can be represented as matrix-vector (scalar) product using group multi-scalar multiplication. However, since the matrix is often times sparse, it is often more convenient to store the matrix in Yale sparse matrix.<a href="#section-3.3.5-1" class="pilcrow">¶</a></p>
 <p id="section-3.3.5-2">Here is an example:<a href="#section-3.3.5-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.5-3">
 <pre>
@@ -1627,10 +1627,10 @@ class LinearCombination:
     element_indices: list[int]
 </pre><a href="#section-3.3.5-3" class="pilcrow">¶</a>
 </div>
-<p id="section-3.3.5-4">The morphism can then be presented as:<a href="#section-3.3.5-4" class="pilcrow">¶</a></p>
+<p id="section-3.3.5-4">The linear map can then be presented as:<a href="#section-3.3.5-4" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.5-5">
 <pre>
-class GroupMorphism:
+class LinearMap:
     Group: groups.Group
     linear_combinations: list[LinearCombination]
     group_elements: list[Group]
@@ -1645,7 +1645,7 @@ class GroupMorphism:
             <h5 id="name-initialization">
 <a href="#section-3.3.5.1" class="section-number selfRef">3.3.5.1. </a><a href="#name-initialization" class="section-name selfRef">Initialization</a>
             </h5>
-<p id="section-3.3.5.1-1">The group morphism <code>GroupMorphism</code> is initialized with<a href="#section-3.3.5.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.5.1-1">The linear map <code>LinearMap</code> is initialized with<a href="#section-3.3.5.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.5.1-2">
 <pre>
 linear_combinations = []
@@ -1656,10 +1656,10 @@ num_elements = 0
 </div>
 </section>
 </div>
-<div id="morphism-map">
+<div id="linear-map-evaluation">
 <section id="section-3.3.5.2">
-            <h5 id="name-morphism-map">
-<a href="#section-3.3.5.2" class="section-number selfRef">3.3.5.2. </a><a href="#name-morphism-map" class="section-name selfRef">Morphism map</a>
+            <h5 id="name-linear-map-evaluation">
+<a href="#section-3.3.5.2" class="section-number selfRef">3.3.5.2. </a><a href="#name-linear-map-evaluation" class="section-name selfRef">Linear map evaluation</a>
             </h5>
 <p id="section-3.3.5.2-1">A witness can be mapped to a group element via:<a href="#section-3.3.5.2-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.5.2-2">
@@ -1683,18 +1683,18 @@ Inputs:
 </div>
 </section>
 </div>
-<div id="statements-for-the-preimage-of-a-group-morphism">
+<div id="statements-for-linear-relations">
 <section id="section-3.3.6">
-          <h4 id="name-statements-for-the-preimage">
-<a href="#section-3.3.6" class="section-number selfRef">3.3.6. </a><a href="#name-statements-for-the-preimage" class="section-name selfRef">Statements for the preimage of a group morphism</a>
+          <h4 id="name-statements-for-linear-relat">
+<a href="#section-3.3.6" class="section-number selfRef">3.3.6. </a><a href="#name-statements-for-linear-relat" class="section-name selfRef">Statements for linear relations</a>
           </h4>
-<p id="section-3.3.6-1">The object <code>GroupMorphismPreimage</code> has two attributes: a morphism <code>morphism</code>, which will be defined in <a href="#morphism" class="auto internal xref">Section 3.3.5</a>, and <code>image</code>, the morphism image of which the prover wants to show the pre-image of.<a href="#section-3.3.6-1" class="pilcrow">¶</a></p>
-<p id="section-3.3.6-2">class GroupMorphismPreimage:
+<p id="section-3.3.6-1">The object <code>LinearRelation</code> has two attributes: a linear map <code>linear_map</code>, which will be defined in <a href="#linear-map" class="auto internal xref">Section 3.3.5</a>, and <code>image</code>, the linear map image of which the prover wants to show the pre-image of.<a href="#section-3.3.6-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.6-2">class LinearRelation:
         Domain = group.ScalarField
         Image = group.Group<a href="#section-3.3.6-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.6-3">
 <pre>
-    morphism = Morphism
+    linear_map = LinearMap
     image = list[group.Group]
 
 def allocate_scalars(self, n: int) -&gt; list[int]
@@ -1714,7 +1714,7 @@ def set_elements(self, elements: list[(int, Group)]) -&gt; None
 allocate_scalars(self, n)
 
 Inputs:
-    - self, the current state of the GroupMorphismPreimage
+    - self, the current state of the LinearRelation
     - n, the number of scalars to allocate
 Outputs:
     - indices, a list of integers each pointing to the new allocated scalars
@@ -1731,8 +1731,8 @@ Procedure:
 <pre>
 allocate_elements(self, n)
 
-1. linear_combination = Morphism.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
-2. self.morphism.append(linear_combination)
+1. linear_combination = LinearMap.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
+2. self.linear_map.append(linear_combination)
 3. self._image.append(lhs)
 </pre><a href="#section-3.3.6.1-4" class="pilcrow">¶</a>
 </div>
@@ -1742,13 +1742,13 @@ allocate_elements(self, n)
 set_elements(self, elements)
 
 Inputs:
-    - self, the current state of the GroupMorphismPreimage
+    - self, the current state of the LinearRelation
     - elements, a list of pairs of indices and group elements to be set
 
 Procedure:
 
 1. for index, element in elements:
-2.   self.morphism.group_elements[index] = element
+2.   self.linear_map.group_elements[index] = element
 </pre><a href="#section-3.3.6.1-6" class="pilcrow">¶</a>
 </div>
 </section>
@@ -1774,8 +1774,8 @@ Outputs:
 
 Procedure:
 
-1. linear_combination = Morphism.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
-2. self.morphism.append(linear_combination)
+1. linear_combination = LinearMap.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
+2. self.linear_map.append(linear_combination)
 3. self._image.append(lhs)
 </pre><a href="#section-3.3.6.2-1" class="pilcrow">¶</a>
 </div>
@@ -1791,7 +1791,7 @@ Procedure:
 <p id="section-3.3.7-1">The statement represented in <a href="#sigma-protocol-group" class="auto internal xref">Section 3</a> can be written as:<a href="#section-3.3.7-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.7-2">
 <pre>
-statement = GroupMorphismPreimage(group)
+statement = LinearRelation(group)
 [var_x] = statement.allocate_scalars(1)
 [var_G, var_X] = statement.allocate_elements(2)
 statement.append_equation(var_X, [(var_x, var_G)])
@@ -1804,7 +1804,7 @@ G = group.generator()
 statement.set_elements([(var_G, G), (var_X, X)])
 </pre><a href="#section-3.3.7-4" class="pilcrow">¶</a>
 </div>
-<p id="section-3.3.7-5">It is worth noting that in the above example, <code>[X] == statement.morphism.map([x])</code>.<a href="#section-3.3.7-5" class="pilcrow">¶</a></p>
+<p id="section-3.3.7-5">It is worth noting that in the above example, <code>[X] == statement.linear_map.map([x])</code>.<a href="#section-3.3.7-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="example-dleq-proofs">
@@ -1821,7 +1821,7 @@ statement.set_elements([(var_G, G), (var_X, X)])
 <p id="section-3.3.8-3">Given group elements <code>G</code>, <code>H</code> and <code>X</code>, <code>Y</code> such that <code>x * G = X</code> and <code>x * H = Y</code>, then the statement is generated as:<a href="#section-3.3.8-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.8-4">
 <pre>
-1. statement = GroupMorphismPreimage()
+1. statement = LinearRelation()
 2. [var_x] = statement.allocate_scalars(1)
 3. statement.append_equation(X, [(var_x, G)])
 4. statement.append_equation(Y, [(var_x, H)])
@@ -1843,7 +1843,7 @@ statement.set_elements([(var_G, G), (var_X, X)])
 <p id="section-3.3.9-3">Given group elements <code>G</code>, <code>H</code> such that <code>C = x * G + r * H</code>, then the statement is generated as:<a href="#section-3.3.9-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.9-4">
 <pre>
-statement = GroupMorphismPreimage()
+statement = LinearRelation()
 var_x, var_r = statement.allocate_scalars(2)
 statement.append_equation(C, [(var_x, G), (var_r, H)])
 </pre><a href="#section-3.3.9-4" class="pilcrow">¶</a>

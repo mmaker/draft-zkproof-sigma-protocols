@@ -72,13 +72,13 @@ Table of Contents
        3.1.1.  Group
        3.1.2.  Scalar
      3.2.  Codec for non-interactive proofs
-     3.3.  Proofs of preimage of a group morphism
+     3.3.  Proofs of preimage of a linear map
        3.3.1.  Core protocol
        3.3.2.  Prover procedures
        3.3.3.  Verifier procedure
        3.3.4.  Witness representation
-       3.3.5.  Group morphism
-       3.3.6.  Statements for the preimage of a group morphism
+       3.3.5.  Linear map
+       3.3.6.  Statements for linear relations
        3.3.7.  Example: Schnorr proofs
        3.3.8.  Example: DLEQ proofs
        3.3.9.  Example: Pedersen commitments
@@ -171,16 +171,16 @@ class SigmaProtocol:
 
    Where:
 
-   *  new(domain_separator: [u8; 32], cs: GroupMorphismPreimage) ->
+   *  new(domain_separator: [u8; 32], cs: LinearRelation) ->
       SigmaProtocol, denoting the initialization function.  This
       function takes as input a label identifying local context
       information (such as: session identifiers, to avoid replay
       attacks; protocol metadata, to avoid hijacking; optionally, a
       timestamp and some pre-shared randomness, to guarantee freshness
-      of the proof) and an instance generated via the
-      GroupMorphismPreimage, the public information shared between
-      prover and verifier.  This function should pre-compute parts of
-      the statement, or initialize the state of the hash function.
+      of the proof) and an instance generated via the LinearRelation,
+      the public information shared between prover and verifier.  This
+      function should pre-compute parts of the statement, or initialize
+      the state of the hash function.
 
    *  prover_commit(self, witness: Witness) -> (commitment,
       prover_state), denoting the *commitment phase*, that is, the
@@ -352,7 +352,7 @@ class SigmaProtocol:
            scalar = OS2IP(uniform_bytes) % self.Group.ScalarField.order
            return scalar
 
-3.3.  Proofs of preimage of a group morphism
+3.3.  Proofs of preimage of a linear map
 
 3.3.1.  Core protocol
 
@@ -375,13 +375,13 @@ Inputs:
 Outputs:
 
 - A (private) prover state, holding the information of the interactive prover necessary for producing the protocol response
-- A (public) commitment message, an element of the morphism image, that is, a vector of group elements.
+- A (public) commitment message, an element of the linear map image, that is, a vector of group elements.
 
 Procedure:
 
-1. nonces = [self.instance.Domain.random(rng) for _ in range(self.instance.morphism.num_scalars)]
+1. nonces = [self.instance.Domain.random(rng) for _ in range(self.instance.linear_map.num_scalars)]
 2. prover_state = self.ProverState(witness, nonces)
-3. commitment = self.instance.morphism(nonces)
+3. commitment = self.instance.linear_map(nonces)
 4. return (prover_state, commitment)
 
 3.3.2.2.  Prover response
@@ -400,7 +400,7 @@ Outputs:
 Procedure:
 
 1. witness, nonces = prover_state
-2. return [nonces[i] + witness[i] * challenge for i in range(self.instance.morphism.num_scalars)]
+2. return [nonces[i] + witness[i] * challenge for i in range(self.instance.linear_map.num_scalars)]
 
 3.3.3.  Verifier procedure
 
@@ -419,9 +419,9 @@ Outputs:
 
 Procedure:
 
-1. assert len(commitment) == self.instance.morphism.num_statements and len(response) == self.instance.morphism.num_scalars
-2. expected = self.instance.morphism(response)
-3. got = [commitment[i] + self.instance.image[i] * challenge for i in range(self.instance.morphism.num_statements)]
+1. assert len(commitment) == self.instance.linear_map.num_constraints and len(response) == self.instance.linear_map.num_scalars
+2. expected = self.instance.linear_map(response)
+3. got = [commitment[i] + self.instance.image[i] * challenge for i in range(self.instance.linear_map.num_constraints)]
 4. return got == expected
 
 3.3.4.  Witness representation
@@ -430,14 +430,14 @@ Procedure:
 
    Witness = [Scalar; num_scalars]
 
-3.3.5.  Group morphism
+3.3.5.  Linear map
 
-   A GroupMorphism represents a function (a _group morphism_ from the
-   scalar field to the elliptic curve group) that, given as input an
-   array of Scalar elements, outputs an array of Group element.  This
-   can be represented as matrix-vector (scalar) product using group
-   multi-scalar multiplication.  However, since the matrix is often
-   times sparse, it is often more convenient to store the matrix in Yale
+   A LinearMap represents a function (a _linear map_ from the scalar
+   field to the elliptic curve group) that, given as input an array of
+   Scalar elements, outputs an array of Group element.  This can be
+   represented as matrix-vector (scalar) product using group multi-
+   scalar multiplication.  However, since the matrix is often times
+   sparse, it is often more convenient to store the matrix in Yale
    sparse matrix.
 
    Here is an example:
@@ -446,9 +446,9 @@ Procedure:
        scalar_indices: list[int]
        element_indices: list[int]
 
-   The morphism can then be presented as:
+   The linear map can then be presented as:
 
-   class GroupMorphism:
+   class LinearMap:
        Group: groups.Group
        linear_combinations: list[LinearCombination]
        group_elements: list[Group]
@@ -459,14 +459,14 @@ Procedure:
 
 3.3.5.1.  Initialization
 
-   The group morphism GroupMorphism is initialized with
+   The linear map LinearMap is initialized with
 
    linear_combinations = []
    group_elements = []
    num_scalars = 0
    num_elements = 0
 
-3.3.5.2.  Morphism map
+3.3.5.2.  Linear map evaluation
 
    A witness can be mapped to a group element via:
 
@@ -484,16 +484,15 @@ Inputs:
 5.     image.append(self.Group.msm(coefficients, elements))
 6. return image
 
-3.3.6.  Statements for the preimage of a group morphism
+3.3.6.  Statements for linear relations
 
-   The object GroupMorphismPreimage has two attributes: a morphism
-   morphism, which will be defined in Section 3.3.5, and image, the
-   morphism image of which the prover wants to show the pre-image of.
+   The object LinearRelation has two attributes: a linear map
+   linear_map, which will be defined in Section 3.3.5, and image, the
+   linear map image of which the prover wants to show the pre-image of.
 
-   class GroupMorphismPreimage: Domain = group.ScalarField Image =
-   group.Group
+   class LinearRelation: Domain = group.ScalarField Image = group.Group
 
-       morphism = Morphism
+       linear_map = LinearMap
        image = list[group.Group]
 
    def allocate_scalars(self, n: int) -> list[int]
@@ -509,7 +508,7 @@ Inputs:
 allocate_scalars(self, n)
 
 Inputs:
-    - self, the current state of the GroupMorphismPreimage
+    - self, the current state of the LinearRelation
     - n, the number of scalars to allocate
 Outputs:
     - indices, a list of integers each pointing to the new allocated scalars
@@ -524,8 +523,8 @@ Procedure:
 
 allocate_elements(self, n)
 
-1. linear_combination = Morphism.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
-2. self.morphism.append(linear_combination)
+1. linear_combination = LinearMap.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
+2. self.linear_map.append(linear_combination)
 3. self._image.append(lhs)
 
    Group elements, being part of the instance, can later be set using
@@ -534,13 +533,13 @@ allocate_elements(self, n)
  set_elements(self, elements)
 
  Inputs:
-     - self, the current state of the GroupMorphismPreimage
+     - self, the current state of the LinearRelation
      - elements, a list of pairs of indices and group elements to be set
 
  Procedure:
 
  1. for index, element in elements:
- 2.   self.morphism.group_elements[index] = element
+ 2.   self.linear_map.group_elements[index] = element
 
 3.3.6.2.  Constraint enforcing
 
@@ -558,15 +557,15 @@ Outputs:
 
 Procedure:
 
-1. linear_combination = Morphism.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
-2. self.morphism.append(linear_combination)
+1. linear_combination = LinearMap.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
+2. self.linear_map.append(linear_combination)
 3. self._image.append(lhs)
 
 3.3.7.  Example: Schnorr proofs
 
    The statement represented in Section 3 can be written as:
 
-   statement = GroupMorphismPreimage(group)
+   statement = LinearRelation(group)
    [var_x] = statement.allocate_scalars(1)
    [var_G, var_X] = statement.allocate_elements(2)
    statement.append_equation(var_X, [(var_x, var_G)])
@@ -578,7 +577,7 @@ Procedure:
    statement.set_elements([(var_G, G), (var_X, X)])
 
    It is worth noting that in the above example, [X] ==
-   statement.morphism.map([x]).
+   statement.linear_map.map([x]).
 
 3.3.8.  Example: DLEQ proofs
 
@@ -589,7 +588,7 @@ Procedure:
    Given group elements G, H and X, Y such that x * G = X and x * H = Y,
    then the statement is generated as:
 
-   1. statement = GroupMorphismPreimage()
+   1. statement = LinearRelation()
    2. [var_x] = statement.allocate_scalars(1)
    3. statement.append_equation(X, [(var_x, G)])
    4. statement.append_equation(Y, [(var_x, H)])
@@ -603,7 +602,7 @@ Procedure:
    Given group elements G, H such that C = x * G + r * H, then the
    statement is generated as:
 
-   statement = GroupMorphismPreimage()
+   statement = LinearRelation()
    var_x, var_r = statement.allocate_scalars(2)
    statement.append_equation(C, [(var_x, G), (var_r, H)])
 
