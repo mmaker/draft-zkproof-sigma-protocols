@@ -70,6 +70,7 @@ class DuplexSponge(DuplexSpongeInterface):
         self.squeeze_index = 0
         self.rate = self.permutation_state.R
         self.capacity = self.permutation_state.N - self.permutation_state.R
+        self.absorb(iv)
 
     def absorb(self, input: bytes):
         self.squeeze_index = self.rate

@@ -143,6 +143,25 @@ class GroupMorphismPreimage:
     def image(self):
         return [self.morphism.group_elements[i] for i in self._image]
 
+    def get_description(self):
+        # We pad all integers to 32 bytes.
+        desc = b''
+        # The number of scalars, elements, and statements
+        desc += self.morphism.num_scalars.to_bytes(32)
+        desc += self.morphism.num_elements.to_bytes(32)
+        desc += self.morphism.num_statements.to_bytes(32)
+        for (idx, linear_combination) in enumerate(self.morphism.linear_combinations):
+            # Index of the group element image of the MSM
+            desc += self._image[idx].to_bytes(32)
+            # Index of the scalars in the MSM
+            desc += (b'').join([scalar_idx.to_bytes(32) for scalar_idx in linear_combination.scalar_indices])
+            # Index of the group elements in the MSM
+            desc += (b'').join([element_idx.to_bytes(32) for element_idx in linear_combination.element_indices])
+        for group_element in self.morphism.group_elements:
+            # Add the serialization of the actual group elements
+            desc += self.group.serialize([group_element])
+        return sha256(desc).digest()
+
 
 class SchnorrProof(SigmaProtocol):
     # A sparse linear combination
