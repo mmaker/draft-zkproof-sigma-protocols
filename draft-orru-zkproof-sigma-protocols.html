@@ -1306,10 +1306,13 @@ class NISigmaProtocol:
         response = self.sp.prover_response(prover_state, challenge)
 
         assert self.sp.verifier(commitment, challenge, response)
-        return self.sp.serialize_batchable(commitment, challenge, response)
+        return self.sp.serialize_commitment(commitment) + self.sp.serialize_response(response)
 
     def verify(self, proof):
-        commitment, response = self.sp.deserialize_batchable(proof)
+        commitment_bytes = proof[:self.sp.instance.commit_bytes_len]
+        response_bytes = proof[self.sp.instance.commit_bytes_len:]
+        commitment = self.sp.deserialize_commitment(commitment_bytes)
+        response = self.sp.deserialize_response(response_bytes)
         challenge = self.hash_state.prover_message(commitment).verifier_challenge()
         return self.sp.verifier(commitment, challenge, response)
 </pre><a href="#section-2-4" class="pilcrow">¶</a>
@@ -1323,10 +1326,14 @@ class NISigmaProtocol:
 <div class="alignLeft art-text artwork" id="section-2.1-2">
 <pre>
 class SigmaProtocol:
-   def new(instance: Statement) -&gt; SigmaProtocol
-   def prover_commit(self, witness: Witness) -&gt; (commitment, prover_state)
+   def new(instance) -&gt; SigmaProtocol
+   def prover_commit(self, witness, rng) -&gt; (commitment, prover_state)
    def prover_response(self, prover_state, challenge) -&gt; response
    def verifier(self, commitment, challenge, response) -&gt; bool
+   def serialize_commitment(self, commitment) -&gt; bytes
+   def serialize_response(self, response) -&gt; bytes
+   def deserialize_commitment(self, data: bytes) -&gt; commitment
+   def deserialize_response(self, data: bytes) -&gt; response
    # optional
    def simulate_response(self, rng) -&gt; response
    # optional
@@ -1336,17 +1343,29 @@ class SigmaProtocol:
 <p id="section-2.1-3">Where:<a href="#section-2.1-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-2.1-4.1">
-            <p id="section-2.1-4.1.1"><code>new(domain_separator: [u8; 32], cs: LinearRelation) -&gt; SigmaProtocol</code>, denoting the initialization function. This function takes as input a label identifying local context information (such as: session identifiers, to avoid replay attacks; protocol metadata, to avoid hijacking; optionally, a timestamp and some pre-shared randomness, to guarantee freshness of the proof) and an instance generated via the <code>LinearRelation</code>, the public information shared between prover and verifier.
+            <p id="section-2.1-4.1.1"><code>new(instance) -&gt; SigmaProtocol</code>, denoting the initialization function. This function takes as input an instance generated via the <code>LinearRelation</code>, the public information shared between prover and verifier.
 This function should pre-compute parts of the statement, or initialize the state of the hash function.<a href="#section-2.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-4.2">
-            <p id="section-2.1-4.2.1"><code>prover_commit(self, witness: Witness) -&gt; (commitment, prover_state)</code>, denoting the <strong>commitment phase</strong>, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover and the statement to be proven. This step generally requires access to a high-quality entropy source to perform the commitment. Leakage of even just of a few bits of the commitment could allow for the complete recovery of the witness. The commitment is meant to be shared, while <code>prover_state</code> must be kept secret.<a href="#section-2.1-4.2.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-4.2.1"><code>prover_commit(self, witness: Witness, rng) -&gt; (commitment, prover_state)</code>, denoting the <strong>commitment phase</strong>, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover, the statement to be proven, and a random number generator <code>rng</code>. This step generally requires access to a high-quality entropy source to perform the commitment. Leakage of even just of a few bits of the commitment could allow for the complete recovery of the witness. The commitment is meant to be shared, while <code>prover_state</code> must be kept secret.<a href="#section-2.1-4.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-4.3">
             <p id="section-2.1-4.3.1"><code>prover_response(self, prover_state, challenge) -&gt; response</code>, denoting the <strong>response phase</strong>, that is, the computation of the second message sent by the prover, depending on the witness, the statement, the challenge received from the verifier, and the internal state <code>prover_state</code>. The returned value <code>response</code> is meant to be shared.<a href="#section-2.1-4.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-4.4">
             <p id="section-2.1-4.4.1"><code>verifier(self, commitment, challenge, response) -&gt; bool</code>, denoting the <strong>verifier algorithm</strong>. This method checks that the protocol transcript is valid for the given statement. The verifier algorithm outputs true if verification succeeds, or false if verification fails.<a href="#section-2.1-4.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-2.1-4.5">
+            <p id="section-2.1-4.5.1"><code>serialize_commitment(self, commitment) -&gt; bytes</code>, serializes the commitment into a canonical byte representation.<a href="#section-2.1-4.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-2.1-4.6">
+            <p id="section-2.1-4.6.1"><code>serialize_response(self, response) -&gt; bytes</code>, serializes the response into a canonical byte representation.<a href="#section-2.1-4.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-2.1-4.7">
+            <p id="section-2.1-4.7.1"><code>deserialize_commitment(self, data: bytes) -&gt; commitment</code>, deserializes a byte array into a commitment. This function can raise a <code>DeserializeError</code> if deserialization fails.<a href="#section-2.1-4.7.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-2.1-4.8">
+            <p id="section-2.1-4.8.1"><code>deserialize_response(self, data: bytes) -&gt; response</code>, deserializes a byte array into a response. This function can raise a <code>DeserializeError</code> if deserialization fails.<a href="#section-2.1-4.8.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-2.1-5">The final two algorithms describe the <strong>zero-knowledge simulator</strong> and are optional, as a sigma protocol is not necessarily zero-knowledge by definition. The simulator is primarily an efficient algorithm for proving zero-knowledge in a theoretical construction, but it is also needed for verifying short proofs and for or-composition, where a witness is not known and thus has to be simulated. We have:<a href="#section-2.1-5" class="pilcrow">¶</a></p>
@@ -1428,7 +1447,7 @@ Finally, line 3 states that the linear relation that need to be proven is
               <p id="section-3.1.1-1.9.1"><code>scalar_mul(scalar: Scalar)</code>, implements scalar multiplication for a group element by an element in its respective scalar field.<a href="#section-3.1.1-1.9.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-3.1.1-2">Functions such as <code>add</code>, <code>equal</code>, and <code>scalar_mul</code> SHOULD be implemented using operator overloading whenever possible.<a href="#section-3.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1.1-2">In this spec, instead of <code>add</code> we will use <code>+</code> with infix notation; instead of <code>equal</code> we will use <code>==</code>, and instead of <code>scalar_mul</code> we will use <code>*</code>. A similar behavior can be achieved using operator overloading.<a href="#section-3.1.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="scalar">
@@ -1444,7 +1463,7 @@ Finally, line 3 states that the linear relation that need to be proven is
               <p id="section-3.1.2-1.2.1"><code>add(scalar: Scalar)</code>: implements field addition for the elements in the field.<a href="#section-3.1.2-1.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.1.2-1.3">
-              <p id="section-3.1.2-1.3.1"><code>mult(scalar: Scalar)</code>, implements field multiplication.<a href="#section-3.1.2-1.3.1" class="pilcrow">¶</a></p>
+              <p id="section-3.1.2-1.3.1"><code>mul(scalar: Scalar)</code>, implements field multiplication.<a href="#section-3.1.2-1.3.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.1.2-1.4">
               <p id="section-3.1.2-1.4.1"><code>random()</code>: outputs a random scalar field element.<a href="#section-3.1.2-1.4.1" class="pilcrow">¶</a></p>
@@ -1456,7 +1475,7 @@ Finally, line 3 states that the linear relation that need to be proven is
               <p id="section-3.1.2-1.6.1"><code>deserialize(buffer)</code>, attempts to map a byte array <code>buffer</code> of size <code>Ns * N</code> into <code>[Scalar; N]</code>, and fails if the input is not the valid canonical byte representation of an element of the group. This function can raise a <code>DeserializeError</code> if deserialization fails.<a href="#section-3.1.2-1.6.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-3.1.2-2">Functions such as <code>add</code>, <code>equal</code>, and <code>scalar_mul</code> SHOULD be implemented using operator overloading whenever possible.<a href="#section-3.1.2-2" class="pilcrow">¶</a></p>
+<p id="section-3.1.2-2">In this spec, instead of <code>add</code> we will use <code>+</code> with infix notation; instead of <code>equal</code> we will use <code>==</code>, and instead of <code>mul</code> we will use <code>*</code>. A similar behavior can be achieved using operator overloading.<a href="#section-3.1.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1519,11 +1538,12 @@ class ByteSchnorrCodec:
             </h5>
 <div class="alignLeft art-text artwork" id="section-3.3.2.1-1">
 <pre>
-prover_commit(self, witness)
+prover_commit(self, witness, rng)
 
 Inputs:
 
 - witness, an array of scalars
+- rng, a random number generator
 
 Outputs:
 
