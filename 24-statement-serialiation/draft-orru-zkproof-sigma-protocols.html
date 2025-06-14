@@ -1171,7 +1171,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
                 <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-codec-for-non-interactive-p" class="internal xref">Codec for non-interactive proofs</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
-                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-proofs-of-preimage-of-a-gro" class="internal xref">Proofs of preimage of a group morphism</a></p>
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-proofs-of-preimage-of-a-lin" class="internal xref">Proofs of preimage of a linear map</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.1">
                     <p id="section-toc.1-1.3.2.3.2.1.1"><a href="#section-3.3.1" class="auto internal xref">3.3.1</a>.  <a href="#name-core-protocol" class="internal xref">Core protocol</a></p>
@@ -1186,10 +1186,10 @@ svg :is([fill="white"], [fill^="#fff"]) {
                     <p id="section-toc.1-1.3.2.3.2.4.1"><a href="#section-3.3.4" class="auto internal xref">3.3.4</a>.  <a href="#name-witness-representation" class="internal xref">Witness representation</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.5">
-                    <p id="section-toc.1-1.3.2.3.2.5.1"><a href="#section-3.3.5" class="auto internal xref">3.3.5</a>.  <a href="#name-group-morphism" class="internal xref">Group morphism</a></p>
+                    <p id="section-toc.1-1.3.2.3.2.5.1"><a href="#section-3.3.5" class="auto internal xref">3.3.5</a>.  <a href="#name-linear-map" class="internal xref">Linear map</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.6">
-                    <p id="section-toc.1-1.3.2.3.2.6.1"><a href="#section-3.3.6" class="auto internal xref">3.3.6</a>.  <a href="#name-statements-for-the-preimage" class="internal xref">Statements for the preimage of a group morphism</a></p>
+                    <p id="section-toc.1-1.3.2.3.2.6.1"><a href="#section-3.3.6" class="auto internal xref">3.3.6</a>.  <a href="#name-statements-for-linear-relat" class="internal xref">Statements for linear relations</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.7">
                     <p id="section-toc.1-1.3.2.3.2.7.1"><a href="#section-3.3.7" class="auto internal xref">3.3.7</a>.  <a href="#name-example-schnorr-proofs" class="internal xref">Example: Schnorr proofs</a></p>
@@ -1223,11 +1223,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
                 <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-privacy-considerations" class="internal xref">Privacy Considerations</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1.2.1">
-                    <p id="section-toc.1-1.5.2.1.2.1.1"><a href="#section-5.1.1" class="auto internal xref">5.1.1</a>.  <a href="#name-soundness-considerations" class="internal xref">Soundness Considerations</a></p>
 </li>
-                </ul>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-soundness-considerations" class="internal xref">Soundness Considerations</a></p>
 </li>
             </ul>
 </li>
@@ -1264,7 +1262,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 Any sigma protocol must define three objects:<a href="#section-1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-1-2.1">
-          <p id="section-1-2.1.1">A commitment, sometimes also called a nonce. This message is computed by the prover.<a href="#section-1-2.1.1" class="pilcrow">¶</a></p>
+          <p id="section-1-2.1.1">A commitment. This message is computed by the prover using secret nonces.<a href="#section-1-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-2.2">
           <p id="section-1-2.2.1">A challenge, computed using the Fiat-Shamir transformation using a hash function.<a href="#section-1-2.2.1" class="pilcrow">¶</a></p>
@@ -1308,10 +1306,13 @@ class NISigmaProtocol:
         response = self.sp.prover_response(prover_state, challenge)
 
         assert self.sp.verifier(commitment, challenge, response)
-        return self.sp.serialize_batchable(commitment, challenge, response)
+        return self.sp.serialize_commitment(commitment) + self.sp.serialize_response(response)
 
     def verify(self, proof):
-        commitment, response = self.sp.deserialize_batchable(proof)
+        commitment_bytes = proof[:self.sp.instance.commit_bytes_len]
+        response_bytes = proof[self.sp.instance.commit_bytes_len:]
+        commitment = self.sp.deserialize_commitment(commitment_bytes)
+        response = self.sp.deserialize_response(response_bytes)
         challenge = self.hash_state.prover_message(commitment).verifier_challenge()
         return self.sp.verifier(commitment, challenge, response)
 </pre><a href="#section-2-4" class="pilcrow">¶</a>
@@ -1325,10 +1326,14 @@ class NISigmaProtocol:
 <div class="alignLeft art-text artwork" id="section-2.1-2">
 <pre>
 class SigmaProtocol:
-   def new(instance: Statement) -&gt; SigmaProtocol
-   def prover_commit(self, witness: Witness) -&gt; (commitment, prover_state)
+   def new(instance) -&gt; SigmaProtocol
+   def prover_commit(self, witness, rng) -&gt; (commitment, prover_state)
    def prover_response(self, prover_state, challenge) -&gt; response
    def verifier(self, commitment, challenge, response) -&gt; bool
+   def serialize_commitment(self, commitment) -&gt; bytes
+   def serialize_response(self, response) -&gt; bytes
+   def deserialize_commitment(self, data: bytes) -&gt; commitment
+   def deserialize_response(self, data: bytes) -&gt; response
    # optional
    def simulate_response(self, rng) -&gt; response
    # optional
@@ -1338,17 +1343,29 @@ class SigmaProtocol:
 <p id="section-2.1-3">Where:<a href="#section-2.1-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-2.1-4.1">
-            <p id="section-2.1-4.1.1"><code>new(domain_separator: [u8; 32], cs: GroupMorphismPreimage) -&gt; SigmaProtocol</code>, denoting the initialization function. This function takes as input a label identifying local context information (such as: session identifiers, to avoid replay attacks; protocol metadata, to avoid hijacking; optionally, a timestamp and some pre-shared randomness, to guarantee freshness of the proof) and an instance generated via the <code>GroupMorphismPreimage</code>, the public information shared between prover and verifier.
+            <p id="section-2.1-4.1.1"><code>new(instance) -&gt; SigmaProtocol</code>, denoting the initialization function. This function takes as input an instance generated via the <code>LinearRelation</code>, the public information shared between prover and verifier.
 This function should pre-compute parts of the statement, or initialize the state of the hash function.<a href="#section-2.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-4.2">
-            <p id="section-2.1-4.2.1"><code>prover_commit(self, witness: Witness) -&gt; (commitment, prover_state)</code>, denoting the <strong>commitment phase</strong>, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover and the statement to be proven. This step generally requires access to a high-quality entropy source to perform the commitment. Leakage of even just of a few bits of the commitment could allow for the complete recovery of the witness. The commitment is meant to be shared, while <code>prover_state</code> must be kept secret.<a href="#section-2.1-4.2.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-4.2.1"><code>prover_commit(self, witness: Witness, rng) -&gt; (commitment, prover_state)</code>, denoting the <strong>commitment phase</strong>, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover, the statement to be proven, and a random number generator <code>rng</code>. This step generally requires access to a high-quality entropy source to perform the commitment. Leakage of even just of a few bits of the commitment could allow for the complete recovery of the witness. The commitment is meant to be shared, while <code>prover_state</code> must be kept secret.<a href="#section-2.1-4.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-4.3">
             <p id="section-2.1-4.3.1"><code>prover_response(self, prover_state, challenge) -&gt; response</code>, denoting the <strong>response phase</strong>, that is, the computation of the second message sent by the prover, depending on the witness, the statement, the challenge received from the verifier, and the internal state <code>prover_state</code>. The returned value <code>response</code> is meant to be shared.<a href="#section-2.1-4.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-4.4">
             <p id="section-2.1-4.4.1"><code>verifier(self, commitment, challenge, response) -&gt; bool</code>, denoting the <strong>verifier algorithm</strong>. This method checks that the protocol transcript is valid for the given statement. The verifier algorithm outputs true if verification succeeds, or false if verification fails.<a href="#section-2.1-4.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-2.1-4.5">
+            <p id="section-2.1-4.5.1"><code>serialize_commitment(self, commitment) -&gt; bytes</code>, serializes the commitment into a canonical byte representation.<a href="#section-2.1-4.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-2.1-4.6">
+            <p id="section-2.1-4.6.1"><code>serialize_response(self, response) -&gt; bytes</code>, serializes the response into a canonical byte representation.<a href="#section-2.1-4.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-2.1-4.7">
+            <p id="section-2.1-4.7.1"><code>deserialize_commitment(self, data: bytes) -&gt; commitment</code>, deserializes a byte array into a commitment. This function can raise a <code>DeserializeError</code> if deserialization fails.<a href="#section-2.1-4.7.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-2.1-4.8">
+            <p id="section-2.1-4.8.1"><code>deserialize_response(self, data: bytes) -&gt; response</code>, deserializes a byte array into a response. This function can raise a <code>DeserializeError</code> if deserialization fails.<a href="#section-2.1-4.8.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-2.1-5">The final two algorithms describe the <strong>zero-knowledge simulator</strong> and are optional, as a sigma protocol is not necessarily zero-knowledge by definition. The simulator is primarily an efficient algorithm for proving zero-knowledge in a theoretical construction, but it is also needed for verifying short proofs and for or-composition, where a witness is not known and thus has to be simulated. We have:<a href="#section-2.1-5" class="pilcrow">¶</a></p>
@@ -1376,7 +1393,7 @@ It relies on two components:
 - a prime-order elliptic-curve group as described in <a href="#group-abstraction" class="auto internal xref">Section 3.1</a>,
 - a hash function.<a href="#section-3-1" class="pilcrow">¶</a></p>
 <p id="section-3-2">Valid choices of elliptic curves and hash functions can be found in <a href="#ciphersuites" class="auto internal xref">Section 3.4</a>.<a href="#section-3-2" class="pilcrow">¶</a></p>
-<p id="section-3-3">Traditionally, sigma protocols are defined in Camenish-Stadtler notation as (for example):<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-3">Traditionally, sigma protocols are defined in Camenisch-Stadler notation as (for example):<a href="#section-3-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3-4">
 <pre>
 1. DLEQ(G, H, X, Y) = PoK{
@@ -1387,7 +1404,7 @@ It relies on two components:
 </div>
 <p id="section-3-5">In the above, line 1 declares that the proof name is "DLEQ", the public information (the <strong>instance</strong>) consists of the group elements <code>(G, X, H, Y)</code> denoted in upper-case.
 Line 2 states that the private information (the <strong>witness</strong>) consists of the scalar <code>x</code>.
-Finally, line 3 states that the constraints (the equations) that need to be proven are
+Finally, line 3 states that the linear relation that need to be proven is
 <code>x * G  = X</code> and <code>x * H = Y</code>.<a href="#section-3-5" class="pilcrow">¶</a></p>
 <div id="group-abstraction">
 <section id="section-3.1">
@@ -1430,7 +1447,7 @@ Finally, line 3 states that the constraints (the equations) that need to be prov
               <p id="section-3.1.1-1.9.1"><code>scalar_mul(scalar: Scalar)</code>, implements scalar multiplication for a group element by an element in its respective scalar field.<a href="#section-3.1.1-1.9.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-3.1.1-2">Functions such as <code>add</code>, <code>equal</code>, and <code>scalar_mul</code> SHOULD be implemented using operator overloading whenever possible.<a href="#section-3.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1.1-2">In this spec, instead of <code>add</code> we will use <code>+</code> with infix notation; instead of <code>equal</code> we will use <code>==</code>, and instead of <code>scalar_mul</code> we will use <code>*</code>. A similar behavior can be achieved using operator overloading.<a href="#section-3.1.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="scalar">
@@ -1446,7 +1463,7 @@ Finally, line 3 states that the constraints (the equations) that need to be prov
               <p id="section-3.1.2-1.2.1"><code>add(scalar: Scalar)</code>: implements field addition for the elements in the field.<a href="#section-3.1.2-1.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.1.2-1.3">
-              <p id="section-3.1.2-1.3.1"><code>mult(scalar: Scalar)</code>, implements field multiplication.<a href="#section-3.1.2-1.3.1" class="pilcrow">¶</a></p>
+              <p id="section-3.1.2-1.3.1"><code>mul(scalar: Scalar)</code>, implements field multiplication.<a href="#section-3.1.2-1.3.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.1.2-1.4">
               <p id="section-3.1.2-1.4.1"><code>random()</code>: outputs a random scalar field element.<a href="#section-3.1.2-1.4.1" class="pilcrow">¶</a></p>
@@ -1458,7 +1475,7 @@ Finally, line 3 states that the constraints (the equations) that need to be prov
               <p id="section-3.1.2-1.6.1"><code>deserialize(buffer)</code>, attempts to map a byte array <code>buffer</code> of size <code>Ns * N</code> into <code>[Scalar; N]</code>, and fails if the input is not the valid canonical byte representation of an element of the group. This function can raise a <code>DeserializeError</code> if deserialization fails.<a href="#section-3.1.2-1.6.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-3.1.2-2">Functions such as <code>add</code>, <code>equal</code>, and <code>scalar_mul</code> SHOULD be implemented using operator overloading whenever possible.<a href="#section-3.1.2-2" class="pilcrow">¶</a></p>
+<p id="section-3.1.2-2">In this spec, instead of <code>add</code> we will use <code>+</code> with infix notation; instead of <code>equal</code> we will use <code>==</code>, and instead of <code>mul</code> we will use <code>*</code>. A similar behavior can be achieved using operator overloading.<a href="#section-3.1.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1495,10 +1512,10 @@ class ByteSchnorrCodec:
 </div>
 </section>
 </div>
-<div id="proofs-of-preimage-of-a-group-morphism">
+<div id="proofs-of-preimage-of-a-linear-map">
 <section id="section-3.3">
-        <h3 id="name-proofs-of-preimage-of-a-gro">
-<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-proofs-of-preimage-of-a-gro" class="section-name selfRef">Proofs of preimage of a group morphism</a>
+        <h3 id="name-proofs-of-preimage-of-a-lin">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-proofs-of-preimage-of-a-lin" class="section-name selfRef">Proofs of preimage of a linear map</a>
         </h3>
 <div id="core-protocol">
 <section id="section-3.3.1">
@@ -1521,22 +1538,23 @@ class ByteSchnorrCodec:
             </h5>
 <div class="alignLeft art-text artwork" id="section-3.3.2.1-1">
 <pre>
-prover_commit(self, witness)
+prover_commit(self, witness, rng)
 
 Inputs:
 
 - witness, an array of scalars
+- rng, a random number generator
 
 Outputs:
 
 - A (private) prover state, holding the information of the interactive prover necessary for producing the protocol response
-- A (public) commitment message, an element of the morphism image, that is, a vector of group elements.
+- A (public) commitment message, an element of the linear map image, that is, a vector of group elements.
 
 Procedure:
 
-1. nonces = [self.instance.Domain.random(rng) for _ in range(self.instance.morphism.num_scalars)]
+1. nonces = [self.instance.Domain.random(rng) for _ in range(self.instance.linear_map.num_scalars)]
 2. prover_state = self.ProverState(witness, nonces)
-3. commitment = self.instance.morphism(nonces)
+3. commitment = self.instance.linear_map(nonces)
 4. return (prover_state, commitment)
 </pre><a href="#section-3.3.2.1-1" class="pilcrow">¶</a>
 </div>
@@ -1563,7 +1581,7 @@ Outputs:
 Procedure:
 
 1. witness, nonces = prover_state
-2. return [nonces[i] + witness[i] * challenge for i in range(self.instance.morphism.num_scalars)]
+2. return [nonces[i] + witness[i] * challenge for i in range(self.instance.linear_map.num_scalars)]
 </pre><a href="#section-3.3.2.2-1" class="pilcrow">¶</a>
 </div>
 </section>
@@ -1592,9 +1610,9 @@ Outputs:
 
 Procedure:
 
-1. assert len(commitment) == self.instance.morphism.num_statements and len(response) == self.instance.morphism.num_scalars
-2. expected = self.instance.morphism(response)
-3. got = [commitment[i] + self.instance.image[i] * challenge for i in range(self.instance.morphism.num_statements)]
+1. assert len(commitment) == self.instance.linear_map.num_constraints and len(response) == self.instance.linear_map.num_scalars
+2. expected = self.instance.linear_map(response)
+3. got = [commitment[i] + self.instance.image[i] * challenge for i in range(self.instance.linear_map.num_constraints)]
 4. return got == expected
 </pre><a href="#section-3.3.3-1" class="pilcrow">¶</a>
 </div>
@@ -1613,12 +1631,12 @@ Witness = [Scalar; num_scalars]
 </div>
 </section>
 </div>
-<div id="morphism">
+<div id="linear-map">
 <section id="section-3.3.5">
-          <h4 id="name-group-morphism">
-<a href="#section-3.3.5" class="section-number selfRef">3.3.5. </a><a href="#name-group-morphism" class="section-name selfRef">Group morphism</a>
+          <h4 id="name-linear-map">
+<a href="#section-3.3.5" class="section-number selfRef">3.3.5. </a><a href="#name-linear-map" class="section-name selfRef">Linear map</a>
           </h4>
-<p id="section-3.3.5-1">A <code>GroupMorphism</code> represents a function (a <em>group morphism</em> from the scalar field to the elliptic curve group) that, given as input an array of <code>Scalar</code> elements, outputs an array of <code>Group</code> element. This can be represented as matrix-vector (scalar) product using group multi-scalar multiplication. However, since the matrix is often times sparse, it is often more convenient to store the matrix in Yale sparse matrix.<a href="#section-3.3.5-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.5-1">A <code>LinearMap</code> represents a function (a <em>linear map</em> from the scalar field to the elliptic curve group) that, given as input an array of <code>Scalar</code> elements, outputs an array of <code>Group</code> element. This can be represented as matrix-vector (scalar) product using group multi-scalar multiplication. However, since the matrix is often times sparse, it is often more convenient to store the matrix in Yale sparse matrix.<a href="#section-3.3.5-1" class="pilcrow">¶</a></p>
 <p id="section-3.3.5-2">Here is an example:<a href="#section-3.3.5-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.5-3">
 <pre>
@@ -1627,10 +1645,10 @@ class LinearCombination:
     element_indices: list[int]
 </pre><a href="#section-3.3.5-3" class="pilcrow">¶</a>
 </div>
-<p id="section-3.3.5-4">The morphism can then be presented as:<a href="#section-3.3.5-4" class="pilcrow">¶</a></p>
+<p id="section-3.3.5-4">The linear map can then be presented as:<a href="#section-3.3.5-4" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.5-5">
 <pre>
-class GroupMorphism:
+class LinearMap:
     Group: groups.Group
     linear_combinations: list[LinearCombination]
     group_elements: list[Group]
@@ -1645,7 +1663,7 @@ class GroupMorphism:
             <h5 id="name-initialization">
 <a href="#section-3.3.5.1" class="section-number selfRef">3.3.5.1. </a><a href="#name-initialization" class="section-name selfRef">Initialization</a>
             </h5>
-<p id="section-3.3.5.1-1">The group morphism <code>GroupMorphism</code> is initialized with<a href="#section-3.3.5.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.5.1-1">The linear map <code>LinearMap</code> is initialized with<a href="#section-3.3.5.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.5.1-2">
 <pre>
 linear_combinations = []
@@ -1656,10 +1674,10 @@ num_elements = 0
 </div>
 </section>
 </div>
-<div id="morphism-map">
+<div id="linear-map-evaluation">
 <section id="section-3.3.5.2">
-            <h5 id="name-morphism-map">
-<a href="#section-3.3.5.2" class="section-number selfRef">3.3.5.2. </a><a href="#name-morphism-map" class="section-name selfRef">Morphism map</a>
+            <h5 id="name-linear-map-evaluation">
+<a href="#section-3.3.5.2" class="section-number selfRef">3.3.5.2. </a><a href="#name-linear-map-evaluation" class="section-name selfRef">Linear map evaluation</a>
             </h5>
 <p id="section-3.3.5.2-1">A witness can be mapped to a group element via:<a href="#section-3.3.5.2-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.5.2-2">
@@ -1683,18 +1701,18 @@ Inputs:
 </div>
 </section>
 </div>
-<div id="statements-for-the-preimage-of-a-group-morphism">
+<div id="statements-for-linear-relations">
 <section id="section-3.3.6">
-          <h4 id="name-statements-for-the-preimage">
-<a href="#section-3.3.6" class="section-number selfRef">3.3.6. </a><a href="#name-statements-for-the-preimage" class="section-name selfRef">Statements for the preimage of a group morphism</a>
+          <h4 id="name-statements-for-linear-relat">
+<a href="#section-3.3.6" class="section-number selfRef">3.3.6. </a><a href="#name-statements-for-linear-relat" class="section-name selfRef">Statements for linear relations</a>
           </h4>
-<p id="section-3.3.6-1">The object <code>GroupMorphismPreimage</code> has two attributes: a morphism <code>morphism</code>, which will be defined in <a href="#morphism" class="auto internal xref">Section 3.3.5</a>, and <code>image</code>, the morphism image of which the prover wants to show the pre-image of.<a href="#section-3.3.6-1" class="pilcrow">¶</a></p>
-<p id="section-3.3.6-2">class GroupMorphismPreimage:
+<p id="section-3.3.6-1">The object <code>LinearRelation</code> has two attributes: a linear map <code>linear_map</code>, which will be defined in <a href="#linear-map" class="auto internal xref">Section 3.3.5</a>, and <code>image</code>, the linear map image of which the prover wants to show the pre-image of.<a href="#section-3.3.6-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.6-2">class LinearRelation:
         Domain = group.ScalarField
         Image = group.Group<a href="#section-3.3.6-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.6-3">
 <pre>
-    morphism = Morphism
+    linear_map = LinearMap
     image = list[group.Group]
 
 def allocate_scalars(self, n: int) -&gt; list[int]
@@ -1714,7 +1732,7 @@ def set_elements(self, elements: list[(int, Group)]) -&gt; None
 allocate_scalars(self, n)
 
 Inputs:
-    - self, the current state of the GroupMorphismPreimage
+    - self, the current state of the LinearRelation
     - n, the number of scalars to allocate
 Outputs:
     - indices, a list of integers each pointing to the new allocated scalars
@@ -1731,8 +1749,8 @@ Procedure:
 <pre>
 allocate_elements(self, n)
 
-1. linear_combination = Morphism.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
-2. self.morphism.append(linear_combination)
+1. linear_combination = LinearMap.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
+2. self.linear_map.append(linear_combination)
 3. self._image.append(lhs)
 </pre><a href="#section-3.3.6.1-4" class="pilcrow">¶</a>
 </div>
@@ -1742,13 +1760,13 @@ allocate_elements(self, n)
 set_elements(self, elements)
 
 Inputs:
-    - self, the current state of the GroupMorphismPreimage
+    - self, the current state of the LinearRelation
     - elements, a list of pairs of indices and group elements to be set
 
 Procedure:
 
 1. for index, element in elements:
-2.   self.morphism.group_elements[index] = element
+2.   self.linear_map.group_elements[index] = element
 </pre><a href="#section-3.3.6.1-6" class="pilcrow">¶</a>
 </div>
 </section>
@@ -1774,8 +1792,8 @@ Outputs:
 
 Procedure:
 
-1. linear_combination = Morphism.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
-2. self.morphism.append(linear_combination)
+1. linear_combination = LinearMap.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
+2. self.linear_map.append(linear_combination)
 3. self._image.append(lhs)
 </pre><a href="#section-3.3.6.2-1" class="pilcrow">¶</a>
 </div>
@@ -1791,7 +1809,7 @@ Procedure:
 <p id="section-3.3.7-1">The statement represented in <a href="#sigma-protocol-group" class="auto internal xref">Section 3</a> can be written as:<a href="#section-3.3.7-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.7-2">
 <pre>
-statement = GroupMorphismPreimage(group)
+statement = LinearRelation(group)
 [var_x] = statement.allocate_scalars(1)
 [var_G, var_X] = statement.allocate_elements(2)
 statement.append_equation(var_X, [(var_x, var_G)])
@@ -1804,7 +1822,7 @@ G = group.generator()
 statement.set_elements([(var_G, G), (var_X, X)])
 </pre><a href="#section-3.3.7-4" class="pilcrow">¶</a>
 </div>
-<p id="section-3.3.7-5">It is worth noting that in the above example, <code>[X] == statement.morphism.map([x])</code>.<a href="#section-3.3.7-5" class="pilcrow">¶</a></p>
+<p id="section-3.3.7-5">It is worth noting that in the above example, <code>[X] == statement.linear_map.map([x])</code>.<a href="#section-3.3.7-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="example-dleq-proofs">
@@ -1821,7 +1839,7 @@ statement.set_elements([(var_G, G), (var_X, X)])
 <p id="section-3.3.8-3">Given group elements <code>G</code>, <code>H</code> and <code>X</code>, <code>Y</code> such that <code>x * G = X</code> and <code>x * H = Y</code>, then the statement is generated as:<a href="#section-3.3.8-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.8-4">
 <pre>
-1. statement = GroupMorphismPreimage()
+1. statement = LinearRelation()
 2. [var_x] = statement.allocate_scalars(1)
 3. statement.append_equation(X, [(var_x, G)])
 4. statement.append_equation(Y, [(var_x, H)])
@@ -1843,7 +1861,7 @@ statement.set_elements([(var_G, G), (var_X, X)])
 <p id="section-3.3.9-3">Given group elements <code>G</code>, <code>H</code> such that <code>C = x * G + r * H</code>, then the statement is generated as:<a href="#section-3.3.9-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.9-4">
 <pre>
-statement = GroupMorphismPreimage()
+statement = LinearRelation()
 var_x, var_r = statement.allocate_scalars(2)
 statement.append_equation(C, [(var_x, G), (var_r, H)])
 </pre><a href="#section-3.3.9-4" class="pilcrow">¶</a>
@@ -1987,27 +2005,27 @@ nonces = [int(bin_nonce[i*scalar_bytes: i*(scalar_bytes+1)]) % p
             <p id="section-5.1-3.4.1">Protection against "harvest now, decrypt later" attacks.<a href="#section-5.1-3.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<div id="soundness-considerations">
-<section id="section-5.1.1">
-          <h4 id="name-soundness-considerations">
-<a href="#section-5.1.1" class="section-number selfRef">5.1.1. </a><a href="#name-soundness-considerations" class="section-name selfRef">Soundness Considerations</a>
-          </h4>
-<p id="section-5.1.1-1">While the proofs themselves offer privacy protections against quantum adversaries, the hardness of the relation being proven depends (at best) on the hardness of the discrete logarithm problem over the elliptic curves specified in <a href="#ciphersuites" class="auto internal xref">Section 3.4</a>.
-Since this problem is known to be efficiently solvable by quantum computers using Shor's algorithm, these proofs MUST NOT be relied upon for post-quantum soundness guarantees.<a href="#section-5.1.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.1.1-2">Implementations requiring post-quantum soundness SHOULD transition to alternative proof systems such as:<a href="#section-5.1.1-2" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-5.1.1-3.1">
-              <p id="section-5.1.1-3.1.1">MPC-in-the-Head approaches as described in <span>[<a href="#GiacomelliMO16" class="cite xref">GiacomelliMO16</a>]</span><a href="#section-5.1.1-3.1.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-5.1.1-3.2">
-              <p id="section-5.1.1-3.2.1">Lattice-based approaches as described in <span>[<a href="#AttemaCK21" class="cite xref">AttemaCK21</a>]</span><a href="#section-5.1.1-3.2.1" class="pilcrow">¶</a></p>
-</li>
-          </ul>
-<p id="section-5.1.1-4">Implementations should consider the timeline for quantum computing advances when planning migration to post-quantum sound alternatives.
-Implementers MAY adopt a hybrid approach during migration to post-quantum security by using AND composition of proofs. This approach enables gradual migration while maintaining security against classical adversaries.
-This composition retains soundness if <strong>both</strong> problem remains hard. AND composition of proofs is NOT described in this specification, but examples may be found in the proof-of-concept implementation and in <span>[<a href="#BonehS23" class="cite xref">BonehS23</a>]</span>.<a href="#section-5.1.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
+<div id="soundness-considerations">
+<section id="section-5.2">
+        <h3 id="name-soundness-considerations">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-soundness-considerations" class="section-name selfRef">Soundness Considerations</a>
+        </h3>
+<p id="section-5.2-1">While the proofs themselves offer privacy protections against quantum adversaries, the hardness of the relation being proven depends (at best) on the hardness of the discrete logarithm problem over the elliptic curves specified in <a href="#ciphersuites" class="auto internal xref">Section 3.4</a>.
+Since this problem is known to be efficiently solvable by quantum computers using Shor's algorithm, these proofs MUST NOT be relied upon for post-quantum soundness guarantees.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">Implementations requiring post-quantum soundness SHOULD transition to alternative proof systems such as:<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.2-3.1">
+            <p id="section-5.2-3.1.1">MPC-in-the-Head approaches as described in <span>[<a href="#GiacomelliMO16" class="cite xref">GiacomelliMO16</a>]</span><a href="#section-5.2-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.2-3.2">
+            <p id="section-5.2-3.2.1">Lattice-based approaches as described in <span>[<a href="#AttemaCK21" class="cite xref">AttemaCK21</a>]</span><a href="#section-5.2-3.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-5.2-4">Implementations should consider the timeline for quantum computing advances when planning migration to post-quantum sound alternatives.
+Implementers MAY adopt a hybrid approach during migration to post-quantum security by using AND composition of proofs. This approach enables gradual migration while maintaining security against classical adversaries.
+This composition retains soundness if <strong>both</strong> problem remains hard. AND composition of proofs is NOT described in this specification, but examples may be found in the proof-of-concept implementation and in <span>[<a href="#BonehS23" class="cite xref">BonehS23</a>]</span>.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2070,7 +2088,7 @@ This composition retains soundness if <strong>both</strong> problem remains hard
 <dd class="break"></dd>
 <dt id="NISTCurves">[NISTCurves]</dt>
         <dd>
-<span class="refTitle">"Digital signature standard (DSS)"</span>, <span class="refContent">National Institute of Standards and Technology (U.S.)</span>, <span class="seriesInfo">DOI 10.6028/nist.fips.186-4</span>, <time datetime="2013" class="refDate">2013</time>, <span>&lt;<a href="https://doi.org/10.6028/nist.fips.186-4">https://doi.org/10.6028/nist.fips.186-4</a>&gt;</span>. </dd>
+<span class="refTitle">"Digital Signature Standard (DSS)"</span>, <span class="refContent">National Institute of Standards and Technology (U.S.)</span>, <span class="seriesInfo">DOI 10.6028/nist.fips.186-5</span>, <time datetime="2023-02" class="refDate">February 2023</time>, <span>&lt;<a href="https://doi.org/10.6028/nist.fips.186-5">https://doi.org/10.6028/nist.fips.186-5</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="SEC1">[SEC1]</dt>
       <dd>
