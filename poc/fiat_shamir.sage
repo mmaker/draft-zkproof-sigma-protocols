@@ -30,10 +30,13 @@ class NISigmaProtocol:
         response = self.sp.prover_response(prover_state, challenge)
 
         assert self.sp.verifier(commitment, challenge, response)
-        return self.sp.serialize_batchable(commitment, challenge, response)
+        return self.sp.serialize_commitment(commitment) + self.sp.serialize_response(response)
 
     def verify(self, proof):
-        commitment, response = self.sp.deserialize_batchable(proof)
+        commitment_bytes = proof[:self.sp.instance.commit_bytes_len]
+        response_bytes = proof[self.sp.instance.commit_bytes_len:]
+        commitment = self.sp.deserialize_commitment(commitment_bytes)
+        response = self.sp.deserialize_response(response_bytes)
         self.codec.prover_message(self.hash_state, commitment)
         challenge = self.codec.verifier_challenge(self.hash_state)
         return self.sp.verifier(commitment, challenge, response)

@@ -178,10 +178,6 @@ class SchnorrProof(SigmaProtocol):
     def deserialize_response(self, data):
         return self.instance.Domain.deserialize(data)
 
-    def get_commitment(self, challenge, response):
-        h_c_values = [self.instance.image[i] * challenge for i in range(self.instance.linear_map.num_constraints)]
-        return [self.instance.linear_map(response)[i] - h_c_values[i] for i in range(self.instance.linear_map.num_constraints)]
-
     def simulate_response(self, rng):
         return [self.instance.Domain.random(rng) for i in range(self.instance.linear_map.num_scalars)]
 
@@ -189,17 +185,3 @@ class SchnorrProof(SigmaProtocol):
         h_c_values = [self.instance.image[i] * challenge for i in range(self.instance.linear_map.num_constraints)]
         # Generate what the correct commitment would be based on the random response and challenge.
         return [self.instance.linear_map(response)[i] - h_c_values[i] for i in range(self.instance.linear_map.num_constraints)]
-
-    # Compatibility methods for batchable serialization
-    def serialize_batchable(self, commitment, challenge, response):
-        return self.serialize_commitment(commitment) + self.serialize_response(response)
-
-    def deserialize_batchable(self, encoded):
-        assert len(encoded) == self.instance.commit_bytes_len + self.instance.response_bytes_len
-        commitment_bytes = encoded[:self.instance.commit_bytes_len]
-        commitment = self.deserialize_commitment(commitment_bytes)
-
-        response_bytes = encoded[self.instance.commit_bytes_len:]
-        response = self.deserialize_response(response_bytes)
-
-        return (commitment, response)

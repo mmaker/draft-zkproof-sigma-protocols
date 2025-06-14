@@ -37,21 +37,31 @@ class AndProof(SchnorrProof):
         )
         return True
 
-    def serialize_batchable(self, commitments, challenge, responses):
-        return b''.join(
-            [protocol.serialize_batchable(commitment, challenge, response) for protocol, commitment, response in zip(self.protocols, commitments, responses)]
-        )
+    def serialize_commitment(self, commitments):
+        return b''.join([protocol.serialize_commitment(commitment) for protocol, commitment in zip(self.protocols, commitments)])
 
-    def deserialize_batchable(self, proof_string):
+    def serialize_response(self, responses):
+        return b''.join([protocol.serialize_response(response) for protocol, response in zip(self.protocols, responses)])
+
+    def deserialize_commitment(self, data):
         commitments = []
-        responses = []
+        offset = 0
         for protocol in self.protocols:
-            proof_len = protocol.instance.commit_bytes_len + protocol.instance.response_bytes_len
-            commitment, response = protocol.deserialize_batchable(proof_string[:proof_len])
-            proof_string = proof_string[proof_len:]
+            commit_len = protocol.instance.commit_bytes_len
+            commitment = protocol.deserialize_commitment(data[offset:offset + commit_len])
             commitments.append(commitment)
+            offset += commit_len
+        return commitments
+
+    def deserialize_response(self, data):
+        responses = []
+        offset = 0
+        for protocol in self.protocols:
+            response_len = protocol.instance.response_bytes_len
+            response = protocol.deserialize_response(data[offset:offset + response_len])
             responses.append(response)
-        return (commitments, responses)
+            offset += response_len
+        return responses
 
 
 class P256AndCodec(P256Codec):
@@ -71,6 +81,16 @@ class OrProof(SchnorrProof):
 
     def __init__(self, instances: list[LinearRelation]):
         self.protocols = [SchnorrProof(instance) for instance in instances]
+        self.instance = self  # For compatibility with fiat_shamir
+    
+    @property
+    def commit_bytes_len(self):
+        return sum(protocol.instance.commit_bytes_len for protocol in self.protocols)
+    
+    @property
+    def response_bytes_len(self):
+        return (sum(protocol.instance.response_bytes_len for protocol in self.protocols) +
+                sum(protocol.instance.Domain.scalar_byte_length() for protocol in self.protocols[:-1]))
 
     def prover_commit(self, witnesses, rng):
         assert witnesses.count(None) == len(self.protocols) - 1
@@ -144,35 +164,44 @@ class OrProof(SchnorrProof):
 
         return True
 
-    def serialize_batchable(self, commitments, challenge, _response):
-        challenges, responses = _response
-        return b''.join(
-                [protocol.serialize_batchable(commitment, challenge, response) for protocol, commitment, response in zip(self.protocols, commitments, responses)] +
-                [protocol.instance.Domain.serialize([challenge]) for (protocol, challenge) in zip(self.protocols[:-1], challenges)]
-            )
+    def serialize_commitment(self, commitments):
+        return b''.join([protocol.serialize_commitment(commitment) for protocol, commitment in zip(self.protocols, commitments)])
 
-    def deserialize_batchable(self, proof_string):
+    def serialize_response(self, _response):
+        challenges, responses = _response
+        return (b''.join([protocol.serialize_response(response) for protocol, response in zip(self.protocols, responses)]) +
+                b''.join([protocol.instance.Domain.serialize([challenge]) for (protocol, challenge) in zip(self.protocols[:-1], challenges)]))
+
+    def deserialize_commitment(self, data):
         commitments = []
+        offset = 0
+        for protocol in self.protocols:
+            commit_len = protocol.instance.commit_bytes_len
+            commitment = protocol.deserialize_commitment(data[offset:offset + commit_len])
+            commitments.append(commitment)
+            offset += commit_len
+        return commitments
+
+    def deserialize_response(self, data):
         challenges = []
         responses = []
-
-        start = 0
+        offset = 0
+        
+        # First deserialize all responses
         for protocol in self.protocols:
-            proof_len = protocol.instance.commit_bytes_len + protocol.instance.response_bytes_len
-            commitment, response = protocol.deserialize_batchable(proof_string[start : start + proof_len])
-            start += proof_len
-            commitments.append(commitment)
+            response_len = protocol.instance.response_bytes_len
+            response = protocol.deserialize_response(data[offset:offset + response_len])
             responses.append(response)
+            offset += response_len
 
-        # The last part of the proof string is the challenges
+        # Then deserialize the challenges (all but the last one)
         for protocol in self.protocols[:-1]:
-            # we should not be needing to inspect Domain here
             challenge_len = protocol.instance.Domain.scalar_byte_length()
-            challenge = protocol.instance.Domain.deserialize(proof_string[start : start + challenge_len])
+            challenge = protocol.instance.Domain.deserialize(data[offset:offset + challenge_len])
             challenges.append(challenge[0])
-            start += challenge_len
+            offset += challenge_len
 
-        return (commitments, (challenges, responses))
+        return (challenges, responses)
 
 
 class P256OrCodec(P256Codec):

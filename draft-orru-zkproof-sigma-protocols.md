@@ -197,18 +197,18 @@ We detail the functions that can be invoked on these objects. Example choices ca
 - `equal(element: Group)`, returns `true` if the two elements are the same and false` otherwise.
 - `scalar_mul(scalar: Scalar)`, implements scalar multiplication for a group element by an element in its respective scalar field.
 
-Functions such as `add`, `equal`, and `scalar_mul` SHOULD be implemented using operator overloading whenever possible.
+In this spec, instead of `add` we will use `+` with infix notation; instead of `equal` we will use `==`, and instead of `scalar_mul` we will use `*`. A similar behavior can be achieved using operator overloading.
 
 ### Scalar
 
 - `identity()`: outputs the (additive) identity element in the scalar field.
 - `add(scalar: Scalar)`: implements field addition for the elements in the field.
-- `mult(scalar: Scalar)`, implements field multiplication.
+- `mul(scalar: Scalar)`, implements field multiplication.
 - `random()`: outputs a random scalar field element.
 - `serialize(scalars: list[Scalar; N])`: serializes a list of scalars and returns their canonical representation of fixed length `Ns * N`.
 - `deserialize(buffer)`, attempts to map a byte array `buffer` of size `Ns * N` into `[Scalar; N]`, and fails if the input is not the valid canonical byte representation of an element of the group. This function can raise a `DeserializeError` if deserialization fails.
 
-Functions such as `add`, `equal`, and `scalar_mul` SHOULD be implemented using operator overloading whenever possible.
+In this spec, instead of `add` we will use `+` with infix notation; instead of `equal` we will use `==`, and instead of `mul` we will use `*`. A similar behavior can be achieved using operator overloading.
 
 ## Codec for non-interactive proofs {#group-prove}
 
@@ -568,7 +568,6 @@ This composition retains soundness if **both** problem remains hard. AND composi
 As of now, it is responsibility of the user to pick a unique initialization vector that identifies the proof system and the session being used. This will be expanded in future versions of this specification.
 
 # Acknowledgments
-
 {:numbered ="false"}
 
 The authors thank Jan Bobolz, Stephan Krenn, Mary Maller, Ivan Visconti, Yuwen Zhang for reviewing a previous edition of this specification.
