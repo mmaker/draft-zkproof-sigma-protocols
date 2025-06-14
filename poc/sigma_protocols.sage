@@ -138,6 +138,48 @@ class LinearRelation:
     def image(self):
         return [self.linear_map.group_elements[i] for i in self._image]
 
+    def get_description(self):
+        """
+        Generate a canonical description that uniquely identifies this linear relation.
+
+        This includes the linear combination indices for each constraint, and the actual group element used.
+
+        Returns:
+            bytes: Canonical byte representation of the linear relation
+        """
+        assert all(x is not None for x in self.morphism.group_elements), "All group elements must be set before serialization."
+
+        # All integers are serialized as 32-byte big-endian values for consistency
+        WORD_SIZE = 32
+
+        serialization_parts = []
+
+        # Encode the structure dimensions
+        serialization_parts.append(self.morphism.num_scalars.to_bytes(WORD_SIZE, 'big'))
+        serialization_parts.append(self.morphism.num_elements.to_bytes(WORD_SIZE, 'big'))
+        serialization_parts.append(self.morphism.num_statements.to_bytes(WORD_SIZE, 'big'))
+
+        # Encode each linear combination constraint
+        for i, linear_combination in enumerate(self.morphism.linear_combinations):
+            # The target group element index for this constraint
+            target_element_idx = self._image[i]
+            serialization_parts.append(target_element_idx.to_bytes(WORD_SIZE, 'big'))
+
+            # Indices of scalars participating in this linear combination
+            for scalar_idx in linear_combination.scalar_indices:
+                serialization_parts.append(scalar_idx.to_bytes(WORD_SIZE, 'big'))
+
+            # Indices of group elements participating in this linear combination
+            for element_idx in linear_combination.element_indices:
+                serialization_parts.append(element_idx.to_bytes(WORD_SIZE, 'big'))
+
+        # Encode the actual group element values
+        for group_element in self.morphism.group_elements:
+            serialization_parts.append(self.group.serialize([group_element]))
+
+        # Return the canonical description without hashing
+        return b''.join(serialization_parts)
+
 
 class SchnorrProof(SigmaProtocol):
     # A sparse linear combination

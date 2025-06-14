@@ -13,7 +13,6 @@ class NISigmaProtocol:
     - a codec that implements `Codec`;
     - a hash function that implements `DuplexSpongeInterface`.
     """
-
     Protocol: SigmaProtocol = None
     Codec: Codec = None
     Hash: 'DuplexSpongeInterface' = None
