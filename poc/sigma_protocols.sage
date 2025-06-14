@@ -14,11 +14,11 @@ class SigmaProtocol(ABC):
     - witness: the secret witness for the relation.
     """
     @abstractmethod
-    def __init__(self, index):
+    def __init__(self, instance):
         raise NotImplementedError
 
     @abstractmethod
-    def prover_commit(self, rng, witness):
+    def prover_commit(self, witness, rng):
         raise NotImplementedError
 
     @abstractmethod
@@ -29,8 +29,24 @@ class SigmaProtocol(ABC):
     def verifier(self, commitment, challenge, response):
         raise NotImplementedError
 
+    @abstractmethod
+    def serialize_commitment(self, commitment):
+        raise NotImplementedError
+
+    @abstractmethod
+    def serialize_response(self, response):
+        raise NotImplementedError
+
+    @abstractmethod
+    def deserialize_commitment(self, data):
+        raise NotImplementedError
+
+    @abstractmethod
+    def deserialize_response(self, data):
+        raise NotImplementedError
+
     # optional
-    def simulate_response(self):
+    def simulate_response(self, rng):
         raise NotImplementedError
 
     # optional

@@ -116,10 +116,13 @@ Upon initialization, the protocol receives as input an `iv` of 32-bytes which un
             response = self.sp.prover_response(prover_state, challenge)
 
             assert self.sp.verifier(commitment, challenge, response)
-            return self.sp.serialize_batchable(commitment, challenge, response)
+            return self.sp.serialize_commitment(commitment) + self.sp.serialize_response(response)
 
         def verify(self, proof):
-            commitment, response = self.sp.deserialize_batchable(proof)
+            commitment_bytes = proof[:self.sp.instance.commit_bytes_len]
+            response_bytes = proof[self.sp.instance.commit_bytes_len:]
+            commitment = self.sp.deserialize_commitment(commitment_bytes)
+            response = self.sp.deserialize_response(response_bytes)
             challenge = self.hash_state.prover_message(commitment).verifier_challenge()
             return self.sp.verifier(commitment, challenge, response)
 
@@ -128,10 +131,14 @@ Upon initialization, the protocol receives as input an `iv` of 32-bytes which un
 The public functions are obtained relying on an internal structure containing the definition of a sigma protocol.
 
     class SigmaProtocol:
-       def new(instance: Statement) -> SigmaProtocol
-       def prover_commit(self, witness: Witness) -> (commitment, prover_state)
+       def new(instance) -> SigmaProtocol
+       def prover_commit(self, witness, rng) -> (commitment, prover_state)
        def prover_response(self, prover_state, challenge) -> response
        def verifier(self, commitment, challenge, response) -> bool
+       def serialize_commitment(self, commitment) -> bytes
+       def serialize_response(self, response) -> bytes
+       def deserialize_commitment(self, data: bytes) -> commitment
+       def deserialize_response(self, data: bytes) -> response
        # optional
        def simulate_response(self, rng) -> response
        # optional
@@ -139,14 +146,22 @@ The public functions are obtained relying on an internal structure containing th
 
 Where:
 
-- `new(domain_separator: [u8; 32], cs: LinearRelation) -> SigmaProtocol`, denoting the initialization function. This function takes as input a label identifying local context information (such as: session identifiers, to avoid replay attacks; protocol metadata, to avoid hijacking; optionally, a timestamp and some pre-shared randomness, to guarantee freshness of the proof) and an instance generated via the `LinearRelation`, the public information shared between prover and verifier.
+- `new(instance) -> SigmaProtocol`, denoting the initialization function. This function takes as input an instance generated via the `LinearRelation`, the public information shared between prover and verifier.
 This function should pre-compute parts of the statement, or initialize the state of the hash function.
 
-- `prover_commit(self, witness: Witness) -> (commitment, prover_state)`, denoting the **commitment phase**, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover and the statement to be proven. This step generally requires access to a high-quality entropy source to perform the commitment. Leakage of even just of a few bits of the commitment could allow for the complete recovery of the witness. The commitment is meant to be shared, while `prover_state` must be kept secret.
+- `prover_commit(self, witness: Witness, rng) -> (commitment, prover_state)`, denoting the **commitment phase**, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover, the statement to be proven, and a random number generator `rng`. This step generally requires access to a high-quality entropy source to perform the commitment. Leakage of even just of a few bits of the commitment could allow for the complete recovery of the witness. The commitment is meant to be shared, while `prover_state` must be kept secret.
 
 - `prover_response(self, prover_state, challenge) -> response`, denoting the **response phase**, that is, the computation of the second message sent by the prover, depending on the witness, the statement, the challenge received from the verifier, and the internal state `prover_state`. The returned value `response` is meant to be shared.
 
 - `verifier(self, commitment, challenge, response) -> bool`, denoting the **verifier algorithm**. This method checks that the protocol transcript is valid for the given statement. The verifier algorithm outputs true if verification succeeds, or false if verification fails.
+
+- `serialize_commitment(self, commitment) -> bytes`, serializes the commitment into a canonical byte representation.
+
+- `serialize_response(self, response) -> bytes`, serializes the response into a canonical byte representation.
+
+- `deserialize_commitment(self, data: bytes) -> commitment`, deserializes a byte array into a commitment. This function can raise a `DeserializeError` if deserialization fails.
+
+- `deserialize_response(self, data: bytes) -> response`, deserializes a byte array into a response. This function can raise a `DeserializeError` if deserialization fails.
 
 The final two algorithms describe the **zero-knowledge simulator** and are optional, as a sigma protocol is not necessarily zero-knowledge by definition. The simulator is primarily an efficient algorithm for proving zero-knowledge in a theoretical construction, but it is also needed for verifying short proofs and for or-composition, where a witness is not known and thus has to be simulated. We have:
 
@@ -247,11 +262,12 @@ The prover of a sigma protocol is stateful and will send two message, a "commitm
 
 #### Prover commitment
 
-    prover_commit(self, witness)
+    prover_commit(self, witness, rng)
 
     Inputs:
 
     - witness, an array of scalars
+    - rng, a random number generator
 
     Outputs:
 

@@ -10,6 +10,15 @@ class AndProof(SchnorrProof):
 
     def __init__(self, instances: list[LinearRelation]):
         self.protocols = [SchnorrProof(instance) for instance in instances]
+        self.instance = self  # For compatibility with fiat_shamir
+
+    @property
+    def commit_bytes_len(self):
+        return sum(protocol.instance.commit_bytes_len for protocol in self.protocols)
+
+    @property
+    def response_bytes_len(self):
+        return sum(protocol.instance.response_bytes_len for protocol in self.protocols)
 
     def prover_commit(self, witnesses, rng):
         prover_states = []
@@ -82,11 +91,11 @@ class OrProof(SchnorrProof):
     def __init__(self, instances: list[LinearRelation]):
         self.protocols = [SchnorrProof(instance) for instance in instances]
         self.instance = self  # For compatibility with fiat_shamir
-    
+
     @property
     def commit_bytes_len(self):
         return sum(protocol.instance.commit_bytes_len for protocol in self.protocols)
-    
+
     @property
     def response_bytes_len(self):
         return (sum(protocol.instance.response_bytes_len for protocol in self.protocols) +
@@ -186,7 +195,7 @@ class OrProof(SchnorrProof):
         challenges = []
         responses = []
         offset = 0
-        
+
         # First deserialize all responses
         for protocol in self.protocols:
             response_len = protocol.instance.response_bytes_len
