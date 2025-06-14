@@ -2,9 +2,7 @@ from abc import ABC, abstractmethod
 from collections import namedtuple
 
 from sagelib import groups
-from sagelib.fiat_shamir import DuplexSpongeInterface, KeccakDuplexSponge
 
-### The abstract APIs for Sigma protocols
 
 class SigmaProtocol(ABC):
     """
@@ -16,11 +14,11 @@ class SigmaProtocol(ABC):
     - witness: the secret witness for the relation.
     """
     @abstractmethod
-    def __init__(self, index):
+    def __init__(self, instance):
         raise NotImplementedError
 
     @abstractmethod
-    def prover_commit(self, rng, witness):
+    def prover_commit(self, witness, rng):
         raise NotImplementedError
 
     @abstractmethod
@@ -31,8 +29,24 @@ class SigmaProtocol(ABC):
     def verifier(self, commitment, challenge, response):
         raise NotImplementedError
 
+    @abstractmethod
+    def serialize_commitment(self, commitment):
+        raise NotImplementedError
+
+    @abstractmethod
+    def serialize_response(self, response):
+        raise NotImplementedError
+
+    @abstractmethod
+    def deserialize_commitment(self, data):
+        raise NotImplementedError
+
+    @abstractmethod
+    def deserialize_response(self, data):
+        raise NotImplementedError
+
     # optional
-    def simulate_response(self):
+    def simulate_response(self, rng):
         raise NotImplementedError
 
     # optional
@@ -40,28 +54,9 @@ class SigmaProtocol(ABC):
         raise NotImplementedError
 
 
-class Codec(ABC):
-    """
-    This is the abstract API of a codec.
-
-    A codec is a collection of:
-    - functions that map prover messages into the hash function domain,
-    - functions that map hash outputs into verifier messages (of the desired distribution).
-    """
-
-    @abstractmethod
-    def prover_message(self, hash_state, elements: list):
-        raise NotImplementedError
-
-    @abstractmethod
-    def verifier_challenge(self, hash_state):
-        raise NotImplementedError
-
-
-
 ### Schnorr proofs
 
-class Morphism:
+class LinearMap:
     """
     This class describes a linear morphism of [Maurer09].
     """
@@ -82,7 +77,7 @@ class Morphism:
         self.linear_combinations.append(linear_combination)
 
     @property
-    def num_statements(self):
+    def num_constraints(self):
         return len(self.linear_combinations)
 
     # def map(self, scalars):
@@ -97,9 +92,9 @@ class Morphism:
         return image
 
 
-class GroupMorphismPreimage:
+class LinearRelation:
     def __init__(self, group):
-        self.morphism = Morphism(group)
+        self.linear_map = LinearMap(group)
         self._image = []
 
         self.group = group
@@ -108,40 +103,40 @@ class GroupMorphismPreimage:
 
     @property
     def commit_bytes_len(self):
-        return self.morphism.num_statements * self.Image.element_byte_length()
+        return self.linear_map.num_constraints * self.Image.element_byte_length()
 
     @property
     def response_bytes_len(self):
-        return self.morphism.num_scalars * self.Domain.scalar_byte_length()
+        return self.linear_map.num_scalars * self.Domain.scalar_byte_length()
 
     def append_equation(self, lhs, rhs):
-        linear_combination = Morphism.LinearCombination(
+        linear_combination = LinearMap.LinearCombination(
             scalar_indices=[x[0] for x in rhs],
             element_indices=[x[1] for x in rhs]
         )
-        self.morphism.append(linear_combination)
+        self.linear_map.append(linear_combination)
         self._image.append(lhs)
 
     def allocate_scalars(self, n: int):
-        indices = list(range(self.morphism.num_scalars,
-                       self.morphism.num_scalars + n))
-        self.morphism.num_scalars += n
+        indices = list(range(self.linear_map.num_scalars,
+                       self.linear_map.num_scalars + n))
+        self.linear_map.num_scalars += n
         return indices
 
     def allocate_elements(self, n: int):
-        indices = list(range(self.morphism.num_elements,
-                       self.morphism.num_elements + n))
-        self.morphism.group_elements.extend([None] * n)
-        self.morphism.num_elements += n
+        indices = list(range(self.linear_map.num_elements,
+                       self.linear_map.num_elements + n))
+        self.linear_map.group_elements.extend([None] * n)
+        self.linear_map.num_elements += n
         return indices
 
     def set_elements(self, elements):
         for index, element in elements:
-            self.morphism.group_elements[index] = element
+            self.linear_map.group_elements[index] = element
 
     @property
     def image(self):
-        return [self.morphism.group_elements[i] for i in self._image]
+        return [self.linear_map.group_elements[i] for i in self._image]
 
     def get_description(self):
         """
@@ -196,138 +191,55 @@ class SchnorrProof(SigmaProtocol):
     def prover_commit(self, witness, rng):
         nonces = [
             self.instance.Domain.random(rng)
-            for _ in range(self.instance.morphism.num_scalars)
+            for _ in range(self.instance.linear_map.num_scalars)
         ]
         prover_state = self.ProverState(witness, nonces)
-        commitment = self.instance.morphism(nonces)
+        commitment = self.instance.linear_map(nonces)
         return (prover_state, commitment)
 
     def prover_response(self, prover_state: ProverState, challenge):
         witness, nonces = prover_state
         return [
             nonces[i] + witness[i] * challenge
-            for i in range(self.instance.morphism.num_scalars)
+            for i in range(self.instance.linear_map.num_scalars)
         ]
 
     def verifier(self, commitment, challenge, response):
-        assert len(commitment) == self.instance.morphism.num_statements
-        assert len(response) == self.instance.morphism.num_scalars
-        expected = self.instance.morphism(response)
+        assert len(commitment) == self.instance.linear_map.num_constraints
+        assert len(response) == self.instance.linear_map.num_scalars
+        expected = self.instance.linear_map(response)
         got = [
             commitment[i] + self.instance.image[i] * challenge
-            for i in range(self.instance.morphism.num_statements)
+            for i in range(self.instance.linear_map.num_constraints)
         ]
 
         # fail hard if the proof does not verify
         assert got == expected, f"verification equation fails.\n{got} != {expected}"
         return True
 
-    def serialize_batchable(self, commitment, challenge, response):
-        return (
-            self.instance.Image.serialize(commitment) +
-            self.instance.Domain.serialize(response)
-        )
+    def serialize_commitment(self, commitment):
+        return self.instance.Image.serialize(commitment)
 
-    def deserialize_batchable(self, encoded):
-        assert len(encoded) == self.instance.commit_bytes_len + self.instance.response_bytes_len
-        commitment_bytes = encoded[: self.instance.commit_bytes_len]
-        commitment = self.instance.Image.deserialize(commitment_bytes)
+    def serialize_challenge(self, challenge):
+        return self.instance.Domain.serialize([challenge])
 
-        response_bytes = encoded[self.instance.commit_bytes_len:]
-        response = self.instance.Domain.deserialize(response_bytes)
+    def serialize_response(self, response):
+        return self.instance.Domain.serialize(response)
 
-        return (commitment, response)
+    def deserialize_commitment(self, data):
+        return self.instance.Image.deserialize(data)
+
+    def deserialize_challenge(self, data):
+        scalar_size = self.instance.Domain.scalar_byte_length()
+        return self.instance.Domain.deserialize(data[:scalar_size])[0]
+
+    def deserialize_response(self, data):
+        return self.instance.Domain.deserialize(data)
 
     def simulate_response(self, rng):
-        return [self.instance.Domain.random(rng) for i in range(self.instance.morphism.num_scalars)]
+        return [self.instance.Domain.random(rng) for i in range(self.instance.linear_map.num_scalars)]
 
     def simulate_commitment(self, response, challenge):
-        h_c_values = [self.instance.image[i] * challenge for i in range(self.instance.morphism.num_statements)]
+        h_c_values = [self.instance.image[i] * challenge for i in range(self.instance.linear_map.num_constraints)]
         # Generate what the correct commitment would be based on the random response and challenge.
-        return [self.instance.morphism([response])[0] - h_c_value for (h_c_value, response) in zip(h_c_values, response)]
-
-
-
-### The Fiat-Shamir transformation of Sigma protocols
-
-class NISigmaProtocol:
-    """
-    The generic Fiat-Shamir transformation of a Sigma protocol.
-    Puts together 3 components:
-    - a Sigma protocol that implements `SigmaProtocol`;
-    - a codec that implements `Codec`;
-    - a hash function that implements `DuplexSpongeInterface`.
-    """
-
-    Protocol: SigmaProtocol = None
-    Codec: Codec = None
-    Hash: DuplexSpongeInterface = None
-
-    def __init__(self, iv, instance):
-        self.hash_state = self.Hash(iv)
-        self.sp = self.Protocol(instance)
-        self.codec = self.Codec()
-
-    def prove(self, witness, rng):
-        hash_state = self.hash_state.clone()
-
-        (prover_state, commitment) = self.sp.prover_commit(witness, rng)
-        self.codec.prover_message(hash_state, commitment)
-        challenge = self.codec.verifier_challenge(hash_state)
-        response = self.sp.prover_response(prover_state, challenge)
-
-        assert self.sp.verifier(commitment, challenge, response)
-        return self.sp.serialize_batchable(commitment, challenge, response)
-
-    def verify(self, proof):
-        hash_state = self.hash_state.clone()
-
-        commitment, response = self.sp.deserialize_batchable(proof)
-        self.codec.prover_message(hash_state, commitment)
-        challenge = self.codec.verifier_challenge(hash_state)
-        return self.sp.verifier(commitment, challenge, response)
-
-### Codecs for the byte-oriented hash functions and elliptic curve groups
-
-class ByteSchnorrCodec(Codec):
-    GG: groups.Group = None
-
-    def prover_message(self, hash_state, elements: list):
-        hash_state.absorb(self.GG.serialize(elements))
-
-    def verifier_challenge(self, hash_state):
-        from hash_to_field import OS2IP
-
-        uniform_bytes = hash_state.squeeze(
-            self.GG.ScalarField.scalar_byte_length() + 16
-        )
-        scalar = OS2IP(uniform_bytes) % self.GG.ScalarField.order
-        return scalar
-
-
-class Bls12381Codec(ByteSchnorrCodec):
-    GG = groups.BLS12_381_G1
-
-
-class P256Codec(ByteSchnorrCodec):
-    GG = groups.GroupP256()
-
-
-### Ciphersuite instantiation
-
-class NISchnorrProofKeccakDuplexSpongeP256(NISigmaProtocol):
-    Protocol = SchnorrProof
-    Codec = P256Codec
-    Hash = KeccakDuplexSponge
-
-
-class NISchnorrProofKeccakDuplexSpongeBls12381(NISigmaProtocol):
-    Protocol = SchnorrProof
-    Codec = Bls12381Codec
-    Hash = KeccakDuplexSponge
-
-
-CIPHERSUITE = {
-    "sigma/OWKeccak1600+P256": NISchnorrProofKeccakDuplexSpongeP256,
-    "sigma/OWKeccak1600+BLS12381": NISchnorrProofKeccakDuplexSpongeBls12381,
-}
+        return [self.instance.linear_map(response)[i] - h_c_values[i] for i in range(self.instance.linear_map.num_constraints)]

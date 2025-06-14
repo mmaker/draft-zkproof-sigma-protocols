@@ -36,7 +36,7 @@ informative:
     title: "draft-orru-zkproofs-fiat-shamir"
     date: false
     target: https://mmaker.github.io/spfs/draft-orru-zkproof-fiat-shamir.html
-  NISTCurves: DOI.10.6028/NIST.FIPS.186-4
+  NISTCurves: DOI.10.6028/NIST.FIPS.186-5
   SEC1:
     title: "SEC 1: Elliptic Curve Cryptography"
     target: https://www.secg.org/sec1-v2.pdf
@@ -86,7 +86,7 @@ This document describes Sigma protocols, a secure, general-purpose non-interacti
 A Sigma Protocol is a simple zero-knowledge proof of knowledge.
 Any sigma protocol must define three objects:
 
-- A commitment, sometimes also called a nonce. This message is computed by the prover.
+- A commitment. This message is computed by the prover using secret nonces.
 - A challenge, computed using the Fiat-Shamir transformation using a hash function.
 - A response, computed by the prover, which depends on the commitment and the challenge.
 
@@ -116,10 +116,13 @@ Upon initialization, the protocol receives as input an `iv` of 32-bytes which un
             response = self.sp.prover_response(prover_state, challenge)
 
             assert self.sp.verifier(commitment, challenge, response)
-            return self.sp.serialize_batchable(commitment, challenge, response)
+            return self.sp.serialize_commitment(commitment) + self.sp.serialize_response(response)
 
         def verify(self, proof):
-            commitment, response = self.sp.deserialize_batchable(proof)
+            commitment_bytes = proof[:self.sp.instance.commit_bytes_len]
+            response_bytes = proof[self.sp.instance.commit_bytes_len:]
+            commitment = self.sp.deserialize_commitment(commitment_bytes)
+            response = self.sp.deserialize_response(response_bytes)
             challenge = self.hash_state.prover_message(commitment).verifier_challenge()
             return self.sp.verifier(commitment, challenge, response)
 
@@ -128,10 +131,14 @@ Upon initialization, the protocol receives as input an `iv` of 32-bytes which un
 The public functions are obtained relying on an internal structure containing the definition of a sigma protocol.
 
     class SigmaProtocol:
-       def new(instance: Statement) -> SigmaProtocol
-       def prover_commit(self, witness: Witness) -> (commitment, prover_state)
+       def new(instance) -> SigmaProtocol
+       def prover_commit(self, witness, rng) -> (commitment, prover_state)
        def prover_response(self, prover_state, challenge) -> response
        def verifier(self, commitment, challenge, response) -> bool
+       def serialize_commitment(self, commitment) -> bytes
+       def serialize_response(self, response) -> bytes
+       def deserialize_commitment(self, data: bytes) -> commitment
+       def deserialize_response(self, data: bytes) -> response
        # optional
        def simulate_response(self, rng) -> response
        # optional
@@ -139,14 +146,22 @@ The public functions are obtained relying on an internal structure containing th
 
 Where:
 
-- `new(domain_separator: [u8; 32], cs: GroupMorphismPreimage) -> SigmaProtocol`, denoting the initialization function. This function takes as input a label identifying local context information (such as: session identifiers, to avoid replay attacks; protocol metadata, to avoid hijacking; optionally, a timestamp and some pre-shared randomness, to guarantee freshness of the proof) and an instance generated via the `GroupMorphismPreimage`, the public information shared between prover and verifier.
+- `new(instance) -> SigmaProtocol`, denoting the initialization function. This function takes as input an instance generated via the `LinearRelation`, the public information shared between prover and verifier.
 This function should pre-compute parts of the statement, or initialize the state of the hash function.
 
-- `prover_commit(self, witness: Witness) -> (commitment, prover_state)`, denoting the **commitment phase**, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover and the statement to be proven. This step generally requires access to a high-quality entropy source to perform the commitment. Leakage of even just of a few bits of the commitment could allow for the complete recovery of the witness. The commitment is meant to be shared, while `prover_state` must be kept secret.
+- `prover_commit(self, witness: Witness, rng) -> (commitment, prover_state)`, denoting the **commitment phase**, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover, the statement to be proven, and a random number generator `rng`. This step generally requires access to a high-quality entropy source to perform the commitment. Leakage of even just of a few bits of the commitment could allow for the complete recovery of the witness. The commitment is meant to be shared, while `prover_state` must be kept secret.
 
 - `prover_response(self, prover_state, challenge) -> response`, denoting the **response phase**, that is, the computation of the second message sent by the prover, depending on the witness, the statement, the challenge received from the verifier, and the internal state `prover_state`. The returned value `response` is meant to be shared.
 
 - `verifier(self, commitment, challenge, response) -> bool`, denoting the **verifier algorithm**. This method checks that the protocol transcript is valid for the given statement. The verifier algorithm outputs true if verification succeeds, or false if verification fails.
+
+- `serialize_commitment(self, commitment) -> bytes`, serializes the commitment into a canonical byte representation.
+
+- `serialize_response(self, response) -> bytes`, serializes the response into a canonical byte representation.
+
+- `deserialize_commitment(self, data: bytes) -> commitment`, deserializes a byte array into a commitment. This function can raise a `DeserializeError` if deserialization fails.
+
+- `deserialize_response(self, data: bytes) -> response`, deserializes a byte array into a response. This function can raise a `DeserializeError` if deserialization fails.
 
 The final two algorithms describe the **zero-knowledge simulator** and are optional, as a sigma protocol is not necessarily zero-knowledge by definition. The simulator is primarily an efficient algorithm for proving zero-knowledge in a theoretical construction, but it is also needed for verifying short proofs and for or-composition, where a witness is not known and thus has to be simulated. We have:
 
@@ -167,7 +182,7 @@ It relies on two components:
 
 Valid choices of elliptic curves and hash functions can be found in {{ciphersuites}}.
 
-Traditionally, sigma protocols are defined in Camenish-Stadtler notation as (for example):
+Traditionally, sigma protocols are defined in Camenisch-Stadler notation as (for example):
 
     1. DLEQ(G, H, X, Y) = PoK{
     2.   (x):        // Secret variables
@@ -176,7 +191,7 @@ Traditionally, sigma protocols are defined in Camenish-Stadtler notation as (for
 
 In the above, line 1 declares that the proof name is "DLEQ", the public information (the **instance**) consists of the group elements `(G, X, H, Y)` denoted in upper-case.
 Line 2 states that the private information (the **witness**) consists of the scalar `x`.
-Finally, line 3 states that the constraints (the equations) that need to be proven are
+Finally, line 3 states that the linear relation that need to be proven is
 `x * G  = X` and `x * H = Y`.
 
 ## Group abstraction {#group-abstraction}
@@ -197,18 +212,18 @@ We detail the functions that can be invoked on these objects. Example choices ca
 - `equal(element: Group)`, returns `true` if the two elements are the same and false` otherwise.
 - `scalar_mul(scalar: Scalar)`, implements scalar multiplication for a group element by an element in its respective scalar field.
 
-Functions such as `add`, `equal`, and `scalar_mul` SHOULD be implemented using operator overloading whenever possible.
+In this spec, instead of `add` we will use `+` with infix notation; instead of `equal` we will use `==`, and instead of `scalar_mul` we will use `*`. A similar behavior can be achieved using operator overloading.
 
 ### Scalar
 
 - `identity()`: outputs the (additive) identity element in the scalar field.
 - `add(scalar: Scalar)`: implements field addition for the elements in the field.
-- `mult(scalar: Scalar)`, implements field multiplication.
+- `mul(scalar: Scalar)`, implements field multiplication.
 - `random()`: outputs a random scalar field element.
 - `serialize(scalars: list[Scalar; N])`: serializes a list of scalars and returns their canonical representation of fixed length `Ns * N`.
 - `deserialize(buffer)`, attempts to map a byte array `buffer` of size `Ns * N` into `[Scalar; N]`, and fails if the input is not the valid canonical byte representation of an element of the group. This function can raise a `DeserializeError` if deserialization fails.
 
-Functions such as `add`, `equal`, and `scalar_mul` SHOULD be implemented using operator overloading whenever possible.
+In this spec, instead of `add` we will use `+` with infix notation; instead of `equal` we will use `==`, and instead of `mul` we will use `*`. A similar behavior can be achieved using operator overloading.
 
 ## Codec for non-interactive proofs {#group-prove}
 
@@ -235,7 +250,7 @@ We describe a codec for Schnorr proofs over groups of prime order `p` that is in
             scalar = OS2IP(uniform_bytes) % self.Group.ScalarField.order
             return scalar
 
-## Proofs of preimage of a group morphism
+## Proofs of preimage of a linear map
 
 ### Core protocol
 
@@ -247,22 +262,23 @@ The prover of a sigma protocol is stateful and will send two message, a "commitm
 
 #### Prover commitment
 
-    prover_commit(self, witness)
+    prover_commit(self, witness, rng)
 
     Inputs:
 
     - witness, an array of scalars
+    - rng, a random number generator
 
     Outputs:
 
     - A (private) prover state, holding the information of the interactive prover necessary for producing the protocol response
-    - A (public) commitment message, an element of the morphism image, that is, a vector of group elements.
+    - A (public) commitment message, an element of the linear map image, that is, a vector of group elements.
 
     Procedure:
 
-    1. nonces = [self.instance.Domain.random(rng) for _ in range(self.instance.morphism.num_scalars)]
+    1. nonces = [self.instance.Domain.random(rng) for _ in range(self.instance.linear_map.num_scalars)]
     2. prover_state = self.ProverState(witness, nonces)
-    3. commitment = self.instance.morphism(nonces)
+    3. commitment = self.instance.linear_map(nonces)
     4. return (prover_state, commitment)
 
 #### Prover response
@@ -281,7 +297,7 @@ The prover of a sigma protocol is stateful and will send two message, a "commitm
     Procedure:
 
     1. witness, nonces = prover_state
-    2. return [nonces[i] + witness[i] * challenge for i in range(self.instance.morphism.num_scalars)]
+    2. return [nonces[i] + witness[i] * challenge for i in range(self.instance.linear_map.num_scalars)]
 
 ### Verifier procedure
 
@@ -300,9 +316,9 @@ The prover of a sigma protocol is stateful and will send two message, a "commitm
 
     Procedure:
 
-    1. assert len(commitment) == self.instance.morphism.num_statements and len(response) == self.instance.morphism.num_scalars
-    2. expected = self.instance.morphism(response)
-    3. got = [commitment[i] + self.instance.image[i] * challenge for i in range(self.instance.morphism.num_statements)]
+    1. assert len(commitment) == self.instance.linear_map.num_constraints and len(response) == self.instance.linear_map.num_scalars
+    2. expected = self.instance.linear_map(response)
+    3. got = [commitment[i] + self.instance.image[i] * challenge for i in range(self.instance.linear_map.num_constraints)]
     4. return got == expected
 
 ### Witness representation {#witness}
@@ -311,9 +327,9 @@ A witness is simply a list of `num_scalars` elements.
 
     Witness = [Scalar; num_scalars]
 
-### Group morphism {#morphism}
+### Linear map {#linear-map}
 
-A `GroupMorphism` represents a function (a _group morphism_ from the scalar field to the elliptic curve group) that, given as input an array of `Scalar` elements, outputs an array of `Group` element. This can be represented as matrix-vector (scalar) product using group multi-scalar multiplication. However, since the matrix is often times sparse, it is often more convenient to store the matrix in Yale sparse matrix.
+A `LinearMap` represents a function (a _linear map_ from the scalar field to the elliptic curve group) that, given as input an array of `Scalar` elements, outputs an array of `Group` element. This can be represented as matrix-vector (scalar) product using group multi-scalar multiplication. However, since the matrix is often times sparse, it is often more convenient to store the matrix in Yale sparse matrix.
 
 Here is an example:
 
@@ -321,9 +337,9 @@ Here is an example:
         scalar_indices: list[int]
         element_indices: list[int]
 
-The morphism can then be presented as:
+The linear map can then be presented as:
 
-    class GroupMorphism:
+    class LinearMap:
         Group: groups.Group
         linear_combinations: list[LinearCombination]
         group_elements: list[Group]
@@ -334,14 +350,14 @@ The morphism can then be presented as:
 
 #### Initialization
 
-The group morphism `GroupMorphism` is initialized with
+The linear map `LinearMap` is initialized with
 
     linear_combinations = []
     group_elements = []
     num_scalars = 0
     num_elements = 0
 
-#### Morphism map
+#### Linear map evaluation
 
 A witness can be mapped to a group element via:
 
@@ -359,15 +375,15 @@ A witness can be mapped to a group element via:
     5.     image.append(self.Group.msm(coefficients, elements))
     6. return image
 
-### Statements for the preimage of a group morphism
+### Statements for linear relations
 
-The object `GroupMorphismPreimage` has two attributes: a morphism `morphism`, which will be defined in {{morphism}}, and `image`, the morphism image of which the prover wants to show the pre-image of.
+The object `LinearRelation` has two attributes: a linear map `linear_map`, which will be defined in {{linear-map}}, and `image`, the linear map image of which the prover wants to show the pre-image of.
 
-class GroupMorphismPreimage:
+class LinearRelation:
         Domain = group.ScalarField
         Image = group.Group
 
-        morphism = Morphism
+        linear_map = LinearMap
         image = list[group.Group]
 
     def allocate_scalars(self, n: int) -> list[int]
@@ -382,7 +398,7 @@ Two function allow two allocate the new scalars (the witness) and group elements
     allocate_scalars(self, n)
 
     Inputs:
-        - self, the current state of the GroupMorphismPreimage
+        - self, the current state of the LinearRelation
         - n, the number of scalars to allocate
     Outputs:
         - indices, a list of integers each pointing to the new allocated scalars
@@ -397,8 +413,8 @@ and below the allocation of group elements
 
     allocate_elements(self, n)
 
-    1. linear_combination = Morphism.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
-    2. self.morphism.append(linear_combination)
+    1. linear_combination = LinearMap.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
+    2. self.linear_map.append(linear_combination)
     3. self._image.append(lhs)
 
 Group elements, being part of the instance, can later be set using the function `set_elements`
@@ -406,13 +422,13 @@ Group elements, being part of the instance, can later be set using the function 
     set_elements(self, elements)
 
     Inputs:
-        - self, the current state of the GroupMorphismPreimage
+        - self, the current state of the LinearRelation
         - elements, a list of pairs of indices and group elements to be set
 
     Procedure:
 
     1. for index, element in elements:
-    2.   self.morphism.group_elements[index] = element
+    2.   self.linear_map.group_elements[index] = element
 
 #### Constraint enforcing
 
@@ -430,15 +446,15 @@ Group elements, being part of the instance, can later be set using the function 
 
     Procedure:
 
-    1. linear_combination = Morphism.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
-    2. self.morphism.append(linear_combination)
+    1. linear_combination = LinearMap.LinearCombination(scalar_indices=[x[0] for x in rhs], element_indices=[x[1] for x in rhs])
+    2. self.linear_map.append(linear_combination)
     3. self._image.append(lhs)
 
 ### Example: Schnorr proofs
 
 The statement represented in {{sigma-protocol-group}} can be written as:
 
-    statement = GroupMorphismPreimage(group)
+    statement = LinearRelation(group)
     [var_x] = statement.allocate_scalars(1)
     [var_G, var_X] = statement.allocate_elements(2)
     statement.append_equation(var_X, [(var_x, var_G)])
@@ -448,7 +464,7 @@ At which point it is possible to set `var_G` and `var_X` whenever the group elem
     G = group.generator()
     statement.set_elements([(var_G, G), (var_X, X)])
 
-It is worth noting that in the above example, `[X] == statement.morphism.map([x])`.
+It is worth noting that in the above example, `[X] == statement.linear_map.map([x])`.
 
 ### Example: DLEQ proofs
 
@@ -458,7 +474,7 @@ A DLEQ proof proves a statement:
 
 Given group elements `G`, `H` and `X`, `Y` such that `x * G = X` and `x * H = Y`, then the statement is generated as:
 
-    1. statement = GroupMorphismPreimage()
+    1. statement = LinearRelation()
     2. [var_x] = statement.allocate_scalars(1)
     3. statement.append_equation(X, [(var_x, G)])
     4. statement.append_equation(Y, [(var_x, H)])
@@ -471,7 +487,7 @@ A representation proof proves a statement
 
 Given group elements `G`, `H` such that `C = x * G + r * H`, then the statement is generated as:
 
-    statement = GroupMorphismPreimage()
+    statement = LinearRelation()
     var_x, var_r = statement.allocate_scalars(2)
     statement.append_equation(C, [(var_x, G), (var_r, H)])
 
@@ -538,7 +554,7 @@ While theoretical analysis demonstrates that both soundness and zero-knowledge p
 
 The zero-knowledge proofs described in this document provide statistical zero-knowledge and statistical soundness properties when modeled in the random oracle model.
 
-### Privacy Considerations
+## Privacy Considerations
 
 These proofs offer zero-knowledge guarantees, meaning they do not leak any information about the prover's witness beyond what can be inferred from the proven statement itself. This property holds even against quantum adversaries with unbounded computational power.
 
@@ -549,7 +565,7 @@ Specifically, these proofs can be used to protect privacy against post-quantum a
 - Post-quantum blindness
 - Protection against "harvest now, decrypt later" attacks.
 
-### Soundness Considerations
+## Soundness Considerations
 
 While the proofs themselves offer privacy protections against quantum adversaries, the hardness of the relation being proven depends (at best) on the hardness of the discrete logarithm problem over the elliptic curves specified in {{ciphersuites}}.
 Since this problem is known to be efficiently solvable by quantum computers using Shor's algorithm, these proofs MUST NOT be relied upon for post-quantum soundness guarantees.
