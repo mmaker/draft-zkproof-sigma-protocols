@@ -2,9 +2,7 @@ from abc import ABC, abstractmethod
 from collections import namedtuple
 
 from sagelib import groups
-from sagelib.fiat_shamir import DuplexSpongeInterface, KeccakDuplexSponge
 
-### The abstract APIs for Sigma protocols
 
 class SigmaProtocol(ABC):
     """
@@ -38,25 +36,6 @@ class SigmaProtocol(ABC):
     # optional
     def simulate_commitment(self, response, challenge):
         raise NotImplementedError
-
-
-class Codec(ABC):
-    """
-    This is the abstract API of a codec.
-
-    A codec is a collection of:
-    - functions that map prover messages into the hash function domain,
-    - functions that map hash outputs into verifier messages (of the desired distribution).
-    """
-
-    @abstractmethod
-    def prover_message(self, hash_state, elements: list):
-        raise NotImplementedError
-
-    @abstractmethod
-    def verifier_challenge(self, hash_state):
-        raise NotImplementedError
-
 
 
 ### Schnorr proofs
@@ -224,89 +203,3 @@ class SchnorrProof(SigmaProtocol):
         response = self.deserialize_response(response_bytes)
 
         return (commitment, response)
-
-
-
-### The Fiat-Shamir transformation of Sigma protocols
-
-class NISigmaProtocol:
-    """
-    The generic Fiat-Shamir transformation of a Sigma protocol.
-    Puts together 3 components:
-    - a Sigma protocol that implements `SigmaProtocol`;
-    - a codec that implements `Codec`;
-    - a hash function that implements `DuplexSpongeInterface`.
-    """
-
-    Protocol: SigmaProtocol = None
-    Codec: Codec = None
-    Hash: DuplexSpongeInterface = None
-
-    def __init__(self, iv, instance):
-        self.hash_state = self.Hash(iv)
-        self.sp = self.Protocol(instance)
-        self.codec = self.Codec()
-
-    def prove(self, witness, rng):
-        hash_state = self.hash_state.clone()
-
-        (prover_state, commitment) = self.sp.prover_commit(witness, rng)
-        self.codec.prover_message(hash_state, commitment)
-        challenge = self.codec.verifier_challenge(hash_state)
-        response = self.sp.prover_response(prover_state, challenge)
-
-        assert self.sp.verifier(commitment, challenge, response)
-        return self.sp.serialize_batchable(commitment, challenge, response)
-
-    def verify(self, proof):
-        hash_state = self.hash_state.clone()
-
-        commitment, response = self.sp.deserialize_batchable(proof)
-        self.codec.prover_message(hash_state, commitment)
-        challenge = self.codec.verifier_challenge(hash_state)
-        return self.sp.verifier(commitment, challenge, response)
-
-### Codecs for the byte-oriented hash functions and elliptic curve groups
-
-class ByteSchnorrCodec(Codec):
-    GG: groups.Group = None
-
-    def prover_message(self, hash_state, elements: list):
-        hash_state.absorb(self.GG.serialize(elements))
-
-    def verifier_challenge(self, hash_state):
-        from hash_to_field import OS2IP
-
-        uniform_bytes = hash_state.squeeze(
-            self.GG.ScalarField.scalar_byte_length() + 16
-        )
-        scalar = OS2IP(uniform_bytes) % self.GG.ScalarField.order
-        return scalar
-
-
-class Bls12381Codec(ByteSchnorrCodec):
-    GG = groups.BLS12_381_G1
-
-
-class P256Codec(ByteSchnorrCodec):
-    GG = groups.GroupP256()
-
-
-### Ciphersuite instantiation
-
-class NISchnorrProofKeccakDuplexSpongeP256(NISigmaProtocol):
-    Protocol = SchnorrProof
-    Codec = P256Codec
-    Hash = KeccakDuplexSponge
-
-
-class NISchnorrProofKeccakDuplexSpongeBls12381(NISigmaProtocol):
-    Protocol = SchnorrProof
-    Codec = Bls12381Codec
-    Hash = KeccakDuplexSponge
-
-
-CIPHERSUITE = {
-    "sigma/OWKeccak1600+P256": NISchnorrProofKeccakDuplexSpongeP256,
-    "sigma/OWKeccak1600+BLS12381": NISchnorrProofKeccakDuplexSpongeBls12381,
-}

@@ -9,7 +9,7 @@ CONTEXT_STRING = b'yellow submarine' * 2
 
 
 def test_vector(test_vector_function):
-    from sagelib.sigma_protocols import NISchnorrProofKeccakDuplexSpongeP256 as NIZK
+    from sagelib.ciphersuite import NISchnorrProofKeccakDuplexSpongeP256 as NIZK
 
     def inner(vectors):
         rng = TestDRNG("test vector seed".encode('utf-8'))
@@ -22,6 +22,7 @@ def test_vector(test_vector_function):
         print(f"{test_vector_name} narg_string: {hex_narg_string}\n")
 
         vectors[test_vector_name] = {
+            "Ciphersuite": "sigma/OWKeccak1600+P256",
             "Context": CONTEXT_STRING.hex(),
             "Statement": "TODO",
             "Proof": hex_narg_string,
@@ -206,9 +207,9 @@ def bbs_blind_commitment_computation(rng, group):
 
 def test_and_composition():
     from sagelib.sigma_protocols import SigmaProtocol, SchnorrProof
-    from sagelib.sigma_protocols import NISigmaProtocol
-    from sagelib.sigma_protocols import NISchnorrProofKeccakDuplexSpongeP256, P256Codec
-    from sagelib.fiat_shamir import KeccakDuplexSponge
+    from sagelib.fiat_shamir import NISigmaProtocol
+    from sagelib.codec import P256Codec
+    from sagelib.duplex_sponge import KeccakDuplexSponge
     from sagelib import groups
 
     class AndProof(SchnorrProof):
@@ -270,7 +271,7 @@ def test_and_composition():
         Hash = KeccakDuplexSponge
 
     rng = TestDRNG("test vector seed".encode('utf-8'))
-    group = NISchnorrProofKeccakDuplexSpongeP256.Codec.GG
+    group = P256Codec.GG
 
 
     statement_1 = LinearRelation(group)
@@ -307,9 +308,9 @@ def test_and_composition():
 
 def test_or_composition():
     from sagelib.sigma_protocols import SchnorrProof
-    from sagelib.sigma_protocols import NISigmaProtocol
-    from sagelib.sigma_protocols import P256Codec
-    from sagelib.fiat_shamir import KeccakDuplexSponge
+    from sagelib.fiat_shamir import NISigmaProtocol
+    from sagelib.codec import P256Codec
+    from sagelib.duplex_sponge import KeccakDuplexSponge
 
     class OrProof(SchnorrProof):
         ProverState: list[SchnorrProof.ProverState]
