@@ -61,7 +61,7 @@ class Codec(ABC):
 
 ### Schnorr proofs
 
-class Morphism:
+class LinearMap:
     """
     This class describes a linear morphism of [Maurer09].
     """
@@ -82,7 +82,7 @@ class Morphism:
         self.linear_combinations.append(linear_combination)
 
     @property
-    def num_statements(self):
+    def num_constraints(self):
         return len(self.linear_combinations)
 
     # def map(self, scalars):
@@ -97,9 +97,9 @@ class Morphism:
         return image
 
 
-class GroupMorphismPreimage:
+class LinearRelation:
     def __init__(self, group):
-        self.morphism = Morphism(group)
+        self.linear_map = LinearMap(group)
         self._image = []
 
         self.group = group
@@ -108,40 +108,40 @@ class GroupMorphismPreimage:
 
     @property
     def commit_bytes_len(self):
-        return self.morphism.num_statements * self.Image.element_byte_length()
+        return self.linear_map.num_constraints * self.Image.element_byte_length()
 
     @property
     def response_bytes_len(self):
-        return self.morphism.num_scalars * self.Domain.scalar_byte_length()
+        return self.linear_map.num_scalars * self.Domain.scalar_byte_length()
 
     def append_equation(self, lhs, rhs):
-        linear_combination = Morphism.LinearCombination(
+        linear_combination = LinearMap.LinearCombination(
             scalar_indices=[x[0] for x in rhs],
             element_indices=[x[1] for x in rhs]
         )
-        self.morphism.append(linear_combination)
+        self.linear_map.append(linear_combination)
         self._image.append(lhs)
 
     def allocate_scalars(self, n: int):
-        indices = list(range(self.morphism.num_scalars,
-                       self.morphism.num_scalars + n))
-        self.morphism.num_scalars += n
+        indices = list(range(self.linear_map.num_scalars,
+                       self.linear_map.num_scalars + n))
+        self.linear_map.num_scalars += n
         return indices
 
     def allocate_elements(self, n: int):
-        indices = list(range(self.morphism.num_elements,
-                       self.morphism.num_elements + n))
-        self.morphism.group_elements.extend([None] * n)
-        self.morphism.num_elements += n
+        indices = list(range(self.linear_map.num_elements,
+                       self.linear_map.num_elements + n))
+        self.linear_map.group_elements.extend([None] * n)
+        self.linear_map.num_elements += n
         return indices
 
     def set_elements(self, elements):
         for index, element in elements:
-            self.morphism.group_elements[index] = element
+            self.linear_map.group_elements[index] = element
 
     @property
     def image(self):
-        return [self.morphism.group_elements[i] for i in self._image]
+        return [self.linear_map.group_elements[i] for i in self._image]
 
 
 class SchnorrProof(SigmaProtocol):
@@ -154,55 +154,76 @@ class SchnorrProof(SigmaProtocol):
     def prover_commit(self, witness, rng):
         nonces = [
             self.instance.Domain.random(rng)
-            for _ in range(self.instance.morphism.num_scalars)
+            for _ in range(self.instance.linear_map.num_scalars)
         ]
         prover_state = self.ProverState(witness, nonces)
-        commitment = self.instance.morphism(nonces)
+        commitment = self.instance.linear_map(nonces)
         return (prover_state, commitment)
 
     def prover_response(self, prover_state: ProverState, challenge):
         witness, nonces = prover_state
         return [
             nonces[i] + witness[i] * challenge
-            for i in range(self.instance.morphism.num_scalars)
+            for i in range(self.instance.linear_map.num_scalars)
         ]
 
     def verifier(self, commitment, challenge, response):
-        assert len(commitment) == self.instance.morphism.num_statements
-        assert len(response) == self.instance.morphism.num_scalars
-        expected = self.instance.morphism(response)
+        assert len(commitment) == self.instance.linear_map.num_constraints
+        assert len(response) == self.instance.linear_map.num_scalars
+        expected = self.instance.linear_map(response)
         got = [
             commitment[i] + self.instance.image[i] * challenge
-            for i in range(self.instance.morphism.num_statements)
+            for i in range(self.instance.linear_map.num_constraints)
         ]
 
         # fail hard if the proof does not verify
         assert got == expected, f"verification equation fails.\n{got} != {expected}"
         return True
 
+    def serialize_commitment(self, commitment):
+        return self.instance.Image.serialize(commitment)
+
+    def serialize_challenge(self, challenge):
+        return self.instance.Domain.serialize([challenge])
+
+    def serialize_response(self, response):
+        return self.instance.Domain.serialize(response)
+
+    def deserialize_commitment(self, data):
+        return self.instance.Image.deserialize(data)
+
+    def deserialize_challenge(self, data):
+        scalar_size = self.instance.Domain.scalar_byte_length()
+        return self.instance.Domain.deserialize(data[:scalar_size])[0]
+
+    def deserialize_response(self, data):
+        return self.instance.Domain.deserialize(data)
+
+    def get_commitment(self, challenge, response):
+        h_c_values = [self.instance.image[i] * challenge for i in range(self.instance.linear_map.num_constraints)]
+        return [self.instance.linear_map(response)[i] - h_c_values[i] for i in range(self.instance.linear_map.num_constraints)]
+
+    def simulate_response(self, rng):
+        return [self.instance.Domain.random(rng) for i in range(self.instance.linear_map.num_scalars)]
+
+    def simulate_commitment(self, response, challenge):
+        h_c_values = [self.instance.image[i] * challenge for i in range(self.instance.linear_map.num_constraints)]
+        # Generate what the correct commitment would be based on the random response and challenge.
+        return [self.instance.linear_map(response)[i] - h_c_values[i] for i in range(self.instance.linear_map.num_constraints)]
+
+    # Compatibility methods for batchable serialization
     def serialize_batchable(self, commitment, challenge, response):
-        return (
-            self.instance.Image.serialize(commitment) +
-            self.instance.Domain.serialize(response)
-        )
+        return self.serialize_commitment(commitment) + self.serialize_response(response)
 
     def deserialize_batchable(self, encoded):
         assert len(encoded) == self.instance.commit_bytes_len + self.instance.response_bytes_len
-        commitment_bytes = encoded[: self.instance.commit_bytes_len]
-        commitment = self.instance.Image.deserialize(commitment_bytes)
+        commitment_bytes = encoded[:self.instance.commit_bytes_len]
+        commitment = self.deserialize_commitment(commitment_bytes)
 
         response_bytes = encoded[self.instance.commit_bytes_len:]
-        response = self.instance.Domain.deserialize(response_bytes)
+        response = self.deserialize_response(response_bytes)
 
         return (commitment, response)
-
-    def simulate_response(self, rng):
-        return [self.instance.Domain.random(rng) for i in range(self.instance.morphism.num_scalars)]
-
-    def simulate_commitment(self, response, challenge):
-        h_c_values = [self.instance.image[i] * challenge for i in range(self.instance.morphism.num_statements)]
-        # Generate what the correct commitment would be based on the random response and challenge.
-        return [self.instance.morphism([response])[0] - h_c_value for (h_c_value, response) in zip(h_c_values, response)]
 
 
 

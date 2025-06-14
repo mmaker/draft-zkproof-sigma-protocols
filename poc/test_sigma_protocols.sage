@@ -2,7 +2,7 @@
 # vim: syntax=python
 
 from sagelib.test_drng import TestDRNG
-from sagelib.sigma_protocols import GroupMorphismPreimage
+from sagelib.sigma_protocols import LinearRelation
 import json
 
 CONTEXT_STRING = b'yellow submarine' * 2
@@ -60,7 +60,7 @@ def discrete_logarithm(rng, group):
 
     """
 
-    statement = GroupMorphismPreimage(group)
+    statement = LinearRelation(group)
     [var_x] = statement.allocate_scalars(1)
     [var_G, var_X] = statement.allocate_elements(2)
     statement.append_equation(var_X, [(var_x, var_G)])
@@ -70,7 +70,7 @@ def discrete_logarithm(rng, group):
 
     x = group.ScalarField.random(rng)
     X = G * x
-    assert [X] == statement.morphism([x])
+    assert [X] == statement.linear_map([x])
 
     statement.set_elements([(var_X, X)])
     return statement, [x]
@@ -90,14 +90,14 @@ def dleq(rng, group):
     X = G * x
     Y = H * x
 
-    statement = GroupMorphismPreimage(group)
+    statement = LinearRelation(group)
     [var_x] = statement.allocate_scalars(1)
     [var_G, var_H, var_X, var_Y] = statement.allocate_elements(4)
     statement.set_elements([(var_G, G), (var_H, H), (var_X, X), (var_Y, Y)])
     statement.append_equation(var_X, [(var_x, var_G)])
     statement.append_equation(var_Y, [(var_x, var_H)])
 
-    assert [X, Y] == statement.morphism([x])
+    assert [X, Y] == statement.linear_map([x])
     return statement, [x]
 
 
@@ -116,7 +116,7 @@ def pedersen_commitment(rng, group):
     witness = [x, r]
 
     C = G * x + H * r
-    statement = GroupMorphismPreimage(group)
+    statement = LinearRelation(group)
     var_x, var_r = statement.allocate_scalars(2)
     var_G, var_H, var_C = statement.allocate_elements(3)
     statement.set_elements([(var_G, G), (var_H, H), (var_C, C)])
@@ -142,7 +142,7 @@ def pedersen_commitment_dleq(rng, group):
     X = group.msm(witness, generators[:2])
     Y = group.msm(witness, generators[2:4])
 
-    statement = GroupMorphismPreimage(group)
+    statement = LinearRelation(group)
     var_x, var_r = statement.allocate_scalars(2)
     var_Gs = statement.allocate_elements(4)
     var_X, var_Y = statement.allocate_elements(2)
@@ -179,7 +179,7 @@ def bbs_blind_commitment_computation(rng, group):
     C = secret_prover_blind * Q_2 + msg_1 * J_1 + msg_2 * J_2 + msg_3 * J_3
 
     # This is the part that needs to be changed in the specification of blind bbs.
-    statement = GroupMorphismPreimage(group)
+    statement = LinearRelation(group)
     [var_secret_prover_blind, var_msg_1, var_msg_2,
         var_msg_3] = statement.allocate_scalars(M+1)
     [var_Q_2, var_J_1, var_J_2, var_J_3] = statement.allocate_elements(M+1)
@@ -214,7 +214,7 @@ def test_and_composition():
     class AndProof(SchnorrProof):
         ProverState: list[SchnorrProof.ProverState]
 
-        def __init__(self, instances: list[GroupMorphismPreimage]):
+        def __init__(self, instances: list[LinearRelation]):
             self.protocols = [SchnorrProof(instance) for instance in instances]
 
         def prover_commit(self, witnesses, rng):
@@ -273,7 +273,7 @@ def test_and_composition():
     group = NISchnorrProofKeccakDuplexSpongeP256.Codec.GG
 
 
-    statement_1 = GroupMorphismPreimage(group)
+    statement_1 = LinearRelation(group)
     [var_x] = statement_1.allocate_scalars(1)
     [var_G, var_X] = statement_1.allocate_elements(2)
     statement_1.append_equation(var_X, [(var_x, var_G)])
@@ -281,11 +281,11 @@ def test_and_composition():
     statement_1.set_elements([(var_G, G)])
     x = group.ScalarField.random(rng)
     X = G * x
-    assert [X] == statement_1.morphism([x])
+    assert [X] == statement_1.linear_map([x])
     statement_1.set_elements([(var_X, X)])
     witness_1 = [x]
 
-    statement_2 = GroupMorphismPreimage(group)
+    statement_2 = LinearRelation(group)
     [var_y] = statement_2.allocate_scalars(1)
     [var_H, var_Y] = statement_2.allocate_elements(2)
     statement_2.append_equation(var_Y, [(var_y, var_H)])
@@ -293,7 +293,7 @@ def test_and_composition():
     statement_2.set_elements([(var_H, H)])
     y = group.ScalarField.random(rng)
     Y = H * y
-    assert [Y] == statement_2.morphism([y])
+    assert [Y] == statement_2.linear_map([y])
     statement_2.set_elements([(var_Y, Y)])
     witness_2 = [y]
 
@@ -314,7 +314,7 @@ def test_or_composition():
     class OrProof(SchnorrProof):
         ProverState: list[SchnorrProof.ProverState]
 
-        def __init__(self, instances: list[GroupMorphismPreimage]):
+        def __init__(self, instances: list[LinearRelation]):
             self.protocols = [SchnorrProof(instance) for instance in instances]
 
         def prover_commit(self, witnesses, rng):
@@ -436,7 +436,7 @@ def test_or_composition():
     rng = TestDRNG("test vector seed".encode('utf-8'))
     group = P256Codec.GG
 
-    statement_1 = GroupMorphismPreimage(group)
+    statement_1 = LinearRelation(group)
     [var_x] = statement_1.allocate_scalars(1)
     [var_G, var_X] = statement_1.allocate_elements(2)
     statement_1.append_equation(var_X, [(var_x, var_G)])
@@ -444,11 +444,11 @@ def test_or_composition():
     statement_1.set_elements([(var_G, G)])
     x = group.ScalarField.random(rng)
     X = G * x
-    assert [X] == statement_1.morphism([x])
+    assert [X] == statement_1.linear_map([x])
     statement_1.set_elements([(var_X, X)])
     witness_1 = [x]
 
-    statement_2 = GroupMorphismPreimage(group)
+    statement_2 = LinearRelation(group)
     [var_y] = statement_2.allocate_scalars(1)
     [var_H, var_Y] = statement_2.allocate_elements(2)
     statement_2.append_equation(var_Y, [(var_y, var_H)])
@@ -456,7 +456,7 @@ def test_or_composition():
     statement_2.set_elements([(var_H, H)])
     y = group.ScalarField.random(rng)
     Y = H * y
-    assert [Y] == statement_2.morphism([y])
+    assert [Y] == statement_2.linear_map([y])
     statement_2.set_elements([(var_Y, Y)])
     witness_2 = None
 
