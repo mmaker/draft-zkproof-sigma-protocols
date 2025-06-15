@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-10T01:20:50.725491+00:00",
+  "timestamp": "2025-06-15T01:28:17.623266+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -157,16 +157,24 @@
       "id": "I_kwDONyiw_86sQNgc",
       "title": "Isolate commitment serialization from prove_batchable",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/5",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "The method `prove_batchable` and `verify_batchable` should be agnostic wrt the sigma protocol and the choice of the hash function. \nIn order for this to happen, commitment and response serialization must be deferred to a separate procedure in SigmaProtocol.\nTherefore:  move serialization to `serialize_commitment` and `serialize_response`.",
       "createdAt": "2025-03-03T01:14:39Z",
-      "updatedAt": "2025-03-03T01:14:39Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-14T16:15:22Z",
+      "closedAt": "2025-06-14T16:15:22Z",
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "This is currently part of the `SigmaProtocol` interface design.",
+          "createdAt": "2025-06-14T16:15:22Z",
+          "updatedAt": "2025-06-14T16:15:22Z"
+        }
+      ]
     },
     {
       "number": 8,
@@ -313,15 +321,15 @@
       "id": "I_kwDONyiw_86woXaK",
       "title": "Add elliptic curve P-384 to the ciphersuite.",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/19",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Considering as target [ARC](https://github.com/chris-wood/draft-arc) presentation proofs, @chris-wood  requested support for P-384 within our ciphersuite. \n\nTo close this issue: add test vectors to the specification.\n\n",
       "createdAt": "2025-04-01T12:57:37Z",
-      "updatedAt": "2025-04-17T20:28:49Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-14T16:16:14Z",
+      "closedAt": "2025-06-14T16:16:14Z",
       "comments": [
         {
           "author": "cathieyun",
@@ -336,6 +344,13 @@
           "body": "cf. #29 -- maybe something is wrong with P384?",
           "createdAt": "2025-04-17T20:28:48Z",
           "updatedAt": "2025-04-17T20:28:48Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "closing in favor of another issue for P384.",
+          "createdAt": "2025-06-14T16:16:14Z",
+          "updatedAt": "2025-06-14T16:16:14Z"
         }
       ]
     },
@@ -380,7 +395,7 @@
       "id": "I_kwDONyiw_86wp6Mm",
       "title": "Establish ciphersuites in implementation.",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/22",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -389,32 +404,48 @@
       "labels": [],
       "body": "## Cryptographic Component Combinations\n\nSimilarly to [Privacy Pass](https://datatracker.ietf.org/doc/html/rfc9497#name-ciphersuites), we must add a section in the spec and in the test vectors that ties together the different cryptographic components. I see the following components:\n\n- **The elliptic curve**: for instance, BLS12-381\n- **The hash function**: for instance, SHA-3 or TurboSHAKE\n- **The codec**: the hash_to_field mechanism, rejection sampling, or modular reduction for field elements\n\nIn the Proof of Concept implementation, this requires updating the test vectors to support multiple groups and elliptic curves.",
       "createdAt": "2025-04-01T15:17:41Z",
-      "updatedAt": "2025-04-10T13:23:32Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-14T16:14:53Z",
+      "closedAt": "2025-06-14T16:14:52Z",
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "@cathieyun: this is fixed an currently available in https://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/ciphersuite.sage",
+          "createdAt": "2025-06-14T16:14:53Z",
+          "updatedAt": "2025-06-14T16:14:53Z"
+        }
+      ]
     },
     {
       "number": 23,
       "id": "I_kwDONyiw_86wqUL6",
       "title": "Add template sections in Fiat-Shamir looking at other specifications",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/23",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Check out other specification, for instance\n\nhttps://datatracker.ietf.org/doc/html/draft-irtf-cfrg-voprf-21#name-iana-considerations-6\n\nand add sections that are clearly missing but relevant, for instance \"Security Considerations\", \"Post-Quantum Security\", \"Application Considerations\"",
       "createdAt": "2025-04-01T15:56:30Z",
-      "updatedAt": "2025-04-01T15:56:30Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-14T16:16:29Z",
+      "closedAt": "2025-06-14T16:16:29Z",
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "done",
+          "createdAt": "2025-06-14T16:16:29Z",
+          "updatedAt": "2025-06-14T16:16:29Z"
+        }
+      ]
     },
     {
       "number": 24,
       "id": "I_kwDONyiw_86wtdnl",
       "title": "Statement serialization",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/24",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -423,8 +454,8 @@
       "labels": [],
       "body": "Currently, a sigma protocol is instantiated using an \"initialization vector\" (a label, a domain separator) of 32 bytes, and does not absorb the statement (the instance). \n\n\n## Instance \n\nTo prove soundness (and thus stronger notions of soundness), the instance must be put in the Fiat-Shamir transformation. This has been called \"strong FS\" in the literature, and the case of Schnorr proofs, these generally consist of the generators used -- in the case of Maurer proofs, of the morphism used. \n\nThe easy way out from this is to take inspiration from libsignal's statement generation process here:\nhttps://github.com/signalapp/libsignal/blob/main/rust/poksho/src/statement.rs#L44-L88\nand check in the **[latex specification](https://sigma.zkproof.org/tex-spec.pdf)** for references to scientific literature.\n\n## Domain Separator\n\nThe way in which these 32 bytes are generated is discretionary but a standard should take a stance here and produce guidelines on how they should be generated. \n\nFrom a theoretical security standpoint, the IV should incorporate: \n- a protocol identifier, \n- a session identifier.\n\nA way to describe how the user should pick a protocol identifier and a session identifier is desirable but not stricly needed, so for now this part can be perhaps be left to the user.\n",
       "createdAt": "2025-04-01T22:33:48Z",
-      "updatedAt": "2025-05-27T14:21:45Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-14T15:47:16Z",
+      "closedAt": "2025-06-14T15:47:16Z",
       "comments": []
     },
     {
@@ -470,9 +501,17 @@
       "labels": [],
       "body": "Given that the Fiat-Shamir spec is only used in the Sigma protocol spec, it seems like it would be simpler to combine the two and have the Fiat-Shamir definition as a sub-component of the Sigma protocol spec. (That way, we don't have to have too many layers of nested specs. For example, our spec dependencies for ARC would be: ARC -> Sigma -> F-S, and the dependences for BBS would be BBS-pseudonyms -> blinded-BBS -> Sigma -> F-S. It would be nice to remove one of those layers, but this is more of an editorial choice than a technical requirement.\n\nMerging the F-S definitions into the Sigma Protocol spec would also simplify the requirements for F-S, as it would no longer have to work in a multi-round setting. This may allow the F-S protocol to be simpler, or at least for its security requirements to be relaxed. ",
       "createdAt": "2025-04-09T20:26:34Z",
-      "updatedAt": "2025-04-09T20:26:34Z",
+      "updatedAt": "2025-06-14T16:46:47Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "I think the layering is wrong:  the fiat-shamir transformation transforms an interactive protocol. Therefore, it should be ARC -> F-S -> Sigma, or am I missing something?\n\nConcerning the technical requirement, it seems that supporting multi round for generic proof systems is of interest by:  \n- @wind4greg for bulletproof support. they can rely on our linear relation statement and just implement a different interactive protocol,\n- the zkproofs community, among which we have the EF and NIST, who is interested in generic snarks,\n- Worldcoin, who is interested in more hash-based constructions.\n\n\nEven for things like sequential composition of sigma protocols (e.g. I present a credential and then just concatenate a range proof for a committed attribute) this seems beneficial for little to no cost. \n[Putting numbers here: multi-round with SHAKE128 costs [30 lines of Rust code](https://github.com/mmaker/sigma-rs/blob/main/src/duplex_sponge/shake.rs). In python it's about 10]\n\nFianlly,  abstraction of `absorb` / `squeeze` can clarify what is the actual Fiat-Shamir transformation doing (cf. \"C4. Other non-interactive transformations\").",
+          "createdAt": "2025-06-14T16:26:22Z",
+          "updatedAt": "2025-06-14T16:46:47Z"
+        }
+      ]
     },
     {
       "number": 28,
@@ -663,9 +702,17 @@
       "labels": [],
       "body": "From @wbl:\n\n> We might also need to tackle not-prime order points: verifying order is\n> expensive, but there are some tricks on BLS 12 to speed it up, but\n> when doing a batched proof cofactor clearing is comparatively cheap.\n\nThis is already discussed in the TeX specification -- perhaps one can just test that the instance is in the group, and not the commitment?",
       "createdAt": "2025-05-10T13:56:59Z",
-      "updatedAt": "2025-05-10T13:56:59Z",
+      "updatedAt": "2025-06-14T16:47:56Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "@cathieyun this one is fun. If you check the instance, and know that it's in the curve, maybe don't have to check that the commitment is in the curve as well?",
+          "createdAt": "2025-06-14T16:47:56Z",
+          "updatedAt": "2025-06-14T16:47:56Z"
+        }
+      ]
     },
     {
       "number": 43,
@@ -682,9 +729,17 @@
       ],
       "body": "Typos: challange, commmit, Stadtler\n\nDefine acronyms: SHO, VRF, ...\nDefine terms, e.g., batchable, ...\nRef [NISTCurves]: if wanting to cite DSS, consider updating from FIPS 186-4 (2013) to FIPS 186-5 (2023); consider citing SP 800-186 (2023) as a reference for the P-* elliptic curves (such as P-384).\nThe expression \"A commitment, sometimes also called nonce\" is a bit confusing. Isn't nonce also being used to denote the (seed of) the discrete-log of the \"commitment\". It might be clearer to distinguish between secret nonce and public nonce.\nSection 2.4: why is the nonce algorithm shown after the challenge algorithm (if the nonce is introduced before the challenge)?\nUnclear the utility of declaring \"simulate_response\", without more guidance on how it would actually be used.\nThe draft uses \"Equations\" to specify the \"constraints\". Does that mean that range constraints (e.g., based on inequalities) are not allowed? Consider clarifying the relation between \"constraints\" and \"equations\".\nConsider adding textual explanation of the syntax of each function, e.g., where the output length of SHAKE128 is specified.",
       "createdAt": "2025-05-22T08:17:31Z",
-      "updatedAt": "2025-05-22T09:01:08Z",
+      "updatedAt": "2025-06-14T13:09:16Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "remaining: \n- Consider citing SP 800-186 (2023) as a reference for the P-* elliptic curves (such as P-384).\n- Consider adding textual explanation of the syntax of each function, e.g., where the output length of SHAKE128 is specified.",
+          "createdAt": "2025-06-14T13:09:16Z",
+          "updatedAt": "2025-06-14T13:09:16Z"
+        }
+      ]
     },
     {
       "number": 44,
@@ -759,6 +814,22 @@
       "body": "For the quoted sentences, refrain from calling \"sigma protocols\" non-interactive\n\n> The draft seems to be conflating \"Sigma Protocols\" (which can be [are?] interactive) with a Sigma-inspired non-interactive (NI) ZKPoK obtained using the Fiat-Shamir (FS) transformation. Note that the draft says:\n> \"Sigma protocols, a [...] *non-interactive* zero-knowledge proof of knowledge\"\n> \"Any sigma protocols must define [...] A challenge, computed using the *Fiat-Shamir transformation* using a hash function.\"\n> \n> Concern: This title might induce ambiguity in the future when referred to in the scope of other specifications/discussions about (i) interactive sigma protocols, or (ii) sigma-protocol-based NIZKP[oK]s that use a transformation different from FS?\n> ",
       "createdAt": "2025-05-22T09:11:35Z",
       "updatedAt": "2025-05-22T09:11:35Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 51,
+      "id": "I_kwDONyiw_867icw9",
+      "title": "Address comments from call for adoption",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/51",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-06-14T16:54:44Z",
+      "updatedAt": "2025-06-14T16:59:49Z",
       "closedAt": null,
       "comments": []
     }
@@ -992,7 +1063,7 @@
       "labels": [],
       "body": "NOTE: there seems to be a bug in scalar multiplication for GroupP384, i.e. (G * x * y) != ((G * x) * y). Changed the test to use P256 instead.",
       "createdAt": "2025-04-13T03:40:28Z",
-      "updatedAt": "2025-04-17T20:28:05Z",
+      "updatedAt": "2025-06-14T12:33:11Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
       "baseRefOid": "5efa56367362d201334f8c2abd39aeb6a2628bbf",
@@ -1028,7 +1099,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2025-05-05T00:44:58Z",
-      "updatedAt": "2025-05-10T18:25:48Z",
+      "updatedAt": "2025-06-14T12:33:06Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
       "baseRefOid": "2b78efed3d9b032770d29ad8dda216c693cf7a73",
@@ -1092,7 +1163,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2025-05-10T18:42:00Z",
-      "updatedAt": "2025-05-10T18:43:32Z",
+      "updatedAt": "2025-06-14T12:33:09Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
       "baseRefOid": "d7b0879f89613bdbaa2da1de9b5ef1b6c6999771",
@@ -1190,26 +1261,123 @@
       "id": "PR_kwDONyiw_86ZnBPx",
       "title": "24 statement serialization",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/48",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "vishady721",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "A draft of what statement serialization could look like!!",
       "createdAt": "2025-06-09T01:40:44Z",
-      "updatedAt": "2025-06-09T01:40:55Z",
+      "updatedAt": "2025-06-14T15:47:15Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
-      "baseRefOid": "8194e690951bf00fff69234bb42fa6216e010b83",
+      "baseRefOid": "4bbc93182bda4713c3b5db2680a766dbfabcf6b6",
       "headRepository": "mmaker/draft-zkproof-sigma-protocols",
       "headRefName": "24-statement-serialiation",
-      "headRefOid": "7f6163aabae22faeeb5ed36bd3212a45c816218f",
+      "headRefOid": "6e2142f02a36853ab9e90d757232ddeb477bef64",
+      "closedAt": "2025-06-14T15:47:15Z",
+      "mergedAt": "2025-06-14T15:47:15Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "6b258431fd26f564300ba599c774156b8b801f25"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 49,
+      "id": "PR_kwDONyiw_86aiPVd",
+      "title": "fix(sigma-protocols): remove mentions of operator overloading. ",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/49",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #33.",
+      "createdAt": "2025-06-14T15:02:56Z",
+      "updatedAt": "2025-06-14T16:10:36Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "d9bc49bceaa9caff7045e4c00bc3ba2167536c06",
+      "headRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "headRefName": "fix/33",
+      "headRefOid": "0b5b5992c84e727c1e0d6e0f3069c30dd1a57bdb",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "@cathieyun we describe group and field operations using `add`, `mul`, etc., but then we use `+`, `*`, etc. \r\nIs this phrasing OK for you, and do you think it addresses the feedback we got? ",
+          "createdAt": "2025-06-14T16:10:36Z",
+          "updatedAt": "2025-06-14T16:10:36Z"
+        }
+      ],
       "reviews": []
+    },
+    {
+      "number": 50,
+      "id": "PR_kwDONyiw_86aif5L",
+      "title": "feat: add short_proofs.",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/50",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #25 ",
+      "createdAt": "2025-06-14T16:49:17Z",
+      "updatedAt": "2025-06-14T16:50:47Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "6b258431fd26f564300ba599c774156b8b801f25",
+      "headRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "headRefName": "feat/short-proofs",
+      "headRefOid": "9ffcf865ccda397b60f4b9fb6c2f329cd77791be",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "@cathieyun  do you think proofs of the form `challenge, response` should be in the next revision?",
+          "createdAt": "2025-06-14T16:50:46Z",
+          "updatedAt": "2025-06-14T16:50:46Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDONyiw_86ujRBN",
+          "commit": {
+            "abbreviatedOid": "9ffcf86"
+          },
+          "author": "copilot-pull-request-reviewer",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "## Pull Request Overview\n\nThis PR adds support for a short challenge-response proof format for sigma protocols. Key changes include:  \n- Introducing a new test function to verify the challenge-response format.  \n- Adding abstract methods for challenge serialization and deserialization in the sigma protocols base class.  \n- Implementing alternative proving and verification methods (prove_short and verify_short) in the NISigmaProtocol class.\n\n### Reviewed Changes\n\nCopilot reviewed 3 out of 3 changed files in this pull request and generated 2 comments.\n\n| File                              | Description                                                           |\n| --------------------------------- | --------------------------------------------------------------------- |\n| poc/test_sigma_protocols.sage     | Adds a new test function for the short challenge-response format.      |\n| poc/sigma_protocols.sage          | Declares abstract methods for challenge serialization/deserialization.  |\n| poc/fiat_shamir.sage              | Implements prove_short and verify_short methods for challenge-response. |\n\n\n\n",
+          "createdAt": "2025-06-14T16:50:03Z",
+          "updatedAt": "2025-06-14T16:50:03Z",
+          "comments": [
+            {
+              "originalPosition": 39,
+              "body": "[nitpick] Consider using a logging framework or relying on test framework output instead of directly printing to stdout to keep test outputs clean and easier to automate.\n```suggestion\n    logging.info(\"Challenge-response format test passed!\")\n```",
+              "createdAt": "2025-06-14T16:50:03Z",
+              "updatedAt": "2025-06-14T16:50:04Z"
+            },
+            {
+              "originalPosition": 42,
+              "body": "The slicing logic in verify_short assumes a fixed-length serialized challenge. It would be beneficial to document this assumption or add error handling to ensure that the proof length matches the expected format.\n```suggestion\n        challenge_len = self.sp.instance.Domain.scalar_byte_length()\n        response_len = self.sp.instance.response_bytes_len\n        expected_proof_len = challenge_len + response_len\n\n        if len(proof) != expected_proof_len:\n            raise ValueError(f\"Invalid proof length: expected {expected_proof_len} bytes, got {len(proof)} bytes.\")\n```",
+              "createdAt": "2025-06-14T16:50:03Z",
+              "updatedAt": "2025-06-14T16:50:04Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
