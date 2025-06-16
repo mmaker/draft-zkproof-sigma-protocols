@@ -4,8 +4,8 @@
 
 Zkproof                                                          M. Orrù
 Internet-Draft                                                      CNRS
-Intended status: Informational                              14 June 2025
-Expires: 16 December 2025
+Intended status: Informational                              16 June 2025
+Expires: 18 December 2025
 
 
                        Fiat-Shamir Transformation
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 December 2025.
+   This Internet-Draft will expire on 18 December 2025.
 
 Copyright Notice
 
@@ -159,7 +159,7 @@ Table of Contents
 
    assert len(iv) == 32
    self.absorb_index = 0
-   self.squeeze_index = 0
+   self.squeeze_index = self.state.R
    self.rate = self.state.R
    self.capacity = self.state.N - self.state.R
 
@@ -216,9 +216,9 @@ Procedure:
 4.         self.permutation_state.permute()
 5.         self.squeeze_index = 0
 6.     chunk_size = min(self.rate - self.squeeze_index, length)
-7.     self.squeeze_index += chunk_size
-8.     length -= chunk_size
-9.     output += bytes(self.permutation_state[self.squeeze_index:self.squeeze_index+chunk_size])
+7.     output += bytes(self.permutation_state[self.squeeze_index:self.squeeze_index+chunk_size])
+8.     self.squeeze_index += chunk_size
+9.     length -= chunk_size
 10. return output
 
 3.4.  Ciphersuites
