@@ -33,7 +33,7 @@ class KeccakPermutationState:
     def __init__(self, iv: bytes):
         assert len(iv) == 32
         self.state = bytearray(200)
-        self.state[self.R: self.R + _sage_const_32] = iv
+        self.state[self.R: self.R + 32] = iv
         self.p = Keccak(1600)
 
     def __getitem__(self, i):
@@ -81,13 +81,16 @@ class DuplexSponge(DuplexSpongeInterface):
         self.squeeze_index = self.rate
 
         while len(input) != 0:
-            if self.absorb_index < self.rate:
-                self.permutation_state[self.absorb_index] = input[0]
-                self.absorb_index += 1
-                input = input[1:]
-            else:
+            if self.absorb_index == self.rate:
                 self.permutation_state.permute()
                 self.absorb_index = 0
+
+            chunk_size = min(self.rate - self.absorb_index, len(input))
+            next_chunk = input[:chunk_size]
+            self.permutation_state[self.absorb_index:
+                                   self.absorb_index + chunk_size] = next_chunk
+            self.absorb_index += chunk_size
+            input = input[chunk_size:]
 
     def squeeze(self, length: int):
         self.absorb_index = self.rate
