@@ -112,14 +112,13 @@ The absorb function incorporates data into the duplex sponge state.
     Procedure:
 
     1. while len(input) != 0:
-    2.   if self.absorb_index == self.rate:
-    3.     self.permutation_state.permute()
-    4.     self.absorb_index = 0
-    5.   chunk_size = min(self.rate - self.absorb_index, len(input))
-    6.   next_chunk = input[:chunk_size]
-    7.   self.permutation_state[self.absorb_index : self.absorb_index + chunk_size] = next_chunk
-    8.   self.absorb_index += chunk_size
-    9.   input = input[chunk_size:]
+    2.    if self.absorb_index < self.rate:
+    3.      self.permutation_state[self.absorb_index] = input[0]
+    4.      self.absorb_index += 1
+    5.      input = input[1:]
+    6.    else:
+    7.      self.permutation_state.permute()
+    8.      self.absorb_index = 0
 
 ## Squeeze
 
