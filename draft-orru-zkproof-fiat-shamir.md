@@ -89,7 +89,7 @@ This is the constructor for a duplex sponge object. It is initialized with a 32-
 
     assert len(iv) == 32
     self.absorb_index = 0
-    self.squeeze_index = 0
+    self.squeeze_index = self.state.R
     self.rate = self.state.R
     self.capacity = self.state.N - self.state.R
 
@@ -144,9 +144,9 @@ The squeeze operation extracts output elements from the sponge state, which are 
     4.         self.permutation_state.permute()
     5.         self.squeeze_index = 0
     6.     chunk_size = min(self.rate - self.squeeze_index, length)
-    7.     self.squeeze_index += chunk_size
-    8.     length -= chunk_size
-    9.     output += bytes(self.permutation_state[self.squeeze_index:self.squeeze_index+chunk_size])
+    7.     output += bytes(self.permutation_state[self.squeeze_index:self.squeeze_index+chunk_size])
+    8.     self.squeeze_index += chunk_size
+    9.     length -= chunk_size
     10. return output
 
 ## Ciphersuites
