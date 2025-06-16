@@ -209,10 +209,11 @@ class Keccak:
                 B[y][(2*x+3*y)%5] = self.rot(A[x][y], self.r[x][y])
 
         #Chi step
+        MASK = (1 << self.w) - 1
         for x in range(5):
             for y in range(5):
-                import operator
-                A[x][y] = operator.xor(B[x][y], operator.and_(operator.not_(B[(x+1)%5][y]), B[(x+2)%5][y]))
+                not_B = (~B[(x+1) % 5][y]) & MASK
+                A[x][y] = B[x][y] ^ (not_B & B[(x+2) % 5][y])
         #Iota step
         A[0][0] = A[0][0]^RCfixed
 
