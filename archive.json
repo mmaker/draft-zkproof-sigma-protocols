@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-15T01:28:17.623266+00:00",
+  "timestamp": "2025-06-17T01:20:49.331419+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -1376,6 +1376,87 @@
               "updatedAt": "2025-06-14T16:50:04Z"
             }
           ]
+        }
+      ]
+    },
+    {
+      "number": 52,
+      "id": "PR_kwDONyiw_86arg0L",
+      "title": "fix(keccak): correct KeccakF1600 implementation and align DuplexSponge with spec",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/52",
+      "state": "MERGED",
+      "author": "nougzarm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "- fix: resolve issues in KeccakF1600 permutation implementation\r\n- fix: update DuplexSponge methods to comply with Construction 3.2 from https://eprint.iacr.org/2025/536.pdf",
+      "createdAt": "2025-06-16T09:45:00Z",
+      "updatedAt": "2025-06-16T13:41:26Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "6b258431fd26f564300ba599c774156b8b801f25",
+      "headRepository": "nougzarm/draft-zkproof-sigma-protocols",
+      "headRefName": "sponge_refactor",
+      "headRefOid": "6c6b84596c2f189a44e3eca71d207c51b81961f3",
+      "closedAt": "2025-06-16T13:41:26Z",
+      "mergedAt": "2025-06-16T13:41:26Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "6d970151b17545281c19cbd44b53518e6426af75"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDONyiw_86uuo_3",
+          "commit": {
+            "abbreviatedOid": "d38c6e8"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "CHANGES_REQUESTED",
+          "body": "shouldn't this require also changing https://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/draft-orru-zkproof-fiat-shamir.md#squeeze ?",
+          "createdAt": "2025-06-16T10:07:59Z",
+          "updatedAt": "2025-06-16T10:07:59Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDONyiw_86uuyI_",
+          "commit": {
+            "abbreviatedOid": "de04834"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2025-06-16T10:18:06Z",
+          "updatedAt": "2025-06-16T10:30:29Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "_sage_const_32?",
+              "createdAt": "2025-06-16T10:18:07Z",
+              "updatedAt": "2025-06-16T10:30:29Z"
+            },
+            {
+              "originalPosition": 61,
+              "body": "can you do this in chunks? I understand that the academic paper does it one by one, but here you're wasting clocks",
+              "createdAt": "2025-06-16T10:19:07Z",
+              "updatedAt": "2025-06-16T10:30:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86uxbvW",
+          "commit": {
+            "abbreviatedOid": "6c6b845"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-06-16T13:41:06Z",
+          "updatedAt": "2025-06-16T13:41:06Z",
+          "comments": []
         }
       ]
     }
