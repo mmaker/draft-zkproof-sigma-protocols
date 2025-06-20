@@ -93,13 +93,12 @@ class DuplexSponge(DuplexSpongeInterface):
             input = input[chunk_size:]
 
     def squeeze(self, length: int):
-        self.absorb_index = self.rate
-
         output = b''
         while length != 0:
             if self.squeeze_index == self.rate:
                 self.permutation_state.permute()
                 self.squeeze_index = 0
+                self.absorb_index = 0
 
             chunk_size = min(self.rate - self.squeeze_index, length)
             output += bytes(
