@@ -93,6 +93,9 @@ class DuplexSponge(DuplexSpongeInterface):
             input = input[chunk_size:]
 
     def squeeze(self, length: int):
+        if length == 0:
+            return b''
+            
         self.absorb_index = self.rate
 
         output = b''
