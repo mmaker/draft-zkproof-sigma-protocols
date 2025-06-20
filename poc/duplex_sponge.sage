@@ -96,7 +96,7 @@ class DuplexSponge(DuplexSpongeInterface):
         if length == 0:
             return b''
             
-        self.absorb_index = self.rate
+        self.absorb_index = 0
 
         output = b''
         while length != 0:

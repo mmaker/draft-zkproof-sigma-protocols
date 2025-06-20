@@ -58,7 +58,7 @@ class TestKeccakDuplexSponge(unittest.TestCase):
         sponge.absorb(b"second")
         output = sponge.squeeze(32)
 
-        expected = binascii.unhexlify("5b89db635853345429206e79f6ba536b83a429b4070443512c498419834cb78e")
+        expected = binascii.unhexlify("20ce6da64ffc09df8de254222c068358da39d23ec43e522ceaaa1b82b90c8b9a")
         self.assertEqual(output, expected)
 
     def test_associativity_of_absorb(self):
