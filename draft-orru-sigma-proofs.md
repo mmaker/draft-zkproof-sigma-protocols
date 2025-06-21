@@ -1,8 +1,8 @@
 ---
-title: "Sigma Protocols"
+title: "Sigma Proofs"
 category: info
 
-docname: draft-orru-zkproof-sigma-protocols-latest
+docname: draft-orru-sigma-proofs-latest
 submissiontype: independent
 number:
 date:
@@ -16,8 +16,8 @@ venue:
 #  type: Working Group
 #  mail: WG@examplecom
 #  arch: https://examplecom/WG
-  github: "mmaker/draft-zkproof-sigma-protocols"
-  latest: "https://mmaker.github.io/draft-zkproof-sigma-protocols/draft-orru-zkproof-sigma-protocols.html"
+  github: "mmaker/draft-sigma-proofs"
+  latest: "https://mmaker.github.io/stdsigma/draft-orru-zkproof-sigma.html"
 
 author:
  -
@@ -33,9 +33,9 @@ normative:
 
 informative:
   fiat-shamir:
-    title: "draft-orru-zkproofs-fiat-shamir"
+    title: "draft-orru-fiat-shamir"
     date: false
-    target: https://mmaker.github.io/spfs/draft-orru-zkproof-fiat-shamir.html
+    target: https://mmaker.github.io/spfs/draft-orru-fiat-shamir.html
   NISTCurves: DOI.10.6028/NIST.FIPS.186-5
   SEC1:
     title: "SEC 1: Elliptic Curve Cryptography"
@@ -77,24 +77,24 @@ informative:
 
 --- abstract
 
-This document describes Sigma protocols, a secure, general-purpose non-interactive zero-knowledge proof of knowledge. Concretely, the scheme allows proving knowledge of a witness, without revealing any information about the undisclosed messages or the signature itself, while at the same time, guarantying soundness of the overall protocols.
+This document describes Sigma Proofs, which are secure, general-purpose non-interactive zero-knowledge proofs of knowledge. Concretely, the scheme allows proving knowledge of a witness, without revealing any information about the undisclosed messages or the signature itself, while at the same time, guarantying soundness of the overall protocols.
 
 --- middle
 
 # Introduction
 
-A Sigma Protocol is a simple zero-knowledge proof of knowledge.
-Any sigma protocol must define three objects:
+A Sigma Proof is a simple zero-knowledge proof of knowledge.
+Any sigma proof must define three objects:
 
 - A commitment. This message is computed by the prover using secret nonces.
 - A challenge, computed using the Fiat-Shamir transformation using a hash function.
 - A response, computed by the prover, which depends on the commitment and the challenge.
 
-A sigma protocol allows a **prover** to convince a **verifier** of the knowledge of a secret **witness** satisfying a **statement**.
+A sigma proof allows a **prover** to convince a **verifier** of the knowledge of a secret **witness** satisfying a **statement**.
 
 # Public functions interface
 
-A non-interactive sigma protocol provides a `prove` and a `verify` public functions. It is parametrized by:
+A non-interactive sigma proof provides a `prove` and a `verify` public functions. It is parametrized by:
 
 - a `Codec`, which specifies how to encode prover messages for the hash function, and how to extract verifier challenges in the right domain;
 - a `SigmaProtocol`, which specifies an interactive 3-message protocol.
