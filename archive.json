@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-19T01:20:36.248758+00:00",
+  "timestamp": "2025-06-22T01:27:28.005036+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -827,9 +827,17 @@
       ],
       "body": "For the quoted sentences, refrain from calling \"sigma protocols\" non-interactive\n\n> The draft seems to be conflating \"Sigma Protocols\" (which can be [are?] interactive) with a Sigma-inspired non-interactive (NI) ZKPoK obtained using the Fiat-Shamir (FS) transformation. Note that the draft says:\n> \"Sigma protocols, a [...] *non-interactive* zero-knowledge proof of knowledge\"\n> \"Any sigma protocols must define [...] A challenge, computed using the *Fiat-Shamir transformation* using a hash function.\"\n> \n> Concern: This title might induce ambiguity in the future when referred to in the scope of other specifications/discussions about (i) interactive sigma protocols, or (ii) sigma-protocol-based NIZKP[oK]s that use a transformation different from FS?\n> ",
       "createdAt": "2025-05-22T09:11:35Z",
-      "updatedAt": "2025-05-22T09:11:35Z",
+      "updatedAt": "2025-06-20T21:59:30Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Adding more context from the NIST email:\n\n> Suggestion: \n> if the goal is indeed to focus on a Sigma+FS-based NIZKPoK, then consider revising the title to be more suggestive of the scope/focus.\n> if the goal is to specify Sigma protocols as a 3-move interaction, then the title seems okay, but then the content could cover more thoroughly the interactive case. The transformation into a non-interactive proof/argument of knowledge could then either (i) be an explained option or (ii) be left to a separate specification.\n\n",
+          "createdAt": "2025-06-20T21:59:30Z",
+          "updatedAt": "2025-06-20T21:59:30Z"
+        }
+      ]
     },
     {
       "number": 51,
@@ -1489,6 +1497,58 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 53,
+      "id": "PR_kwDONyiw_86bdEWt",
+      "title": "fix(keccak): make squeeze() spec-compliant and add unit tests",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/53",
+      "state": "OPEN",
+      "author": "nougzarm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-06-20T17:37:45Z",
+      "updatedAt": "2025-06-20T21:14:27Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "11aba8279483805523bbdbe4d41c754fb74243dc",
+      "headRepository": "nougzarm/draft-zkproof-sigma-protocols",
+      "headRefName": "main",
+      "headRefOid": "3e5c0be4c8223e8a365f35ec70cd73baed7936be",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 54,
+      "id": "PR_kwDONyiw_86bfH-y",
+      "title": "Rename sigma protocols to proofs",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/54",
+      "state": "OPEN",
+      "author": "cathieyun",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "To address the NIST feedback (https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/47), and also to improve clarity, renaming from \"Sigma Protocols\" to \"Sigma Proofs\".\r\n\r\nI didn't rename \"sigma protocols\" throughout the core of the spec because at some point, the spec language is actually referring to the _protocol_ instead of the final _proof_. Happy to do a closer pass to differentiate between the two. This is also a very rough suggestion, can bikeshed this more if this rename will cause more confusion and ambiguity than it solves.\r\n\r\n\r\n",
+      "createdAt": "2025-06-21T00:43:52Z",
+      "updatedAt": "2025-06-21T00:43:53Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "11aba8279483805523bbdbe4d41c754fb74243dc",
+      "headRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "headRefName": "rename-sigma-protocol",
+      "headRefOid": "737501d74ab15912b38b68e72f477242592cfd49",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
