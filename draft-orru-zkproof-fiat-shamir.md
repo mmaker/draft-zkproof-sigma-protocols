@@ -44,12 +44,13 @@ In addition, the specification provides codes, a way to absorb specific data typ
 
 # Introduction
 
-The Fiat-Shamir transformation relies on a hash function that can absorb inputs incrementally and squeeze variable-length unpredictable messages. On a high level, it consists of three main components:
+The Fiat-Shamir transformation relies on a hash function that can absorb inputs incrementally and squeeze variable-length unpredictable messages. On a high level, it puts together:
 
-- A label.
-- An underlying hash function H, in a chosen mode, and instantiated over a chosen domain, which the hash state invokes to execute the actions.
+- An IV uniquely describing the protocol.
+- A function H, in a chosen mode, and instantiated over a chosen domain, which the hash state invokes to execute the actions.
+- An interactive proof that is public-coin.
 
-The core actions supported are:
+The core actions supported from the underlying hash function are:
 
 - `absorb` indicates a sequence of elements in input to be absorbed by the underlying hash function.
 - `squeeze` given input `length`, produces that many elements as output.
@@ -60,121 +61,40 @@ The API follows the template of duplex sponges.
 
 A duplex sponge has the following interface:
 
-  class DuplexSpongeInterface:
-      type Unit
-
       def new(iv: bytes) -> hash_state
-      def absorb(self, x: list[Unit])
-      def squeeze(self, length: int) -> list[Unit]
-      def finalize(self)
+      def absorb(hash_state, x: list[Unit])
+      def squeeze(hash_state, length: int) -> list[Unit]
 
 where
 
-- `init(label)`, creates a new `hash_state` object with a description label `label`;
+- `init(iv)`, creates a new `hash_state` object with a description iv `iv`;
 - `absorb(hash_state, values)`, absorbs a list of native elements (that is, of type `Unit`);
 - `squeeze(hash_state, length)`, squeezes from the `hash_state` object a list of `Unit` elements.
-- `finalize(hash_state)`, deletes the hash object safely.
 
 The above can be extended to support absorption and squeeze from different domains than the domain in which the hash function is initialized over. Such extensions are called codecs.
 
-# Overwrite mode implementation from permutation functions
+# Ciphersuites
 
-A duplex sponge in overwrite mode is based on a permutation function `P` that maps a vector of `r + c` elements of type `Unit` elements. It implements the `DuplexSpongeInterface`.
-
-## Initialization
-
-This is the constructor for a duplex sponge object. It is initialized with a 32-byte value that initializes the sponge state.
-
-    new(iv)
-
-    assert len(iv) == 32
-    self.absorb_index = 0
-    self.squeeze_index = self.state.R
-    self.rate = self.state.R
-    self.capacity = self.state.N - self.state.R
-
-## Absorb
-
-The absorb function incorporates data into the duplex sponge state.
-
-    absorb(self, input)
-
-    Inputs:
-
-    -  self, the current duplex sponge object
-    -  input, the input to be absorbed
-
-    Constants:
-        permutation
-
-        self.squeeze_index = self.rate
-
-    Procedure:
-
-    1. while len(input) != 0:
-    2.   if self.absorb_index == self.rate:
-    3.     self.permutation_state.permute()
-    4.     self.absorb_index = 0
-    5.   chunk_size = min(self.rate - self.absorb_index, len(input))
-    6.   next_chunk = input[:chunk_size]
-    7.   self.permutation_state[self.absorb_index : self.absorb_index + chunk_size] = next_chunk
-    8.   self.absorb_index += chunk_size
-    9.   input = input[chunk_size:]
-
-## Squeeze
-
-The squeeze operation extracts output elements from the sponge state, which are uniformly distributed and can be used as a digest, a key stream, or other cryptographic material.
-
-    squeeze(self, length)
-
-    Inputs:
-
-    - self, the current duplex sponge object
-    - length, the number of bytes to be squeezed out of the sponge
-
-    Outputs:
-
-    - digest, a byte array of `length` elements uniformly distributed
-
-    Procedure:
-
-    1. output = b''
-    2. while length != 0:
-    3.     if self.squeeze_index == self.rate:
-    4.         self.permutation_state.permute()
-    5.         self.squeeze_index = 0
-    6.     chunk_size = min(self.rate - self.squeeze_index, length)
-    7.     output += bytes(self.permutation_state[self.squeeze_index:self.squeeze_index+chunk_size])
-    8.     self.squeeze_index += chunk_size
-    9.     length -= chunk_size
-    10. return output
-
-## Ciphersuites
-
-## Keccak
-
-`Keccak-f` is the permutation function underlying~{{SHA3}}. We instantiate `DuplexSponge` with `Keccak-f[1600]`, using rate `R = 136` and capacity `C = 64`.
-
-# SHAKE128 compatibility [WIP]
+## SHAKE128
 
 SHAKE128 is a variable-length hash function based on the Keccak sponge construction {{SHA3}}. It belongs to the SHA-3 family but offers a flexible output length, and provides 128 bits of security against collision attacks, regardless of the output length requested.
 
-## Initialization
+### Initialization
 
-    new(self, label)
+    new(self, iv)
 
     Inputs:
 
-    - label, a byte array
+    - iv, a byte array
 
     Outputs:
 
     -  a hash state interface
 
-    1. h = shake_128(label)
+    1. h = shake_128(iv)
     2. return h
 
-## SHAKE128 Absorb
+### SHAKE128 Absorb
 
     absorb(hash_state, x)
 
@@ -187,7 +107,7 @@ SHAKE128 is a variable-length hash function based on the Keccak sponge construct
 
 This method is also re-exported as `absorb_bytes`.
 
-## SHAKE128 Squeeze
+### SHAKE128 Squeeze
 
     squeeze(hash_state, length)
 
@@ -196,58 +116,89 @@ This method is also re-exported as `absorb_bytes`.
     - hash_state, the hash state
     - length, the number of elements to be squeezed
 
-    1. h.digest(length)
+    1. h.copy().digest(length)
 
 This method is also re-exported as `squeeze_bytes`.
 
+## Duplex Sponge
+
+A duplex sponge in overwrite mode is based on a permutation function that operates on a state vector. It implements the `DuplexSpongeInterface` and maintains internal state to support incremental absorption and variable-length output generation.
+
+
+### Initialization
+
+This is the constructor for a duplex sponge object. It is initialized with a 32-byte initialization vector.
+
+    new(iv)
+
+    Inputs:
+    - iv, a 32-byte initialization vector
+
+    Procedure:
+    1. self.absorb_index = 0
+    2. self.squeeze_index = self.permutation_state.R
+    3. self.rate = self.permutation_state.R
+    4. self.capacity = self.permutation_state.N - self.permutation_state.R
+
+### Absorb
+
+The absorb function incorporates data into the duplex sponge state using overwrite mode.
+
+    absorb(self, input)
+
+    Inputs:
+    - self, the current duplex sponge object
+    - input, the input bytes to be absorbed
+
+    Procedure:
+    1. self.squeeze_index = self.rate
+    2. while len(input) != 0:
+    3.     if self.absorb_index == self.rate:
+    4.         self.permutation_state.permute()
+    5.         self.absorb_index = 0
+    6.     chunk_size = min(self.rate - self.absorb_index, len(input))
+    7.     next_chunk = input[:chunk_size]
+    8.     self.permutation_state[self.absorb_index:self.absorb_index + chunk_size] = next_chunk
+    9.     self.absorb_index += chunk_size
+    10.    input = input[chunk_size:]
+
+### Squeeze
+
+The squeeze operation extracts output elements from the sponge state, which are uniformly distributed and can be used as a digest, key stream, or other cryptographic material.
+
+    squeeze(self, length)
+
+    Inputs:
+    - self, the current duplex sponge object
+    - length, the number of bytes to be squeezed out of the sponge
+
+    Outputs:
+    - digest, a byte array of `length` elements uniformly distributed
+
+    Procedure:
+    1. output = b''
+    2. while length != 0:
+    3.     if self.squeeze_index == self.rate:
+    4.         self.permutation_state.permute()
+    5.         self.squeeze_index = 0
+    6.         self.absorb_index = 0
+    7.     chunk_size = min(self.rate - self.squeeze_index, length)
+    8.     output += bytes(self.permutation_state[self.squeeze_index:self.squeeze_index+chunk_size])
+    9.     self.squeeze_index += chunk_size
+    10.    length -= chunk_size
+    11. return output
+
+### Keccak-f[1600] Implementation
+
+`Keccak-f` is the permutation function underlying {{SHA3}}.
+
+`KeccakDuplexSponge` instantiated `DuplexSponge` with `Keccak-f[1600]`, using rate `R = 136` bytes and capacity `C = 64` bytes.
+
 # Codecs registry
 
-## P-384 (secp384r1)
+## Elliptic curves
 
-### Absorb scalars
-
-    absorb_scalars(hash_state, scalars)
-
-    Inputs:
-
-    - hash_state, the hash state
-    - scalars, a list of elements of P-384's scalar field
-
-    Constants:
-
-    - scalar_byte_length = ceil(384/8)
-
-    1. for scalar in scalars:
-    2.     hash_state.absorb_bytes(scalar_to_bytes(scalar))
-
-Where the function `scalar_to_bytes` is defined in {#notation}
-
-### Absorb elements
-
-    absorb_elements(hash_state, elements)
-
-    Inputs:
-
-    - hash_state, the hash state
-    - elements, a list of P-384 group elements
-
-    1. for element in elements:
-    2.     hash_state.absorb_bytes(ecpoint_to_bytes(element))
-
-### Squeeze scalars
-
-    squeeze_scalars(hash_state, length)
-
-    Inputs:
-
-    - hash_state, the hash state
-    - length, an unsiged integer of 64 bits determining the output length.
-
-    1. for i in range(length):
-    2.     scalar_bytes = hash_state.squeeze_bytes(field_bytes_length + 16)
-    3.     scalars.append(bytes_to_scalar_mod_order(scalar_bytes))
-
-# Notation and Terminology {#notation}
+### Notation and Terminology {#notation}
 
 For an elliptic curve, we consider two fields, the coordinate fields, which indicates the base field, the field over which the elliptic curve equation is defined, and the scalar field, over which the scalar operations are performed.
 
@@ -277,3 +228,46 @@ The following functions and notation are used throughout the document.
 
     1. byte = 2 if sgn0(element.y) == 0 else 3
     2. return I2OSP(byte, 1) + I2OSP(x, field_bytes_length)
+
+### Absorb scalars
+
+    absorb_scalars(hash_state, scalars)
+
+    Inputs:
+
+    - hash_state, the hash state
+    - scalars, a list of elements of the elliptic curve's scalar field
+
+    Constants:
+
+    - scalar_byte_length = ceil(384/8)
+
+    1. for scalar in scalars:
+    2.     hash_state.absorb_bytes(scalar_to_bytes(scalar))
+
+Where the function `scalar_to_bytes` is defined in {#notation}
+
+### Absorb elements
+
+    absorb_elements(hash_state, elements)
+
+    Inputs:
+
+    - hash_state, the hash state
+    - elements, a list of group elements
+
+    1. for element in elements:
+    2.     hash_state.absorb_bytes(ecpoint_to_bytes(element))
+
+### Squeeze scalars
+
+    squeeze_scalars(hash_state, length)
+
+    Inputs:
+
+    - hash_state, the hash state
+    - length, an unsiged integer of 64 bits determining the output length.
+
+    1. for i in range(length):
+    2.     scalar_bytes = hash_state.squeeze_bytes(field_bytes_length + 16)
+    3.     scalars.append(bytes_to_scalar_mod_order(scalar_bytes))

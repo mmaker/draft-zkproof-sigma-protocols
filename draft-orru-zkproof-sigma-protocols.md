@@ -163,7 +163,7 @@ This function should pre-compute parts of the statement, or initialize the state
 
 - `deserialize_response(self, data: bytes) -> response`, deserializes a byte array into a response. This function can raise a `DeserializeError` if deserialization fails.
 
-The final two algorithms describe the **zero-knowledge simulator** and are optional, as a sigma protocol is not necessarily zero-knowledge by definition. The simulator is primarily an efficient algorithm for proving zero-knowledge in a theoretical construction, but it is also needed for verifying short proofs and for or-composition, where a witness is not known and thus has to be simulated. We have:
+The final two algorithms describe the **zero-knowledge simulator**. In particular, they may be used for proof composition (e.g. OR-composition). The function `simulate_commitment` is also used when verifying short proofs. We have:
 
 - `simulate_response(self, rng) -> response`, denoting the first stage of the simulator. It is an algorithm drawing a random response given a specified cryptographically secure RNG that follows the same output distribution of the algorithm  `prover_response`.
 
@@ -491,7 +491,6 @@ Given group elements `G`, `H` such that `C = x * G + r * H`, then the statement 
     var_x, var_r = statement.allocate_scalars(2)
     statement.append_equation(C, [(var_x, G), (var_r, H)])
 
-
 ### Serializing the statement for the Fiat-Shamir transformation
 
 Let `H` be a hash object. The statement is encoded in a stateful hash object as follows.
@@ -502,26 +501,6 @@ Let `H` be a hash object. The statement is encoded in a stateful hash object as 
       hasher.update_usize([equation.lhs, equation.rhs[0], equation.rhs[1]])
     hasher.update(generators)
     iv = hasher.digest()
-
-In simpler terms, without stateful hash objects, this should correspond to the following:
-
-    bin_challenge = SHAKE128(iv).update(commitment).digest(scalar_bytes)
-    challenge = int(bin_challenge) % p
-
-and the nonce is produced as:
-
-    bin_nonce = SHAKE128(iv)
-                .update(random)
-                .update(pad)
-                .update(cs.scalars)
-                .digest(cs.num_scalars * scalar_bytes)
-    nonces = [int(bin_nonce[i*scalar_bytes: i*(scalar_bytes+1)]) % p
-              for i in range(cs.num_scalars-1)]
-
-Where:
-    - `pad` is a (padding) zero string of length `168 - len(random)`.
-    - `scalar_bytes` is the number of bytes required to produce a uniformly random group element
-    - `random` is a random seed obtained from the operating system memory
 
 ## Ciphersuites {#ciphersuites}
 
