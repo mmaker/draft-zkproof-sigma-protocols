@@ -80,11 +80,10 @@ Table of Contents
        3.1.2.  SHAKE128 Absorb
        3.1.3.  SHAKE128 Squeeze
      3.2.  Duplex Sponge
-       3.2.1.  Permutation State
-       3.2.2.  Initialization
-       3.2.3.  Absorb
-       3.2.4.  Squeeze
-       3.2.5.  Keccak-f[1600] Implementation
+       3.2.1.  Initialization
+       3.2.2.  Absorb
+       3.2.3.  Squeeze
+       3.2.4.  Keccak-f[1600] Implementation
    4.  Codecs registry
      4.1.  Elliptic curves
        4.1.1.  Notation and Terminology
@@ -120,8 +119,6 @@ Table of Contents
 2.  The API
 
    A duplex sponge has the following interface:
-
-   class DuplexSpongeInterface: type Unit
 
      def new(iv: bytes) -> hash_state
      def absorb(self, x: list[Unit])
@@ -199,21 +196,7 @@ Table of Contents
    DuplexSpongeInterface and maintains internal state to support
    incremental absorption and variable-length output generation.
 
-3.2.1.  Permutation State
-
-   The permutation state maintains the internal state of the sponge:
-
-   class KeccakPermutationState:
-       R = 136  # rate in bytes
-       N = 200  # total state size in bytes (R + capacity)
-
-       def __init__(self, iv: bytes):
-           assert len(iv) == 32
-           self.state = bytearray(200)
-           self.state[self.R: self.R + 32] = iv
-           self.p = Keccak(1600)
-
-3.2.2.  Initialization
+3.2.1.  Initialization
 
    This is the constructor for a duplex sponge object.  It is
    initialized with a 32-byte initialization vector.
@@ -229,7 +212,7 @@ Table of Contents
   3. self.rate = self.permutation_state.R
   4. self.capacity = self.permutation_state.N - self.permutation_state.R
 
-3.2.3.  Absorb
+3.2.2.  Absorb
 
    The absorb function incorporates data into the duplex sponge state
    using overwrite mode.
@@ -252,7 +235,7 @@ Procedure:
 9.     self.absorb_index += chunk_size
 10.    input = input[chunk_size:]
 
-3.2.4.  Squeeze
+3.2.3.  Squeeze
 
    The squeeze operation extracts output elements from the sponge state,
    which are uniformly distributed and can be used as a digest, key
@@ -280,7 +263,7 @@ Procedure:
 10.    length -= chunk_size
 11. return output
 
-3.2.5.  Keccak-f[1600] Implementation
+3.2.4.  Keccak-f[1600] Implementation
 
    Keccak-f is the permutation function underlying [SHA3].
 

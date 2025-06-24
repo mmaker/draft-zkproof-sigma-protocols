@@ -1175,19 +1175,16 @@ svg :is([fill="white"], [fill^="#fff"]) {
                 <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-duplex-sponge" class="internal xref">Duplex Sponge</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.1">
-                    <p id="section-toc.1-1.3.2.2.2.1.1"><a href="#section-3.2.1" class="auto internal xref">3.2.1</a>.  <a href="#name-permutation-state" class="internal xref">Permutation State</a></p>
+                    <p id="section-toc.1-1.3.2.2.2.1.1"><a href="#section-3.2.1" class="auto internal xref">3.2.1</a>.  <a href="#name-initialization-2" class="internal xref">Initialization</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.2">
-                    <p id="section-toc.1-1.3.2.2.2.2.1"><a href="#section-3.2.2" class="auto internal xref">3.2.2</a>.  <a href="#name-initialization-2" class="internal xref">Initialization</a></p>
+                    <p id="section-toc.1-1.3.2.2.2.2.1"><a href="#section-3.2.2" class="auto internal xref">3.2.2</a>.  <a href="#name-absorb" class="internal xref">Absorb</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.3">
-                    <p id="section-toc.1-1.3.2.2.2.3.1"><a href="#section-3.2.3" class="auto internal xref">3.2.3</a>.  <a href="#name-absorb" class="internal xref">Absorb</a></p>
+                    <p id="section-toc.1-1.3.2.2.2.3.1"><a href="#section-3.2.3" class="auto internal xref">3.2.3</a>.  <a href="#name-squeeze" class="internal xref">Squeeze</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.4">
-                    <p id="section-toc.1-1.3.2.2.2.4.1"><a href="#section-3.2.4" class="auto internal xref">3.2.4</a>.  <a href="#name-squeeze" class="internal xref">Squeeze</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.5">
-                    <p id="section-toc.1-1.3.2.2.2.5.1"><a href="#section-3.2.5" class="auto internal xref">3.2.5</a>.  <a href="#name-keccak-f1600-implementation" class="internal xref">Keccak-f[1600] Implementation</a></p>
+                    <p id="section-toc.1-1.3.2.2.2.4.1"><a href="#section-3.2.4" class="auto internal xref">3.2.4</a>.  <a href="#name-keccak-f1600-implementation" class="internal xref">Keccak-f[1600] Implementation</a></p>
 </li>
                 </ul>
 </li>
@@ -1265,28 +1262,26 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-the-api" class="section-name selfRef">The API</a>
       </h2>
 <p id="section-2-1">A duplex sponge has the following interface:<a href="#section-2-1" class="pilcrow">¶</a></p>
-<p id="section-2-2">class DuplexSpongeInterface:
-      type Unit<a href="#section-2-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-2-3">
+<div class="alignLeft art-text artwork" id="section-2-2">
 <pre>
   def new(iv: bytes) -&gt; hash_state
   def absorb(self, x: list[Unit])
   def squeeze(self, length: int) -&gt; list[Unit]
-</pre><a href="#section-2-3" class="pilcrow">¶</a>
+</pre><a href="#section-2-2" class="pilcrow">¶</a>
 </div>
-<p id="section-2-4">where<a href="#section-2-4" class="pilcrow">¶</a></p>
+<p id="section-2-3">where<a href="#section-2-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-2-5.1">
-          <p id="section-2-5.1.1"><code>init(label)</code>, creates a new <code>hash_state</code> object with a description label <code>label</code>;<a href="#section-2-5.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-2-4.1">
+          <p id="section-2-4.1.1"><code>init(label)</code>, creates a new <code>hash_state</code> object with a description label <code>label</code>;<a href="#section-2-4.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-2-5.2">
-          <p id="section-2-5.2.1"><code>absorb(hash_state, values)</code>, absorbs a list of native elements (that is, of type <code>Unit</code>);<a href="#section-2-5.2.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-2-4.2">
+          <p id="section-2-4.2.1"><code>absorb(hash_state, values)</code>, absorbs a list of native elements (that is, of type <code>Unit</code>);<a href="#section-2-4.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-2-5.3">
-          <p id="section-2-5.3.1"><code>squeeze(hash_state, length)</code>, squeezes from the <code>hash_state</code> object a list of <code>Unit</code> elements.<a href="#section-2-5.3.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-2-4.3">
+          <p id="section-2-4.3.1"><code>squeeze(hash_state, length)</code>, squeezes from the <code>hash_state</code> object a list of <code>Unit</code> elements.<a href="#section-2-4.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-2-6">The above can be extended to support absorption and squeeze from different domains than the domain in which the hash function is initialized over. Such extensions are called codecs.<a href="#section-2-6" class="pilcrow">¶</a></p>
+<p id="section-2-5">The above can be extended to support absorption and squeeze from different domains than the domain in which the hash function is initialized over. Such extensions are called codecs.<a href="#section-2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="ciphersuites">
@@ -1371,34 +1366,13 @@ Inputs:
 <a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-duplex-sponge" class="section-name selfRef">Duplex Sponge</a>
         </h3>
 <p id="section-3.2-1">A duplex sponge in overwrite mode is based on a permutation function that operates on a state vector. It implements the <code>DuplexSpongeInterface</code> and maintains internal state to support incremental absorption and variable-length output generation.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
-<div id="permutation-state">
-<section id="section-3.2.1">
-          <h4 id="name-permutation-state">
-<a href="#section-3.2.1" class="section-number selfRef">3.2.1. </a><a href="#name-permutation-state" class="section-name selfRef">Permutation State</a>
-          </h4>
-<p id="section-3.2.1-1">The permutation state maintains the internal state of the sponge:<a href="#section-3.2.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.2.1-2">
-<pre>
-class KeccakPermutationState:
-    R = 136  # rate in bytes
-    N = 200  # total state size in bytes (R + capacity)
-
-    def __init__(self, iv: bytes):
-        assert len(iv) == 32
-        self.state = bytearray(200)
-        self.state[self.R: self.R + 32] = iv
-        self.p = Keccak(1600)
-</pre><a href="#section-3.2.1-2" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
 <div id="initialization-1">
-<section id="section-3.2.2">
+<section id="section-3.2.1">
           <h4 id="name-initialization-2">
-<a href="#section-3.2.2" class="section-number selfRef">3.2.2. </a><a href="#name-initialization-2" class="section-name selfRef">Initialization</a>
+<a href="#section-3.2.1" class="section-number selfRef">3.2.1. </a><a href="#name-initialization-2" class="section-name selfRef">Initialization</a>
           </h4>
-<p id="section-3.2.2-1">This is the constructor for a duplex sponge object. It is initialized with a 32-byte initialization vector.<a href="#section-3.2.2-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.2.2-2">
+<p id="section-3.2.1-1">This is the constructor for a duplex sponge object. It is initialized with a 32-byte initialization vector.<a href="#section-3.2.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.2.1-2">
 <pre>
 new(iv)
 
@@ -1410,17 +1384,17 @@ Procedure:
 2. self.squeeze_index = self.permutation_state.R
 3. self.rate = self.permutation_state.R
 4. self.capacity = self.permutation_state.N - self.permutation_state.R
-</pre><a href="#section-3.2.2-2" class="pilcrow">¶</a>
+</pre><a href="#section-3.2.1-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="absorb">
-<section id="section-3.2.3">
+<section id="section-3.2.2">
           <h4 id="name-absorb">
-<a href="#section-3.2.3" class="section-number selfRef">3.2.3. </a><a href="#name-absorb" class="section-name selfRef">Absorb</a>
+<a href="#section-3.2.2" class="section-number selfRef">3.2.2. </a><a href="#name-absorb" class="section-name selfRef">Absorb</a>
           </h4>
-<p id="section-3.2.3-1">The absorb function incorporates data into the duplex sponge state using overwrite mode.<a href="#section-3.2.3-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.2.3-2">
+<p id="section-3.2.2-1">The absorb function incorporates data into the duplex sponge state using overwrite mode.<a href="#section-3.2.2-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.2.2-2">
 <pre>
 absorb(self, input)
 
@@ -1439,17 +1413,17 @@ Procedure:
 8.     self.permutation_state[self.absorb_index:self.absorb_index + chunk_size] = next_chunk
 9.     self.absorb_index += chunk_size
 10.    input = input[chunk_size:]
-</pre><a href="#section-3.2.3-2" class="pilcrow">¶</a>
+</pre><a href="#section-3.2.2-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="squeeze">
-<section id="section-3.2.4">
+<section id="section-3.2.3">
           <h4 id="name-squeeze">
-<a href="#section-3.2.4" class="section-number selfRef">3.2.4. </a><a href="#name-squeeze" class="section-name selfRef">Squeeze</a>
+<a href="#section-3.2.3" class="section-number selfRef">3.2.3. </a><a href="#name-squeeze" class="section-name selfRef">Squeeze</a>
           </h4>
-<p id="section-3.2.4-1">The squeeze operation extracts output elements from the sponge state, which are uniformly distributed and can be used as a digest, key stream, or other cryptographic material.<a href="#section-3.2.4-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.2.4-2">
+<p id="section-3.2.3-1">The squeeze operation extracts output elements from the sponge state, which are uniformly distributed and can be used as a digest, key stream, or other cryptographic material.<a href="#section-3.2.3-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.2.3-2">
 <pre>
 squeeze(self, length)
 
@@ -1472,17 +1446,17 @@ Procedure:
 9.     self.squeeze_index += chunk_size
 10.    length -= chunk_size
 11. return output
-</pre><a href="#section-3.2.4-2" class="pilcrow">¶</a>
+</pre><a href="#section-3.2.3-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="keccak-f1600-implementation">
-<section id="section-3.2.5">
+<section id="section-3.2.4">
           <h4 id="name-keccak-f1600-implementation">
-<a href="#section-3.2.5" class="section-number selfRef">3.2.5. </a><a href="#name-keccak-f1600-implementation" class="section-name selfRef">Keccak-f[1600] Implementation</a>
+<a href="#section-3.2.4" class="section-number selfRef">3.2.4. </a><a href="#name-keccak-f1600-implementation" class="section-name selfRef">Keccak-f[1600] Implementation</a>
           </h4>
-<p id="section-3.2.5-1"><code>Keccak-f</code> is the permutation function underlying <span>[<a href="#SHA3" class="cite xref">SHA3</a>]</span>.<a href="#section-3.2.5-1" class="pilcrow">¶</a></p>
-<p id="section-3.2.5-2"><code>KeccakDuplexSponge</code> instantiated <code>DuplexSponge</code> with <code>Keccak-f[1600]</code>, using rate <code>R = 136</code> bytes and capacity <code>C = 64</code> bytes.<a href="#section-3.2.5-2" class="pilcrow">¶</a></p>
+<p id="section-3.2.4-1"><code>Keccak-f</code> is the permutation function underlying <span>[<a href="#SHA3" class="cite xref">SHA3</a>]</span>.<a href="#section-3.2.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.2.4-2"><code>KeccakDuplexSponge</code> instantiated <code>DuplexSponge</code> with <code>Keccak-f[1600]</code>, using rate <code>R = 136</code> bytes and capacity <code>C = 64</code> bytes.<a href="#section-3.2.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
