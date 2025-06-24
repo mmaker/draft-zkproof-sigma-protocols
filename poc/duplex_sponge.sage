@@ -1,6 +1,7 @@
 
 from abc import ABC, abstractmethod
 import struct
+import hashlib
 from keccak import Keccak
 
 
@@ -114,3 +115,25 @@ class KeccakDuplexSponge(DuplexSponge):
     def __init__(self, iv: bytes):
         self.permutation_state = KeccakPermutationState(iv)
         super().__init__(iv)
+
+
+class SHAKE128(DuplexSpongeInterface):
+    def __init__(self, iv: bytes):
+        assert len(iv) == 32
+        self.hash_state = hashlib.shake_128()
+        self.hash_state.update(iv)
+
+    def absorb(self, x: bytes):
+        self.hash_state.update(x)
+
+    def squeeze(self, length: int) -> bytes:
+        return self.hash_state.copy().digest(length)
+
+
+if __name__ == "__main__":
+    # Example usage
+    iv = b'\0' * 32  # Initialization vector
+    sponge = SHAKE128(iv)
+    sponge.absorb(b'hello!')
+    output = sponge.squeeze(64)
+    print(output.hex())  # Output the squeezed bytes in hex format
