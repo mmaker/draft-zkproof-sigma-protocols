@@ -15,11 +15,10 @@ Expires: 26 December 2025                                    Apple, Inc.
 Abstract
 
    This document describes Sigma protocols, a secure, general-purpose
-   non-interactive zero-knowledge proof of knowledge.  Concretely, the
-   scheme allows proving knowledge of a witness, without revealing any
-   information about the undisclosed messages or the signature itself,
-   while at the same time, guarantying soundness of the overall
-   protocols.
+   zero-knowledge proof of knowledge.  Concretely, the scheme allows
+   proving knowledge of a witness, without revealing any information
+   about the undisclosed messages or the signature itself, while at the
+   same time, guarantying soundness of the overall protocols.
 
 About This Document
 
@@ -65,36 +64,34 @@ Copyright Notice
 Table of Contents
 
    1.  Introduction
-   2.  Public functions interface
-     2.1.  Core interface
-   3.  Sigma protocols over prime-order groups
-     3.1.  Group abstraction
-       3.1.1.  Group
-       3.1.2.  Scalar
-     3.2.  Codec for non-interactive proofs
-     3.3.  Proofs of preimage of a linear map
-       3.3.1.  Core protocol
-       3.3.2.  Prover procedures
-       3.3.3.  Verifier procedure
-       3.3.4.  Witness representation
-       3.3.5.  Linear map
-       3.3.6.  Statements for linear relations
-       3.3.7.  Example: Schnorr proofs
-       3.3.8.  Example: DLEQ proofs
-       3.3.9.  Example: Pedersen commitments
-       3.3.10. Serializing the statement for the Fiat-Shamir
+     1.1.  Core interface
+   2.  Sigma protocols over prime-order groups
+     2.1.  Group abstraction
+       2.1.1.  Group
+       2.1.2.  Scalar
+     2.2.  Proofs of preimage of a linear map
+       2.2.1.  Core protocol
+       2.2.2.  Prover procedures
+       2.2.3.  Verifier procedure
+       2.2.4.  Witness representation
+       2.2.5.  Linear map
+       2.2.6.  Statements for linear relations
+       2.2.7.  Example: Schnorr proofs
+       2.2.8.  Example: DLEQ proofs
+       2.2.9.  Example: Pedersen commitments
+       2.2.10. Serializing the statement for the Fiat-Shamir
                transformation
-     3.4.  Ciphersuites
-       3.4.1.  P-256 (secp256r1)
-   4.  Security Considerations
-   5.  Post-Quantum Security Considerations
-     5.1.  Privacy Considerations
-     5.2.  Soundness Considerations
-   6.  Generation of the initialization vector
-   7.  Acknowledgments
-   8.  References
-     8.1.  Normative References
-     8.2.  Informative References
+     2.3.  Ciphersuites
+       2.3.1.  P-256 (secp256r1)
+   3.  Security Considerations
+   4.  Post-Quantum Security Considerations
+     4.1.  Privacy Considerations
+     4.2.  Soundness Considerations
+   5.  Generation of the initialization vector
+   6.  Acknowledgments
+   7.  References
+     7.1.  Normative References
+     7.2.  Informative References
    Authors' Addresses
 
 1.  Introduction
@@ -114,50 +111,7 @@ Table of Contents
    A sigma protocol allows a *prover* to convince a *verifier* of the
    knowledge of a secret *witness* satisfying a *statement*.
 
-2.  Public functions interface
-
-   A non-interactive sigma protocol provides a prove and a verify public
-   functions.  It is parametrized by:
-
-   *  a Codec, which specifies how to encode prover messages for the
-      hash function, and how to extract verifier challenges in the right
-      domain;
-
-   *  a SigmaProtocol, which specifies an interactive 3-message
-      protocol.
-
-   For how to implement these function in prime-order groups and
-   elliptic curves, see Section 3.2.  Upon initialization, the protocol
-   receives as input an iv of 32-bytes which uniquely describes the
-   protocol and the session being proven and (optionally) pre-processes
-   some information about the protocol using the instance.  Guidelines
-   on the generation of this value are given in Section 6.
-
-class NISigmaProtocol:
-    Protocol: SigmaProtocol
-    Codec: Codec
-
-    def __init__(self, iv: [], instance):
-        self.hash_state = self.Codec(iv)
-        self.sp = self.Protocol(instance)
-
-    def prove(self, witness, rng):
-        (prover_state, commitment) = self.sp.prover_commit(witness, rng)
-        challenge = self.hash_state.prover_message(commitment).verifier_challenge()
-        response = self.sp.prover_response(prover_state, challenge)
-
-        assert self.sp.verifier(commitment, challenge, response)
-        return self.sp.serialize_commitment(commitment) + self.sp.serialize_response(response)
-
-    def verify(self, proof):
-        commitment_bytes = proof[:self.sp.instance.commit_bytes_len]
-        response_bytes = proof[self.sp.instance.commit_bytes_len:]
-        commitment = self.sp.deserialize_commitment(commitment_bytes)
-        response = self.sp.deserialize_response(response_bytes)
-        challenge = self.hash_state.prover_message(commitment).verifier_challenge()
-        return self.sp.verifier(commitment, challenge, response)
-
-2.1.  Core interface
+1.1.  Core interface
 
    The public functions are obtained relying on an internal structure
    containing the definition of a sigma protocol.
@@ -245,15 +199,15 @@ class NISigmaProtocol:
    statements and combiners of those, such as OR statements, validity of
    t-out-of-n statements, and more.
 
-3.  Sigma protocols over prime-order groups
+2.  Sigma protocols over prime-order groups
 
    The following sub-section present concrete instantiations of sigma
    protocols over prime-order elliptic curve groups.  It relies on two
    components: - a prime-order elliptic-curve group as described in
-   Section 3.1, - a hash function.
+   Section 2.1, - a hash function.
 
    Valid choices of elliptic curves and hash functions can be found in
-   Section 3.4.
+   Section 2.3.
 
    Traditionally, sigma protocols are defined in Camenisch-Stadler
    notation as (for example):
@@ -270,7 +224,7 @@ class NISigmaProtocol:
    3 states that the linear relation that need to be proven is x * G = X
    and x * H = Y.
 
-3.1.  Group abstraction
+2.1.  Group abstraction
 
    Because of their dominance, the presentation in the following focuses
    on proof goals over elliptic curves, therefore leveraging additive
@@ -280,9 +234,9 @@ class NISigmaProtocol:
    counterparts over residue classes.
 
    We detail the functions that can be invoked on these objects.
-   Example choices can be found in Section 3.4.
+   Example choices can be found in Section 2.3.
 
-3.1.1.  Group
+2.1.1.  Group
 
    *  identity(), returns the neutral element in the group.
 
@@ -315,7 +269,7 @@ class NISigmaProtocol:
    instead of equal we will use ==, and instead of scalar_mul we will
    use *. A similar behavior can be achieved using operator overloading.
 
-3.1.2.  Scalar
+2.1.2.  Scalar
 
    *  identity(): outputs the (additive) identity element in the scalar
       field.
@@ -339,48 +293,19 @@ class NISigmaProtocol:
    instead of equal we will use ==, and instead of mul we will use *. A
    similar behavior can be achieved using operator overloading.
 
-3.2.  Codec for non-interactive proofs
+2.2.  Proofs of preimage of a linear map
 
-   We describe a codec for Schnorr proofs over groups of prime order p
-   that is intended for byte-oriented hash functions.  Informally, the
-   prover messages are serialized by concatenating the point compresion
-   functions, and the verifier challenge is generated by squeezing out
-   log2(p) + 16 element and reducing the result modulo p
-
-   class ByteSchnorrCodec:
-       Group: groups.Group = None
-       Hash: DuplexSpongeInterface = None
-
-       def __init__(self, iv: bytes):
-           self.hash_state = self.Hash(iv)
-
-       def prover_message(self, elements: list):
-           self.hash_state.absorb(self.Group.serialize(elements))
-           # calls can be chained
-           return self
-
-       def verifier_challenge(self):
-           from hash_to_field import OS2IP
-
-           uniform_bytes = self.hash_state.squeeze(
-               self.Group.ScalarField.scalar_byte_length() + 16
-           )
-           scalar = OS2IP(uniform_bytes) % self.Group.ScalarField.order
-           return scalar
-
-3.3.  Proofs of preimage of a linear map
-
-3.3.1.  Core protocol
+2.2.1.  Core protocol
 
    This defines the object SchnorrProof.  The initialization function
    takes as input the statement, and pre-processes it.
 
-3.3.2.  Prover procedures
+2.2.2.  Prover procedures
 
    The prover of a sigma protocol is stateful and will send two message,
    a "commitment" and a "response" message, described below.
 
-3.3.2.1.  Prover commitment
+2.2.2.1.  Prover commitment
 
 prover_commit(self, witness, rng)
 
@@ -401,7 +326,7 @@ Procedure:
 3. commitment = self.instance.linear_map(nonces)
 4. return (prover_state, commitment)
 
-3.3.2.2.  Prover response
+2.2.2.2.  Prover response
 
 prover_response(self, prover_state, challenge)
 
@@ -419,7 +344,7 @@ Procedure:
 1. witness, nonces = prover_state
 2. return [nonces[i] + witness[i] * challenge for i in range(self.instance.linear_map.num_scalars)]
 
-3.3.3.  Verifier procedure
+2.2.3.  Verifier procedure
 
 verify(self, commitment, challenge, response)
 
@@ -441,13 +366,13 @@ Procedure:
 3. got = [commitment[i] + self.instance.image[i] * challenge for i in range(self.instance.linear_map.num_constraints)]
 4. return got == expected
 
-3.3.4.  Witness representation
+2.2.4.  Witness representation
 
    A witness is simply a list of num_scalars elements.
 
    Witness = [Scalar; num_scalars]
 
-3.3.5.  Linear map
+2.2.5.  Linear map
 
    A LinearMap represents a function (a _linear map_ from the scalar
    field to the elliptic curve group) that, given as input an array of
@@ -474,7 +399,7 @@ Procedure:
 
        def map(self, scalars: list[Group.ScalarField]) -> Group
 
-3.3.5.1.  Initialization
+2.2.5.1.  Initialization
 
    The linear map LinearMap is initialized with
 
@@ -483,7 +408,7 @@ Procedure:
    num_scalars = 0
    num_elements = 0
 
-3.3.5.2.  Linear map evaluation
+2.2.5.2.  Linear map evaluation
 
    A witness can be mapped to a group element via:
 
@@ -501,10 +426,10 @@ Inputs:
 5.     image.append(self.Group.msm(coefficients, elements))
 6. return image
 
-3.3.6.  Statements for linear relations
+2.2.6.  Statements for linear relations
 
    The object LinearRelation has two attributes: a linear map
-   linear_map, which will be defined in Section 3.3.5, and image, the
+   linear_map, which will be defined in Section 2.2.5, and image, the
    linear map image of which the prover wants to show the pre-image of.
 
    class LinearRelation: Domain = group.ScalarField Image = group.Group
@@ -517,7 +442,7 @@ Inputs:
    def append_equation(self, lhs: int, rhs: list[(int, int)]) -> None
    def set_elements(self, elements: list[(int, Group)]) -> None
 
-3.3.6.1.  Element and scalar variables allocation
+2.2.6.1.  Element and scalar variables allocation
 
    Two function allow two allocate the new scalars (the witness) and
    group elements (the instance).
@@ -558,7 +483,7 @@ allocate_elements(self, n)
  1. for index, element in elements:
  2.   self.linear_map.group_elements[index] = element
 
-3.3.6.2.  Constraint enforcing
+2.2.6.2.  Constraint enforcing
 
 append_equation(self, lhs, rhs)
 
@@ -578,9 +503,9 @@ Procedure:
 2. self.linear_map.append(linear_combination)
 3. self._image.append(lhs)
 
-3.3.7.  Example: Schnorr proofs
+2.2.7.  Example: Schnorr proofs
 
-   The statement represented in Section 3 can be written as:
+   The statement represented in Section 2 can be written as:
 
    statement = LinearRelation(group)
    [var_x] = statement.allocate_scalars(1)
@@ -596,7 +521,7 @@ Procedure:
    It is worth noting that in the above example, [X] ==
    statement.linear_map.map([x]).
 
-3.3.8.  Example: DLEQ proofs
+2.2.8.  Example: DLEQ proofs
 
    A DLEQ proof proves a statement:
 
@@ -610,7 +535,7 @@ Procedure:
    3. statement.append_equation(X, [(var_x, G)])
    4. statement.append_equation(Y, [(var_x, H)])
 
-3.3.9.  Example: Pedersen commitments
+2.2.9.  Example: Pedersen commitments
 
    A representation proof proves a statement
 
@@ -623,7 +548,7 @@ Procedure:
    var_x, var_r = statement.allocate_scalars(2)
    statement.append_equation(C, [(var_x, G), (var_r, H)])
 
-3.3.10.  Serializing the statement for the Fiat-Shamir transformation
+2.2.10.  Serializing the statement for the Fiat-Shamir transformation
 
    Let H be a hash object.  The statement is encoded in a stateful hash
    object as follows.
@@ -635,13 +560,13 @@ Procedure:
  hasher.update(generators)
  iv = hasher.digest()
 
-3.4.  Ciphersuites
+2.3.  Ciphersuites
 
-3.4.1.  P-256 (secp256r1)
+2.3.1.  P-256 (secp256r1)
 
    This ciphersuite uses P-256 [NISTCurves] for the Group.
 
-3.4.1.1.  Elliptic curve group of P-256 (secp384r1) [NISTCurves]
+2.3.1.1.  Elliptic curve group of P-256 (secp384r1) [NISTCurves]
 
    *  order(): Return the integer 11579208923731619542357098500868790785
       2837564279074904382605163141518161494337.
@@ -658,7 +583,7 @@ Procedure:
       that the point is on the curve, and that the point is not the
       point at infinity.
 
-3.4.1.2.  Scalar Field of P-256
+2.3.1.2.  Scalar Field of P-256
 
    *  serialize(s): Relies on the Field-Element-to-Octet-String
       conversion according to [SEC1]; Ns = 32.
@@ -668,7 +593,7 @@ Procedure:
       can fail if the input does not represent a Scalar in the range [0,
       G.Order() - 1].
 
-4.  Security Considerations
+3.  Security Considerations
 
    Sigma protocols provide the following guarantees in the random oracle
    model:
@@ -692,13 +617,13 @@ Procedure:
    hardness properties for relations proven using these protocols falls
    outside the scope of this document.
 
-5.  Post-Quantum Security Considerations
+4.  Post-Quantum Security Considerations
 
    The zero-knowledge proofs described in this document provide
    statistical zero-knowledge and statistical soundness properties when
    modeled in the random oracle model.
 
-5.1.  Privacy Considerations
+4.1.  Privacy Considerations
 
    These proofs offer zero-knowledge guarantees, meaning they do not
    leak any information about the prover's witness beyond what can be
@@ -716,12 +641,12 @@ Procedure:
 
    *  Protection against "harvest now, decrypt later" attacks.
 
-5.2.  Soundness Considerations
+4.2.  Soundness Considerations
 
    While the proofs themselves offer privacy protections against quantum
    adversaries, the hardness of the relation being proven depends (at
    best) on the hardness of the discrete logarithm problem over the
-   elliptic curves specified in Section 3.4.  Since this problem is
+   elliptic curves specified in Section 2.3.  Since this problem is
    known to be efficiently solvable by quantum computers using Shor's
    algorithm, these proofs MUST NOT be relied upon for post-quantum
    soundness guarantees.
@@ -743,22 +668,22 @@ Procedure:
    this specification, but examples may be found in the proof-of-concept
    implementation and in [BonehS23].
 
-6.  Generation of the initialization vector
+5.  Generation of the initialization vector
 
    As of now, it is responsibility of the user to pick a unique
    initialization vector that identifies the proof system and the
    session being used.  This will be expanded in future versions of this
    specification.
 
-7.  Acknowledgments
+6.  Acknowledgments
 
    The authors thank Jan Bobolz, Stephan Krenn, Mary Maller, Ivan
    Visconti, Yuwen Zhang for reviewing a previous edition of this
    specification.
 
-8.  References
+7.  References
 
-8.1.  Normative References
+7.1.  Normative References
 
    [KEYAGREEMENT]
               Barker, E., Chen, L., Roginsky, A., Vassilev, A., and R.
@@ -768,7 +693,7 @@ Procedure:
               DOI 10.6028/nist.sp.800-56ar3, April 2018,
               <https://doi.org/10.6028/nist.sp.800-56ar3>.
 
-8.2.  Informative References
+7.2.  Informative References
 
    [AttemaCK21]
               Attema, T., Cramer, R., and L. Kohl, "A Compressed Sigma-
