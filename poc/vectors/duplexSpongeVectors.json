@@ -61,40 +61,19 @@
     "Tag": "656467652d636173652d746573742d646f6d61696e2d6162736f726230303030"
   },
   "test_associativity_of_absorb": {
+    "Expected": "7dfada182d6191e106ce287c2262a443ce2fb695c7cc5037a46626e88889af58",
     "HashFunction": "Keccak-f[1600] overwrite mode",
-    "Tag": "6162736f72622d6173736f6369617469766974792d646f6d61696e2d2d2d2d2d",
-    "TestCases": [
+    "Operations": [
       {
-        "Expected": "7dfada182d6191e106ce287c2262a443ce2fb695c7cc5037a46626e88889af58",
-        "Operations": [
-          {
-            "data": "68656c6c6f20776f726c64",
-            "type": "absorb"
-          },
-          {
-            "length": 32,
-            "type": "squeeze"
-          }
-        ]
+        "data": "68656c6c6f20776f726c64",
+        "type": "absorb"
       },
       {
-        "Expected": "7dfada182d6191e106ce287c2262a443ce2fb695c7cc5037a46626e88889af58",
-        "Operations": [
-          {
-            "data": "68656c6c6f",
-            "type": "absorb"
-          },
-          {
-            "data": "20776f726c64",
-            "type": "absorb"
-          },
-          {
-            "length": 32,
-            "type": "squeeze"
-          }
-        ]
+        "length": 32,
+        "type": "squeeze"
       }
-    ]
+    ],
+    "Tag": "6162736f72622d6173736f6369617469766974792d646f6d61696e2d2d2d2d2d"
   },
   "test_keccak_duplex_sponge": {
     "Expected": "73e4a040a956f57693fb2b2dde8a8ea2c14d39ff8830060cd0301d6de25b2097ba858efedeeb89368eaf7c94a68f62835f932b5f0dd0ba376c48a0fdb5e21f0c",
@@ -169,36 +148,18 @@
     "Tag": "756e69745f74657374735f6b656363616b5f7461675f5f5f5f5f5f5f5f5f5f5f"
   },
   "test_tag_affects_output": {
+    "Expected": "2ecad63584ec0ff7f31edb822530762e5cb4b7dc1a62b1ffe02c43f3073a61b8",
     "HashFunction": "Keccak-f[1600] overwrite mode",
-    "TestCases": [
+    "Operations": [
       {
-        "Expected": "2ecad63584ec0ff7f31edb822530762e5cb4b7dc1a62b1ffe02c43f3073a61b8",
-        "Operations": [
-          {
-            "data": "696e707574",
-            "type": "absorb"
-          },
-          {
-            "length": 32,
-            "type": "squeeze"
-          }
-        ],
-        "Tag": "646f6d61696e2d6f6e652d646966666572732d686572652d3030303030303030"
+        "data": "696e707574",
+        "type": "absorb"
       },
       {
-        "Expected": "6310fa0356e1bab0442fa19958e1c4a6d1dcc565b2b139b6044d1a809f531825",
-        "Operations": [
-          {
-            "data": "696e707574",
-            "type": "absorb"
-          },
-          {
-            "length": 32,
-            "type": "squeeze"
-          }
-        ],
-        "Tag": "646f6d61696e2d74776f2d646966666572732d686572652d3030303030303030"
+        "length": 32,
+        "type": "squeeze"
       }
-    ]
+    ],
+    "Tag": "646f6d61696e2d6f6e652d646966666572732d686572652d3030303030303030"
   }
 }

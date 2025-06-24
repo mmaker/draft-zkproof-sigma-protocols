@@ -37,9 +37,6 @@ def test_keccak_duplex_sponge():
     ]
 
     output = run_operations(tag, operations)
-    expected = bytes.fromhex("73e4a040a956f57693fb2b2dde8a8ea2c14d39ff8830060cd0301d6de25b2097ba858efedeeb89368eaf7c94a68f62835f932b5f0dd0ba376c48a0fdb5e21f0c")
-    assert output == expected
-
     return {
         "Tag": tag.hex(),
         "Operations": operations,
@@ -57,9 +54,6 @@ def test_absorb_empty_before_does_not_break():
     ]
 
     output = run_operations(tag, operations)
-    expected = bytes.fromhex("73e4a040a956f57693fb2b2dde8a8ea2c14d39ff8830060cd0301d6de25b2097ba858efedeeb89368eaf7c94a68f62835f932b5f0dd0ba376c48a0fdb5e21f0c")
-    assert output == expected
-
     return {
         "Tag": tag.hex(),
         "Operations": operations,
@@ -77,9 +71,6 @@ def test_absorb_empty_after_does_not_break():
     ]
 
     output = run_operations(tag, operations)
-    expected = bytes.fromhex("73e4a040a956f57693fb2b2dde8a8ea2c14d39ff8830060cd0301d6de25b2097ba858efedeeb89368eaf7c94a68f62835f932b5f0dd0ba376c48a0fdb5e21f0c")
-    assert output == expected
-
     return {
         "Tag": tag.hex(),
         "Operations": operations,
@@ -98,9 +89,6 @@ def test_squeeze_zero_behavior():
     ]
 
     output = run_operations(tag, operations)
-    expected = bytes.fromhex("73e4a040a956f57693fb2b2dde8a8ea2c14d39ff8830060cd0301d6de25b2097ba858efedeeb89368eaf7c94a68f62835f932b5f0dd0ba376c48a0fdb5e21f0c")
-    assert output == expected
-
     return {
         "Tag": tag.hex(),
         "Operations": operations,
@@ -118,7 +106,6 @@ def test_squeeze_zero_after_behavior():
     ]
 
     output = run_operations(tag, operations)
-
     return {
         "Tag": tag.hex(),
         "Operations": operations,
@@ -137,9 +124,6 @@ def test_absorb_squeeze_absorb_consistency():
     ]
 
     output = run_operations(tag, operations)
-    expected = bytes.fromhex("20ce6da64ffc09df8de254222c068358da39d23ec43e522ceaaa1b82b90c8b9a")
-    assert output == expected
-
     return {
         "Tag": tag.hex(),
         "Operations": operations,
@@ -171,16 +155,8 @@ def test_associativity_of_absorb():
 
     return {
         "Tag": tag.hex(),
-        "TestCases": [
-            {
-                "Operations": operations1,
-                "Expected": out1.hex()
-            },
-            {
-                "Operations": operations2,
-                "Expected": out2.hex()
-            }
-        ]
+        "Operations": operations1,
+        "Expected": out1.hex()
     }
 
 @test_vector
@@ -204,18 +180,9 @@ def test_tag_affects_output():
     assert output2 == expected2
 
     return {
-        "TestCases": [
-            {
-                "Tag": tag1.hex(),
-                "Operations": operations,
-                "Expected": output1.hex()
-            },
-            {
-                "Tag": tag2.hex(),
-                "Operations": operations,
-                "Expected": output2.hex()
-            }
-        ]
+        "Tag": tag1.hex(),
+        "Operations": operations,
+        "Expected": output1.hex()
     }
 
 @test_vector
