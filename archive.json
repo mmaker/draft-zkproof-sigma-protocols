@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-22T01:27:28.005036+00:00",
+  "timestamp": "2025-06-24T01:20:54.173902+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -741,19 +741,11 @@
         "editorial",
         "easy"
       ],
-      "body": "Typos: challange, commmit, Stadtler\n\nDefine acronyms: SHO, VRF, ...\nDefine terms, e.g., batchable, ...\nRef [NISTCurves]: if wanting to cite DSS, consider updating from FIPS 186-4 (2013) to FIPS 186-5 (2023); consider citing SP 800-186 (2023) as a reference for the P-* elliptic curves (such as P-384).\nThe expression \"A commitment, sometimes also called nonce\" is a bit confusing. Isn't nonce also being used to denote the (seed of) the discrete-log of the \"commitment\". It might be clearer to distinguish between secret nonce and public nonce.\nSection 2.4: why is the nonce algorithm shown after the challenge algorithm (if the nonce is introduced before the challenge)?\nUnclear the utility of declaring \"simulate_response\", without more guidance on how it would actually be used.\nThe draft uses \"Equations\" to specify the \"constraints\". Does that mean that range constraints (e.g., based on inequalities) are not allowed? Consider clarifying the relation between \"constraints\" and \"equations\".\nConsider adding textual explanation of the syntax of each function, e.g., where the output length of SHAKE128 is specified.",
+      "body": "Typos: challange, commmit, Stadtler\n\n- [x] Define acronyms: SHO, VRF, ...\n\n- [x] Define terms, e.g., batchable, ...\n\n- [ ] Ref [NISTCurves]: if wanting to cite DSS, consider updating from FIPS 186-4 (2013) to FIPS 186-5 (2023); consider citing SP 800-186 (2023) as a reference for the P-* elliptic curves (such as P-384).\n\n- [ ] The expression \"A commitment, sometimes also called nonce\" is a bit confusing. Isn't nonce also being used to denote the (seed of) the discrete-log of the \"commitment\". It might be clearer to distinguish between secret nonce and public nonce.\n\n- [ ] Section 2.4: why is the nonce algorithm shown after the challenge algorithm (if the nonce is introduced before the challenge)?\n\n- [x] Unclear the utility of declaring \"simulate_response\", without more guidance on how it would actually be used.\n\n- [ ] The draft uses \"Equations\" to specify the \"constraints\". Does that mean that range constraints (e.g., based on inequalities) are not allowed? Consider clarifying the relation between \"constraints\" and \"equations\".\n\n- [ ] Consider adding textual explanation of the syntax of each function, e.g., where the output length of SHAKE128 is specified.",
       "createdAt": "2025-05-22T08:17:31Z",
-      "updatedAt": "2025-06-14T13:09:16Z",
+      "updatedAt": "2025-06-24T00:28:41Z",
       "closedAt": null,
-      "comments": [
-        {
-          "author": "mmaker",
-          "authorAssociation": "OWNER",
-          "body": "remaining: \n- Consider citing SP 800-186 (2023) as a reference for the P-* elliptic curves (such as P-384).\n- Consider adding textual explanation of the syntax of each function, e.g., where the output length of SHAKE128 is specified.",
-          "createdAt": "2025-06-14T13:09:16Z",
-          "updatedAt": "2025-06-14T13:09:16Z"
-        }
-      ]
+      "comments": []
     },
     {
       "number": 44,
@@ -1361,10 +1353,10 @@
       "labels": [],
       "body": "Fixes #25 ",
       "createdAt": "2025-06-14T16:49:17Z",
-      "updatedAt": "2025-06-17T23:57:14Z",
+      "updatedAt": "2025-06-24T01:02:09Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
-      "baseRefOid": "6b258431fd26f564300ba599c774156b8b801f25",
+      "baseRefOid": "0a5afa8b296504ff3ab186cce1ed0878e015df47",
       "headRepository": "mmaker/draft-zkproof-sigma-protocols",
       "headRefName": "feat/short-proofs",
       "headRefOid": "9ffcf865ccda397b60f4b9fb6c2f329cd77791be",
@@ -1503,24 +1495,26 @@
       "id": "PR_kwDONyiw_86bdEWt",
       "title": "fix(keccak): make squeeze() spec-compliant and add unit tests",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/53",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "nougzarm",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2025-06-20T17:37:45Z",
-      "updatedAt": "2025-06-20T21:14:27Z",
+      "updatedAt": "2025-06-23T22:57:21Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
       "baseRefOid": "11aba8279483805523bbdbe4d41c754fb74243dc",
       "headRepository": "nougzarm/draft-zkproof-sigma-protocols",
       "headRefName": "main",
       "headRefOid": "3e5c0be4c8223e8a365f35ec70cd73baed7936be",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-06-23T22:57:21Z",
+      "mergedAt": "2025-06-23T22:57:21Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "50bced374d883ce0281317b911b34a43c16d3c8c"
+      },
       "comments": [],
       "reviews": []
     },
@@ -1536,10 +1530,10 @@
       "labels": [],
       "body": "To address the NIST feedback (https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/47), and also to improve clarity, renaming from \"Sigma Protocols\" to \"Sigma Proofs\".\r\n\r\nI didn't rename \"sigma protocols\" throughout the core of the spec because at some point, the spec language is actually referring to the _protocol_ instead of the final _proof_. Happy to do a closer pass to differentiate between the two. This is also a very rough suggestion, can bikeshed this more if this rename will cause more confusion and ambiguity than it solves.\r\n\r\n\r\n",
       "createdAt": "2025-06-21T00:43:52Z",
-      "updatedAt": "2025-06-21T00:43:53Z",
+      "updatedAt": "2025-06-24T01:19:22Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
-      "baseRefOid": "11aba8279483805523bbdbe4d41c754fb74243dc",
+      "baseRefOid": "0a5afa8b296504ff3ab186cce1ed0878e015df47",
       "headRepository": "mmaker/draft-zkproof-sigma-protocols",
       "headRefName": "rename-sigma-protocol",
       "headRefOid": "737501d74ab15912b38b68e72f477242592cfd49",
@@ -1547,7 +1541,15 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "I'm not sure if the wording \"Sigma Proof\" has ever been used in cryptography.\r\nI can be persuaded of the title given the CFRG feedback but I am against changing the formal definition as it can potentially lead to more useless naming discussions with other cryptographers",
+          "createdAt": "2025-06-24T01:18:53Z",
+          "updatedAt": "2025-06-24T01:19:22Z"
+        }
+      ],
       "reviews": []
     }
   ]
