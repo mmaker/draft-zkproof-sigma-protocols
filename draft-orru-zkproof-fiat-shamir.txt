@@ -86,11 +86,11 @@ Table of Contents
        3.2.4.  Squeeze
        3.2.5.  Keccak-f[1600] Implementation
    4.  Codecs registry
-     4.1.  Notation and Terminology
-     4.2.  P-384 (secp384r1)
-       4.2.1.  Absorb scalars
-       4.2.2.  Absorb elements
-       4.2.3.  Squeeze scalars
+     4.1.  Elliptic curves
+       4.1.1.  Notation and Terminology
+       4.1.2.  Absorb scalars
+       4.1.3.  Absorb elements
+       4.1.4.  Squeeze scalars
    5.  References
      5.1.  Normative References
      5.2.  Informative References
@@ -126,7 +126,6 @@ Table of Contents
      def new(iv: bytes) -> hash_state
      def absorb(self, x: list[Unit])
      def squeeze(self, length: int) -> list[Unit]
-     def finalize(self)
 
    where
 
@@ -138,8 +137,6 @@ Table of Contents
 
    *  squeeze(hash_state, length), squeezes from the hash_state object a
       list of Unit elements.
-
-   *  finalize(hash_state), deletes the hash object safely.
 
    The above can be extended to support absorption and squeeze from
    different domains than the domain in which the hash function is
@@ -292,7 +289,9 @@ Procedure:
 
 4.  Codecs registry
 
-4.1.  Notation and Terminology
+4.1.  Elliptic curves
+
+4.1.1.  Notation and Terminology
 
    For an elliptic curve, we consider two fields, the coordinate fields,
    which indicates the base field, the field over which the elliptic
@@ -338,16 +337,14 @@ Procedure:
 
       2.  return I2OSP(byte, 1) + I2OSP(x, field_bytes_length)
 
-4.2.  P-384 (secp384r1)
-
-4.2.1.  Absorb scalars
+4.1.2.  Absorb scalars
 
    absorb_scalars(hash_state, scalars)
 
    Inputs:
 
    - hash_state, the hash state
-   - scalars, a list of elements of P-384's scalar field
+   - scalars, a list of elements of the elliptic curve's scalar field
 
    Constants:
 
@@ -358,19 +355,19 @@ Procedure:
 
    Where the function scalar_to_bytes is defined in {#notation}
 
-4.2.2.  Absorb elements
+4.1.3.  Absorb elements
 
    absorb_elements(hash_state, elements)
 
    Inputs:
 
    - hash_state, the hash state
-   - elements, a list of P-384 group elements
+   - elements, a list of group elements
 
    1. for element in elements:
    2.     hash_state.absorb_bytes(ecpoint_to_bytes(element))
 
-4.2.3.  Squeeze scalars
+4.1.4.  Squeeze scalars
 
  squeeze_scalars(hash_state, length)
 
