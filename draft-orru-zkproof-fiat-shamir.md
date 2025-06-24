@@ -57,7 +57,7 @@ The core actions supported from the underlying hash function are:
 
 The API follows the template of duplex sponges.
 
-# The API
+# The Duplex Sponge API
 
 A duplex sponge has the following interface:
 
@@ -72,6 +72,63 @@ where
 - `squeeze(hash_state, length)`, squeezes from the `hash_state` object a list of `Unit` elements.
 
 The above can be extended to support absorption and squeeze from different domains than the domain in which the hash function is initialized over. Such extensions are called codecs.
+
+# Fiat-Shamir transformation for Sigma Protocols
+
+We describe how to construct non-interactive proofs for sigma protocols.
+It is parametrized by:
+
+- a `Codec`, which specifies how to encode prover messages for the hash function, and how to extract verifier challenges in the right domain;
+- a `SigmaProtocol`, which specifies an interactive 3-message protocol.
+
+Upon initialization, the protocol receives as input an `iv` of 32-bytes which uniquely describes the protocol and the session being proven and (optionally) pre-processes some information about the protocol using the instance.
+
+    class NISigmaProtocol:
+        Protocol: SigmaProtocol
+        Codec: Codec
+
+        def __init__(self, iv: [], instance):
+            self.hash_state = self.Codec(iv)
+            self.ip = self.Protocol(instance)
+
+        def prove(self, witness, rng):
+            (prover_state, commitment) = self.ip.prover_commit(witness, rng)
+            challenge = self.hash_state.prover_message(commitment).verifier_challenge()
+            response = self.ip.prover_response(prover_state, challenge)
+
+            assert self.ip.verifier(commitment, challenge, response)
+            return self.ip.serialize_commitment(commitment) + self.ip.serialize_response(response)
+
+        def verify(self, proof):
+            commitment_bytes = proof[:self.ip.instance.commit_bytes_len]
+            response_bytes = proof[self.ip.instance.commit_bytes_len:]
+            commitment = self.ip.deserialize_commitment(commitment_bytes)
+            response = self.ip.deserialize_response(response_bytes)
+            challenge = self.hash_state.prover_message(commitment).verifier_challenge()
+            return self.ip.verifier(commitment, challenge, response)
+
+## Codec for Linear maps {#group-prove}
+
+We describe a codec for Schnorr proofs over groups of prime order `p` that is intended for byte-oriented hash functions.
+
+    class LinearMapCodec:
+        Group: groups.Group = None
+        DuplexSponge: DuplexSpongeInterface = None
+
+        def __init__(self, iv: bytes):
+            self.hash_state = self.DuplexSponge(iv)
+
+        def prover_message(self, elements: list):
+            self.hash_state.absorb(self.Group.serialize(elements))
+            # calls can be chained
+            return self
+
+        def verifier_challenge(self):
+            uniform_bytes = self.hash_state.squeeze(
+                self.Group.ScalarField.scalar_byte_length() + 16
+            )
+            scalar = OS2IP(uniform_bytes) % self.Group.ScalarField.order
+            return scalar
 
 # Ciphersuites
 
