@@ -1368,7 +1368,7 @@ This function should pre-compute parts of the statement, or initialize the state
             <p id="section-2.1-4.8.1"><code>deserialize_response(self, data: bytes) -&gt; response</code>, deserializes a byte array into a response. This function can raise a <code>DeserializeError</code> if deserialization fails.<a href="#section-2.1-4.8.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-2.1-5">The final two algorithms describe the <strong>zero-knowledge simulator</strong> and are optional, as a sigma protocol is not necessarily zero-knowledge by definition. The simulator is primarily an efficient algorithm for proving zero-knowledge in a theoretical construction, but it is also needed for verifying short proofs and for or-composition, where a witness is not known and thus has to be simulated. We have:<a href="#section-2.1-5" class="pilcrow">¶</a></p>
+<p id="section-2.1-5">The final two algorithms describe the <strong>zero-knowledge simulator</strong>. In particular, they may be used for proof composition (e.g. OR-composition). The function <code>simulate_commitment</code> is also used when verifying short proofs. We have:<a href="#section-2.1-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-2.1-6.1">
             <p id="section-2.1-6.1.1"><code>simulate_response(self, rng) -&gt; response</code>, denoting the first stage of the simulator. It is an algorithm drawing a random response given a specified cryptographically secure RNG that follows the same output distribution of the algorithm  <code>prover_response</code>.<a href="#section-2.1-6.1.1" class="pilcrow">¶</a></p>
@@ -1884,29 +1884,6 @@ hasher.update(generators)
 iv = hasher.digest()
 </pre><a href="#section-3.3.10-2" class="pilcrow">¶</a>
 </div>
-<p id="section-3.3.10-3">In simpler terms, without stateful hash objects, this should correspond to the following:<a href="#section-3.3.10-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3.10-4">
-<pre>
-bin_challenge = SHAKE128(iv).update(commitment).digest(scalar_bytes)
-challenge = int(bin_challenge) % p
-</pre><a href="#section-3.3.10-4" class="pilcrow">¶</a>
-</div>
-<p id="section-3.3.10-5">and the nonce is produced as:<a href="#section-3.3.10-5" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3.10-6">
-<pre>
-bin_nonce = SHAKE128(iv)
-            .update(random)
-            .update(pad)
-            .update(cs.scalars)
-            .digest(cs.num_scalars * scalar_bytes)
-nonces = [int(bin_nonce[i*scalar_bytes: i*(scalar_bytes+1)]) % p
-          for i in range(cs.num_scalars-1)]
-</pre><a href="#section-3.3.10-6" class="pilcrow">¶</a>
-</div>
-<p id="section-3.3.10-7">Where:
-    - <code>pad</code> is a (padding) zero string of length <code>168 - len(random)</code>.
-    - <code>scalar_bytes</code> is the number of bytes required to produce a uniformly random group element
-    - <code>random</code> is a random seed obtained from the operating system memory<a href="#section-3.3.10-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>

@@ -74,25 +74,26 @@ Table of Contents
 
    1.  Introduction
    2.  The API
-   3.  Overwrite mode implementation from permutation functions
-     3.1.  Initialization
-     3.2.  Absorb
-     3.3.  Squeeze
-     3.4.  Ciphersuites
-     3.5.  Keccak
-   4.  SHAKE128 compatibility [WIP]
-     4.1.  Initialization
-     4.2.  SHAKE128 Absorb
-     4.3.  SHAKE128 Squeeze
-   5.  Codecs registry
-     5.1.  P-384 (secp384r1)
-       5.1.1.  Absorb scalars
-       5.1.2.  Absorb elements
-       5.1.3.  Squeeze scalars
-   6.  Notation and Terminology
-   7.  References
-     7.1.  Normative References
-     7.2.  Informative References
+   3.  Ciphersuites
+     3.1.  SHAKE128
+       3.1.1.  Initialization
+       3.1.2.  SHAKE128 Absorb
+       3.1.3.  SHAKE128 Squeeze
+     3.2.  Duplex Sponge
+       3.2.1.  Permutation State
+       3.2.2.  Initialization
+       3.2.3.  Absorb
+       3.2.4.  Squeeze
+       3.2.5.  Keccak-f[1600] Implementation
+   4.  Codecs registry
+     4.1.  Notation and Terminology
+     4.2.  P-384 (secp384r1)
+       4.2.1.  Absorb scalars
+       4.2.2.  Absorb elements
+       4.2.3.  Squeeze scalars
+   5.  References
+     5.1.  Normative References
+     5.2.  Informative References
    Author's Address
 
 1.  Introduction
@@ -144,99 +145,16 @@ Table of Contents
    different domains than the domain in which the hash function is
    initialized over.  Such extensions are called codecs.
 
-3.  Overwrite mode implementation from permutation functions
+3.  Ciphersuites
 
-   A duplex sponge in overwrite mode is based on a permutation function
-   P that maps a vector of r + c elements of type Unit elements.  It
-   implements the DuplexSpongeInterface.
-
-3.1.  Initialization
-
-   This is the constructor for a duplex sponge object.  It is
-   initialized with a 32-byte value that initializes the sponge state.
-
-   new(iv)
-
-   assert len(iv) == 32
-   self.absorb_index = 0
-   self.squeeze_index = self.state.R
-   self.rate = self.state.R
-   self.capacity = self.state.N - self.state.R
-
-3.2.  Absorb
-
-   The absorb function incorporates data into the duplex sponge state.
-
-absorb(self, input)
-
-Inputs:
-
--  self, the current duplex sponge object
--  input, the input to be absorbed
-
-Constants:
-    permutation
-
-    self.squeeze_index = self.rate
-
-Procedure:
-
-1. while len(input) != 0:
-2.   if self.absorb_index == self.rate:
-3.     self.permutation_state.permute()
-4.     self.absorb_index = 0
-5.   chunk_size = min(self.rate - self.absorb_index, len(input))
-6.   next_chunk = input[:chunk_size]
-7.   self.permutation_state[self.absorb_index : self.absorb_index + chunk_size] = next_chunk
-8.   self.absorb_index += chunk_size
-9.   input = input[chunk_size:]
-
-3.3.  Squeeze
-
-   The squeeze operation extracts output elements from the sponge state,
-   which are uniformly distributed and can be used as a digest, a key
-   stream, or other cryptographic material.
-
-squeeze(self, length)
-
-Inputs:
-
-- self, the current duplex sponge object
-- length, the number of bytes to be squeezed out of the sponge
-
-Outputs:
-
-- digest, a byte array of `length` elements uniformly distributed
-
-Procedure:
-
-1. output = b''
-2. while length != 0:
-3.     if self.squeeze_index == self.rate:
-4.         self.permutation_state.permute()
-5.         self.squeeze_index = 0
-6.     chunk_size = min(self.rate - self.squeeze_index, length)
-7.     output += bytes(self.permutation_state[self.squeeze_index:self.squeeze_index+chunk_size])
-8.     self.squeeze_index += chunk_size
-9.     length -= chunk_size
-10. return output
-
-3.4.  Ciphersuites
-
-3.5.  Keccak
-
-   Keccak-f is the permutation function underlying~[SHA3].  We
-   instantiate DuplexSponge with Keccak-f[1600], using rate R = 136 and
-   capacity C = 64.
-
-4.  SHAKE128 compatibility [WIP]
+3.1.  SHAKE128
 
    SHAKE128 is a variable-length hash function based on the Keccak
    sponge construction [SHA3].  It belongs to the SHA-3 family but
    offers a flexible output length, and provides 128 bits of security
    against collision attacks, regardless of the output length requested.
 
-4.1.  Initialization
+3.1.1.  Initialization
 
    new(self, label)
 
@@ -251,7 +169,7 @@ Procedure:
    1. h = shake_128(label)
    2. return h
 
-4.2.  SHAKE128 Absorb
+3.1.2.  SHAKE128 Absorb
 
    absorb(hash_state, x)
 
@@ -264,7 +182,7 @@ Procedure:
 
    This method is also re-exported as absorb_bytes.
 
-4.3.  SHAKE128 Squeeze
+3.1.3.  SHAKE128 Squeeze
 
    squeeze(hash_state, length)
 
@@ -273,58 +191,108 @@ Procedure:
    - hash_state, the hash state
    - length, the number of elements to be squeezed
 
-   1. h.digest(length)
+   1. h.copy().digest(length)
 
    This method is also re-exported as squeeze_bytes.
 
-5.  Codecs registry
+3.2.  Duplex Sponge
 
-5.1.  P-384 (secp384r1)
+   A duplex sponge in overwrite mode is based on a permutation function
+   that operates on a state vector.  It implements the
+   DuplexSpongeInterface and maintains internal state to support
+   incremental absorption and variable-length output generation.
 
-5.1.1.  Absorb scalars
+3.2.1.  Permutation State
 
-   absorb_scalars(hash_state, scalars)
+   The permutation state maintains the internal state of the sponge:
 
-   Inputs:
+   class KeccakPermutationState:
+       R = 136  # rate in bytes
+       N = 200  # total state size in bytes (R + capacity)
 
-   - hash_state, the hash state
-   - scalars, a list of elements of P-384's scalar field
+       def __init__(self, iv: bytes):
+           assert len(iv) == 32
+           self.state = bytearray(200)
+           self.state[self.R: self.R + 32] = iv
+           self.p = Keccak(1600)
 
-   Constants:
+3.2.2.  Initialization
 
-   - scalar_byte_length = ceil(384/8)
+   This is the constructor for a duplex sponge object.  It is
+   initialized with a 32-byte initialization vector.
 
-   1. for scalar in scalars:
-   2.     hash_state.absorb_bytes(scalar_to_bytes(scalar))
+  new(iv)
 
-   Where the function scalar_to_bytes is defined in {#notation}
+  Inputs:
+  - iv, a 32-byte initialization vector
 
-5.1.2.  Absorb elements
+  Procedure:
+  1. self.absorb_index = 0
+  2. self.squeeze_index = self.permutation_state.R
+  3. self.rate = self.permutation_state.R
+  4. self.capacity = self.permutation_state.N - self.permutation_state.R
 
-   absorb_elements(hash_state, elements)
+3.2.3.  Absorb
 
-   Inputs:
+   The absorb function incorporates data into the duplex sponge state
+   using overwrite mode.
 
-   - hash_state, the hash state
-   - elements, a list of P-384 group elements
+absorb(self, input)
 
-   1. for element in elements:
-   2.     hash_state.absorb_bytes(ecpoint_to_bytes(element))
+Inputs:
+- self, the current duplex sponge object
+- input, the input bytes to be absorbed
 
-5.1.3.  Squeeze scalars
+Procedure:
+1. self.squeeze_index = self.rate
+2. while len(input) != 0:
+3.     if self.absorb_index == self.rate:
+4.         self.permutation_state.permute()
+5.         self.absorb_index = 0
+6.     chunk_size = min(self.rate - self.absorb_index, len(input))
+7.     next_chunk = input[:chunk_size]
+8.     self.permutation_state[self.absorb_index:self.absorb_index + chunk_size] = next_chunk
+9.     self.absorb_index += chunk_size
+10.    input = input[chunk_size:]
 
- squeeze_scalars(hash_state, length)
+3.2.4.  Squeeze
 
- Inputs:
+   The squeeze operation extracts output elements from the sponge state,
+   which are uniformly distributed and can be used as a digest, key
+   stream, or other cryptographic material.
 
- - hash_state, the hash state
- - length, an unsiged integer of 64 bits determining the output length.
+squeeze(self, length)
 
- 1. for i in range(length):
- 2.     scalar_bytes = hash_state.squeeze_bytes(field_bytes_length + 16)
- 3.     scalars.append(bytes_to_scalar_mod_order(scalar_bytes))
+Inputs:
+- self, the current duplex sponge object
+- length, the number of bytes to be squeezed out of the sponge
 
-6.  Notation and Terminology
+Outputs:
+- digest, a byte array of `length` elements uniformly distributed
+
+Procedure:
+1. output = b''
+2. while length != 0:
+3.     if self.squeeze_index == self.rate:
+4.         self.permutation_state.permute()
+5.         self.squeeze_index = 0
+6.         self.absorb_index = 0
+7.     chunk_size = min(self.rate - self.squeeze_index, length)
+8.     output += bytes(self.permutation_state[self.squeeze_index:self.squeeze_index+chunk_size])
+9.     self.squeeze_index += chunk_size
+10.    length -= chunk_size
+11. return output
+
+3.2.5.  Keccak-f[1600] Implementation
+
+   Keccak-f is the permutation function underlying [SHA3].
+
+   KeccakDuplexSponge instantiated DuplexSponge with Keccak-f[1600],
+   using rate R = 136 bytes and capacity C = 64 bytes.
+
+4.  Codecs registry
+
+4.1.  Notation and Terminology
 
    For an elliptic curve, we consider two fields, the coordinate fields,
    which indicates the base field, the field over which the elliptic
@@ -370,16 +338,61 @@ Procedure:
 
       2.  return I2OSP(byte, 1) + I2OSP(x, field_bytes_length)
 
-7.  References
+4.2.  P-384 (secp384r1)
 
-7.1.  Normative References
+4.2.1.  Absorb scalars
+
+   absorb_scalars(hash_state, scalars)
+
+   Inputs:
+
+   - hash_state, the hash state
+   - scalars, a list of elements of P-384's scalar field
+
+   Constants:
+
+   - scalar_byte_length = ceil(384/8)
+
+   1. for scalar in scalars:
+   2.     hash_state.absorb_bytes(scalar_to_bytes(scalar))
+
+   Where the function scalar_to_bytes is defined in {#notation}
+
+4.2.2.  Absorb elements
+
+   absorb_elements(hash_state, elements)
+
+   Inputs:
+
+   - hash_state, the hash state
+   - elements, a list of P-384 group elements
+
+   1. for element in elements:
+   2.     hash_state.absorb_bytes(ecpoint_to_bytes(element))
+
+4.2.3.  Squeeze scalars
+
+ squeeze_scalars(hash_state, length)
+
+ Inputs:
+
+ - hash_state, the hash state
+ - length, an unsiged integer of 64 bits determining the output length.
+
+ 1. for i in range(length):
+ 2.     scalar_bytes = hash_state.squeeze_bytes(field_bytes_length + 16)
+ 3.     scalars.append(bytes_to_scalar_mod_order(scalar_bytes))
+
+5.  References
+
+5.1.  Normative References
 
    [RFC8017]  Moriarty, K., Ed., Kaliski, B., Jonsson, J., and A. Rusch,
               "PKCS #1: RSA Cryptography Specifications Version 2.2",
               RFC 8017, DOI 10.17487/RFC8017, November 2016,
               <https://www.rfc-editor.org/rfc/rfc8017>.
 
-7.2.  Informative References
+5.2.  Informative References
 
    [SHA3]     "SHA-3 Standard: Permutation-Based Hash and Extendable-
               Output Functions", n.d.,
