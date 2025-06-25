@@ -4,8 +4,8 @@
 
 Zkproof                                                          M. Orrù
 Internet-Draft                                                      CNRS
-Intended status: Informational                              24 June 2025
-Expires: 26 December 2025
+Intended status: Informational                              25 June 2025
+Expires: 27 December 2025
 
 
                        Fiat-Shamir Transformation
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 December 2025.
+   This Internet-Draft will expire on 27 December 2025.
 
 Copyright Notice
 
@@ -121,16 +121,19 @@ Table of Contents
 
 2.  The Duplex Sponge API
 
-   A duplex sponge has the following interface:
+   A duplex sponge operates over an abstract Unit type and provides the
+   following interface:
 
      def new(iv: bytes) -> hash_state
      def absorb(hash_state, x: list[Unit])
      def squeeze(hash_state, length: int) -> list[Unit]
 
-   where
+   In the remainder of this spec, we assume that Unit=u8.  (The type
+   Unit MUST have fixed size in memory, partial ordering, and at least
+   two elements.)  The API functions are described as follows:
 
-   *  init(iv), creates a new hash_state object with a description iv
-      iv;
+   *  init(iv), creates a new hash_state object with a 32-byte
+      initialization vector iv;
 
    *  absorb(hash_state, values), absorbs a list of native elements
       (that is, of type Unit);
@@ -163,7 +166,7 @@ class NISigmaProtocol:
     Protocol: SigmaProtocol
     Codec: Codec
 
-    def __init__(self, iv: [], instance):
+    def init(self, iv: [], instance):
         self.hash_state = self.Codec(iv)
         self.ip = self.Protocol(instance)
 
@@ -242,8 +245,6 @@ class NISigmaProtocol:
 
    1. h.update(x)
 
-   This method is also re-exported as absorb_bytes.
-
 4.1.3.  SHAKE128 Squeeze
 
    squeeze(hash_state, length)
@@ -254,8 +255,6 @@ class NISigmaProtocol:
    - length, the number of elements to be squeezed
 
    1. h.copy().digest(length)
-
-   This method is also re-exported as squeeze_bytes.
 
 4.2.  Duplex Sponge
 
@@ -402,7 +401,7 @@ Procedure:
    - scalar_byte_length = ceil(384/8)
 
    1. for scalar in scalars:
-   2.     hash_state.absorb_bytes(scalar_to_bytes(scalar))
+   2.     hash_state.absorb(scalar_to_bytes(scalar))
 
    Where the function scalar_to_bytes is defined in {#notation}
 
@@ -416,20 +415,20 @@ Procedure:
    - elements, a list of group elements
 
    1. for element in elements:
-   2.     hash_state.absorb_bytes(ecpoint_to_bytes(element))
+   2.     hash_state.absorb(ecpoint_to_bytes(element))
 
 5.1.4.  Squeeze scalars
 
- squeeze_scalars(hash_state, length)
+  squeeze_scalars(hash_state, length)
 
- Inputs:
+  Inputs:
 
- - hash_state, the hash state
- - length, an unsiged integer of 64 bits determining the output length.
+  - hash_state, the hash state
+  - length, an unsiged integer of 64 bits determining the output length.
 
- 1. for i in range(length):
- 2.     scalar_bytes = hash_state.squeeze_bytes(field_bytes_length + 16)
- 3.     scalars.append(bytes_to_scalar_mod_order(scalar_bytes))
+  1. for i in range(length):
+  2.     scalar_bytes = hash_state.squeeze(field_bytes_length + 16)
+  3.     scalars.append(bytes_to_scalar_mod_order(scalar_bytes))
 
 6.  References
 

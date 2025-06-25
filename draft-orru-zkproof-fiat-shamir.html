@@ -1050,7 +1050,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Orrù</td>
-<td class="center">Expires 26 December 2025</td>
+<td class="center">Expires 27 December 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1063,12 +1063,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-orru-zkproof-fiat-shamir-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-06-24" class="published">24 June 2025</time>
+<time datetime="2025-06-25" class="published">25 June 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-12-26">26 December 2025</time></dd>
+<dd class="expires"><time datetime="2025-12-27">27 December 2025</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1119,7 +1119,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 26 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 27 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1272,7 +1272,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
       <h2 id="name-the-duplex-sponge-api">
 <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-the-duplex-sponge-api" class="section-name selfRef">The Duplex Sponge API</a>
       </h2>
-<p id="section-2-1">A duplex sponge has the following interface:<a href="#section-2-1" class="pilcrow">¶</a></p>
+<p id="section-2-1">A duplex sponge operates over an abstract <code>Unit</code> type and provides the following interface:<a href="#section-2-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-2-2">
 <pre>
   def new(iv: bytes) -&gt; hash_state
@@ -1280,10 +1280,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
   def squeeze(hash_state, length: int) -&gt; list[Unit]
 </pre><a href="#section-2-2" class="pilcrow">¶</a>
 </div>
-<p id="section-2-3">where<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-2-3">In the remainder of this spec, we assume that <code>Unit=u8</code>.
+(The type <code>Unit</code> MUST have fixed size in memory, partial ordering, and at least two elements.)
+The API functions are described as follows:<a href="#section-2-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-2-4.1">
-          <p id="section-2-4.1.1"><code>init(iv)</code>, creates a new <code>hash_state</code> object with a description iv <code>iv</code>;<a href="#section-2-4.1.1" class="pilcrow">¶</a></p>
+          <p id="section-2-4.1.1"><code>init(iv)</code>, creates a new <code>hash_state</code> object with a 32-byte initialization vector <code>iv</code>;<a href="#section-2-4.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-2-4.2">
           <p id="section-2-4.2.1"><code>absorb(hash_state, values)</code>, absorbs a list of native elements (that is, of type <code>Unit</code>);<a href="#section-2-4.2.1" class="pilcrow">¶</a></p>
@@ -1317,7 +1319,7 @@ class NISigmaProtocol:
     Protocol: SigmaProtocol
     Codec: Codec
 
-    def __init__(self, iv: [], instance):
+    def init(self, iv: [], instance):
         self.hash_state = self.Codec(iv)
         self.ip = self.Protocol(instance)
 
@@ -1421,7 +1423,6 @@ Inputs:
 1. h.update(x)
 </pre><a href="#section-4.1.2-1" class="pilcrow">¶</a>
 </div>
-<p id="section-4.1.2-2">This method is also re-exported as <code>absorb_bytes</code>.<a href="#section-4.1.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="shake128-squeeze">
@@ -1441,7 +1442,6 @@ Inputs:
 1. h.copy().digest(length)
 </pre><a href="#section-4.1.3-1" class="pilcrow">¶</a>
 </div>
-<p id="section-4.1.3-2">This method is also re-exported as <code>squeeze_bytes</code>.<a href="#section-4.1.3-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1627,7 +1627,7 @@ Constants:
 - scalar_byte_length = ceil(384/8)
 
 1. for scalar in scalars:
-2.     hash_state.absorb_bytes(scalar_to_bytes(scalar))
+2.     hash_state.absorb(scalar_to_bytes(scalar))
 </pre><a href="#section-5.1.2-1" class="pilcrow">¶</a>
 </div>
 <p id="section-5.1.2-2">Where the function <code>scalar_to_bytes</code> is defined in {#notation}<a href="#section-5.1.2-2" class="pilcrow">¶</a></p>
@@ -1648,7 +1648,7 @@ Inputs:
 - elements, a list of group elements
 
 1. for element in elements:
-2.     hash_state.absorb_bytes(ecpoint_to_bytes(element))
+2.     hash_state.absorb(ecpoint_to_bytes(element))
 </pre><a href="#section-5.1.3-1" class="pilcrow">¶</a>
 </div>
 </section>
@@ -1668,7 +1668,7 @@ Inputs:
 - length, an unsiged integer of 64 bits determining the output length.
 
 1. for i in range(length):
-2.     scalar_bytes = hash_state.squeeze_bytes(field_bytes_length + 16)
+2.     scalar_bytes = hash_state.squeeze(field_bytes_length + 16)
 3.     scalars.append(bytes_to_scalar_mod_order(scalar_bytes))
 </pre><a href="#section-5.1.4-1" class="pilcrow">¶</a>
 </div>

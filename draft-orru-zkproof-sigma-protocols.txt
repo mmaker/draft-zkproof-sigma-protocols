@@ -5,16 +5,16 @@
 Network Working Group                                            M. Orrù
 Internet-Draft                                                      CNRS
 Intended status: Informational                                    C. Yun
-Expires: 26 December 2025                                    Apple, Inc.
-                                                            24 June 2025
+Expires: 27 December 2025                                    Apple, Inc.
+                                                            25 June 2025
 
 
-                            Sigma Protocols
+                   Sigma Protocols Interactive Proofs
                draft-orru-zkproof-sigma-protocols-latest
 
 Abstract
 
-   This document describes Sigma protocols, a secure, general-purpose
+   This document describes Sigma Protocols, a secure, general-purpose
    zero-knowledge proof of knowledge.  Concretely, the scheme allows
    proving knowledge of a witness, without revealing any information
    about the undisclosed messages or the signature itself, while at the
@@ -48,7 +48,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 December 2025.
+   This Internet-Draft will expire on 27 December 2025.
 
 Copyright Notice
 
