@@ -59,15 +59,17 @@ The API follows the template of duplex sponges.
 
 # The Duplex Sponge API
 
-A duplex sponge has the following interface:
+A duplex sponge operates over an abstract `Unit` type and provides the following interface:
 
       def new(iv: bytes) -> hash_state
       def absorb(hash_state, x: list[Unit])
       def squeeze(hash_state, length: int) -> list[Unit]
 
-where
+In the remainder of this spec, we assume that `Unit=u8`.
+(The type `Unit` MUST have fixed size in memory, partial ordering, and at least two elements.)
+The API functions are described as follows:
 
-- `init(iv)`, creates a new `hash_state` object with a description iv `iv`;
+- `init(iv)`, creates a new `hash_state` object with a 32-byte initialization vector `iv`;
 - `absorb(hash_state, values)`, absorbs a list of native elements (that is, of type `Unit`);
 - `squeeze(hash_state, length)`, squeezes from the `hash_state` object a list of `Unit` elements.
 
@@ -87,7 +89,7 @@ Upon initialization, the protocol receives as input an `iv` of 32-bytes which un
         Protocol: SigmaProtocol
         Codec: Codec
 
-        def __init__(self, iv: [], instance):
+        def init(self, iv: [], instance):
             self.hash_state = self.Codec(iv)
             self.ip = self.Protocol(instance)
 
@@ -162,8 +164,6 @@ SHAKE128 is a variable-length hash function based on the Keccak sponge construct
 
     1. h.update(x)
 
-This method is also re-exported as `absorb_bytes`.
-
 ### SHAKE128 Squeeze
 
     squeeze(hash_state, length)
@@ -175,7 +175,6 @@ This method is also re-exported as `absorb_bytes`.
 
     1. h.copy().digest(length)
 
-This method is also re-exported as `squeeze_bytes`.
 
 ## Duplex Sponge
 
@@ -300,7 +299,7 @@ The following functions and notation are used throughout the document.
     - scalar_byte_length = ceil(384/8)
 
     1. for scalar in scalars:
-    2.     hash_state.absorb_bytes(scalar_to_bytes(scalar))
+    2.     hash_state.absorb(scalar_to_bytes(scalar))
 
 Where the function `scalar_to_bytes` is defined in {#notation}
 
@@ -314,7 +313,7 @@ Where the function `scalar_to_bytes` is defined in {#notation}
     - elements, a list of group elements
 
     1. for element in elements:
-    2.     hash_state.absorb_bytes(ecpoint_to_bytes(element))
+    2.     hash_state.absorb(ecpoint_to_bytes(element))
 
 ### Squeeze scalars
 
@@ -326,5 +325,5 @@ Where the function `scalar_to_bytes` is defined in {#notation}
     - length, an unsiged integer of 64 bits determining the output length.
 
     1. for i in range(length):
-    2.     scalar_bytes = hash_state.squeeze_bytes(field_bytes_length + 16)
+    2.     scalar_bytes = hash_state.squeeze(field_bytes_length + 16)
     3.     scalars.append(bytes_to_scalar_mod_order(scalar_bytes))

@@ -1,5 +1,5 @@
 ---
-title: "Sigma Protocols"
+title: "Sigma Protocols Interactive Proofs"
 category: info
 
 docname: draft-orru-zkproof-sigma-protocols-latest
@@ -77,7 +77,7 @@ informative:
 
 --- abstract
 
-This document describes Sigma protocols, a secure, general-purpose zero-knowledge proof of knowledge. Concretely, the scheme allows proving knowledge of a witness, without revealing any information about the undisclosed messages or the signature itself, while at the same time, guarantying soundness of the overall protocols.
+This document describes Sigma Protocols, a secure, general-purpose zero-knowledge proof of knowledge. Concretely, the scheme allows proving knowledge of a witness, without revealing any information about the undisclosed messages or the signature itself, while at the same time, guarantying soundness of the overall protocols.
 
 --- middle
 
