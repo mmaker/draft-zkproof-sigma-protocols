@@ -470,6 +470,12 @@ Sigma protocols provide the following guarantees in the random oracle model:
 
 While theoretical analysis demonstrates that both soundness and zero-knowledge properties are statistical in nature, practical security depends on the cryptographic strength of the underlying hash function. It's important to note that the soundness of a zero-knowledge proof provides no guarantees regarding the computational hardness of the relation being proven. An assessment of the specific hardness properties for relations proven using these protocols falls outside the scope of this document.
 
+## Privacy Considerations
+
+The zero-knowledge proofs described are publicly verifiable (transferable) when they are constructed using the Fiat-Shamir transformation, as defined in the spec. This is because any party can perform the Fiat-Shamir transformation over the contents of the proof, to verify that the challenge was computed properly.
+
+The zero-knowlege proofs can be deniable if they are constructed with an interactive protocol, with an honest verifier and without transferable message authenticity. This is because given the contents of a proof, it is impossible to differentiate between an honestly generated or simulated proof. However, this construction is out of scope for this spec.
+
 # Post-Quantum Security Considerations
 
 The zero-knowledge proofs described in this document provide statistical zero-knowledge and statistical soundness properties when modeled in the random oracle model.
