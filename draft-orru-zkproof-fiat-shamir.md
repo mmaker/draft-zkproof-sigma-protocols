@@ -26,6 +26,11 @@ author:
     fullname: "Michele Orrù"
     organization: CNRS
     email: "m@orru.net"
+-
+
+    fullname: "Giacomo Fenzi"
+    organization: EPFL
+    email: "giacomo.fenzi@epfl.ch"
 
 normative:
 
@@ -36,13 +41,37 @@ informative:
 
 --- abstract
 
-This document describes the Fiat-Shamir transformation via a duplex sponge interface that is capable of supporting a number of different hash functions, to "absorb" elements from different domains, and produce pseudoranom elements "squeezing" from the hash object.
+This document describes the Fiat-Shamir transformation, a generic procedure to compile an interactive protocol into a non-interactive protocol by combining the interactive protocol with a duplex sponge.
 
-In addition, the specification provides codes, a way to absorb specific data types.
+We describe a generic duplex sponge interface that support "absorb" and "squeeze" operations over a elements of a specified base type. 
+The absorb operation supports incrementally updating the hash state of the sponge, and the squeeze operation enables squeezing variable-length unpredictable messages.
+The sponge interface supports a number of different hash functions.
+
+In addition, the specification introduces codecs, a mechanism to extend the functionality of a duplex sponge to support elements of other domains.
+
+Given an interactive protocol and a suitable codec, we describe how to construct a non-interactive protocol.
 
 --- middle
 
 # Introduction
+
+The Fiat-Shamir transformation is a technique that uses a hash function to convert a public-coin interactive protocol between a prover and a verifier into a corresponding non-interactive protocol.
+
+We consider a variant of the Fiat-Shamir transformation, where the hash-function is obtained from a _duplex sponge_ and the interactive protocol is a _3-message protocol_ (where the first message originates from the prover). 
+
+A duplex sponge is a stateful hash object that can absorb inputs incrementally and squeeze variable-length unpredictable messages.
+The duplex sponge is defined over a base alphabet (typically bytes) which might not match the domain over which the prover and verifier messages are defined.
+
+A _codec_ internally uses a duplex sponge and exposes absorb and squeeze operations matching the domain of the prover and verifier messages.
+
+The Fiat-Shamir transformation then combines the following ingredients to construct a non-interactive protocol:
+
+- An initialization vector (IV) uniquely identifying the protocol.
+- A 3-message interactive protocol.
+- A codec defined over the prover and verifier message domains and internally using a duplex sponge.
+
+
+# Introduction [OLD]
 
 The Fiat-Shamir transformation relies on a hash function that can absorb inputs incrementally and squeeze variable-length unpredictable messages. On a high level, it puts together:
 
@@ -57,33 +86,47 @@ The core actions supported from the underlying hash function are:
 
 The API follows the template of duplex sponges.
 
-# The Duplex Sponge API
+# The Duplex Sponge Interface
 
-A duplex sponge operates over an abstract `Unit` type and provides the following interface:
+A duplex sponge operates over an abstract `Unit` type and provides the following interface.
 
-      def new(iv: bytes) -> hash_state
-      def absorb(hash_state, x: list[Unit])
-      def squeeze(hash_state, length: int) -> list[Unit]
+    class DuplexSponge:
+      def new(iv: bytes) -> DuplexSponge
+      def absorb(self, x: list[Unit])
+      def squeeze(self, length: int) -> list[Unit]
 
-In the remainder of this spec, we assume that `Unit=u8`.
-(The type `Unit` MUST have fixed size in memory, partial ordering, and at least two elements.)
-The API functions are described as follows:
+Where:
 
-- `init(iv)`, creates a new `hash_state` object with a 32-byte initialization vector `iv`;
-- `absorb(hash_state, values)`, absorbs a list of native elements (that is, of type `Unit`);
-- `squeeze(hash_state, length)`, squeezes from the `hash_state` object a list of `Unit` elements.
+- The type `Unit` MUST have fixed size in memory, partial ordering, and at least two elements.
+- `init(iv: bytes) -> DuplexSponge` denotes the initialization function. This function takes as input a 32-byte initialization vector `iv` and initializes the state of the duplex sponge.
+- `absorb(self, values: list[Unit])` denotes the absorb operation of the sponge. This function takes as input a list of `Unit` elements and mutates the `DuplexSponge` internal state;
+- `squeeze(self, length: int)` denotes the squeeze operation of the sponge. This function takes as input a integral `length` and squeezes a list of `Unit` elements of length `length`.
 
-The above can be extended to support absorption and squeeze from different domains than the domain in which the hash function is initialized over. Such extensions are called codecs.
+# The Codec interface
+
+A codec provides the following interface.
+
+    class Codec:
+        def new(iv: bytes) -> Codec
+        def prover_message(self, prover_message)
+        def verifier_challenge(self) -> verifier_challenge
+
+Where:
+
+- `init(iv: bytes) -> DuplexSponge` denotes the initialization function. This function takes as input a 32-byte initialization vector `iv` and initializes the state of the codec.
+- `prover_message(self, prover_message) -> self` denotes the absorb operation of the codec. This function takes as input a prover message `prover_message` and mutates the codec's internal state.
+- `verifier_challenge(self) -> verifier_challenge` denotes the squeeze operation of the codec. This function takes no inputs and uses the codec's internal state to produce an unpredictable verifier challenge `verifier_challenge`.
+
 
 # Fiat-Shamir transformation for Sigma Protocols
 
 We describe how to construct non-interactive proofs for sigma protocols.
-It is parametrized by:
+The Fiat-Shamir transformation is parametrized by:
 
-- a `Codec`, which specifies how to encode prover messages for the hash function, and how to extract verifier challenges in the right domain;
+- a `Codec`, which specifies how to absorb prover messages and how to squeeze verifier challenges;
 - a `SigmaProtocol`, which specifies an interactive 3-message protocol.
 
-Upon initialization, the protocol receives as input an `iv` of 32-bytes which uniquely describes the protocol and the session being proven and (optionally) pre-processes some information about the protocol using the instance.
+Upon initialization, the protocol receives as input an `iv` of 32-bytes which uniquely identifies the protocol and the session being proven and (optionally) pre-processes some information about the protocol using the instance.
 
     class NISigmaProtocol:
         Protocol: SigmaProtocol
@@ -117,7 +160,7 @@ We describe a codec for Schnorr proofs over groups of prime order `p` that is in
         Group: groups.Group = None
         DuplexSponge: DuplexSpongeInterface = None
 
-        def __init__(self, iv: bytes):
+        def init(self, iv: bytes):
             self.hash_state = self.DuplexSponge(iv)
 
         def prover_message(self, elements: list):
