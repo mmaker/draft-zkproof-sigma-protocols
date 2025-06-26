@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-24T01:20:54.173902+00:00",
+  "timestamp": "2025-06-26T01:20:19.573581+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -697,16 +697,24 @@
       ],
       "body": "From @wbl: \n\n> More broadly I think there introduction seems to promise a bit much.\n> It discusses OR proofs, t out of n, and ultimately a degree of\n> composibility (maybe), but I think a bit more needs to be said here to\n> make that work. If we just want to do it for linear equations over\n> prime order groups, fine, but then the intro should be revised to make\n> that clear. Ideally we'd include some degree of composibility via the\n> auxilliary data passed in or at least warnings about when and when not\n> to compose. ",
       "createdAt": "2025-05-10T13:53:54Z",
-      "updatedAt": "2025-05-22T10:08:27Z",
+      "updatedAt": "2025-06-25T20:09:02Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This is a good point, we never explicitly state that proof composition (e.g. OR-composition) is out of scope for the spec - and if anything, the intro implies that it should be part of the spec, if we are supporting a zero-knowledge simulator.\n\nWe should decide if proof composition is actually in scope, and update the spec accordingly. If it's out of scope (which seems to be the case from other conversations) then we should remove these optional functions, for simplicity. But if it's in scope (which could also be plausible, given that the proof of concept does composition for AND and OR proofs?) we should add that to the spec. There's a bit of a mismatch right now.",
+          "createdAt": "2025-06-25T20:09:02Z",
+          "updatedAt": "2025-06-25T20:09:02Z"
+        }
+      ]
     },
     {
       "number": 39,
       "id": "I_kwDONyiw_862CuIT",
       "title": "Editorial: explain where elements are tested for being in the EC subgroup",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/39",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -716,8 +724,8 @@
       "labels": [],
       "body": "From @wbl:\n\n> We might also need to tackle not-prime order points: verifying order is\n> expensive, but there are some tricks on BLS 12 to speed it up, but\n> when doing a batched proof cofactor clearing is comparatively cheap.\n\nThis is already discussed in the TeX specification -- perhaps one can just test that the instance is in the group, and not the commitment?",
       "createdAt": "2025-05-10T13:56:59Z",
-      "updatedAt": "2025-06-14T16:47:56Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-25T20:21:04Z",
+      "closedAt": "2025-06-25T20:21:04Z",
       "comments": [
         {
           "author": "mmaker",
@@ -725,6 +733,13 @@
           "body": "@cathieyun this one is fun. If you check the instance, and know that it's in the curve, maybe don't have to check that the commitment is in the curve as well?",
           "createdAt": "2025-06-14T16:47:56Z",
           "updatedAt": "2025-06-14T16:47:56Z"
+        },
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I agree that you could skip the check that the commitment is on the curve, if you know the underlying instance is on the curve. However it seems like better practice to always check, to make it harder to \"shoot yourself in the foot\" or as a failsafe if you forget to check that the instance is on the curve. How expensive is the check that the commitment is on the curve? Unless we can show that it is prohibitive/impractical, I would recommend keeping the check that the commitment is on the curve, for security.",
+          "createdAt": "2025-06-25T20:21:04Z",
+          "updatedAt": "2025-06-25T20:21:04Z"
         }
       ]
     },
@@ -743,16 +758,24 @@
       ],
       "body": "Typos: challange, commmit, Stadtler\n\n- [x] Define acronyms: SHO, VRF, ...\n\n- [x] Define terms, e.g., batchable, ...\n\n- [ ] Ref [NISTCurves]: if wanting to cite DSS, consider updating from FIPS 186-4 (2013) to FIPS 186-5 (2023); consider citing SP 800-186 (2023) as a reference for the P-* elliptic curves (such as P-384).\n\n- [ ] The expression \"A commitment, sometimes also called nonce\" is a bit confusing. Isn't nonce also being used to denote the (seed of) the discrete-log of the \"commitment\". It might be clearer to distinguish between secret nonce and public nonce.\n\n- [ ] Section 2.4: why is the nonce algorithm shown after the challenge algorithm (if the nonce is introduced before the challenge)?\n\n- [x] Unclear the utility of declaring \"simulate_response\", without more guidance on how it would actually be used.\n\n- [ ] The draft uses \"Equations\" to specify the \"constraints\". Does that mean that range constraints (e.g., based on inequalities) are not allowed? Consider clarifying the relation between \"constraints\" and \"equations\".\n\n- [ ] Consider adding textual explanation of the syntax of each function, e.g., where the output length of SHAKE128 is specified.",
       "createdAt": "2025-05-22T08:17:31Z",
-      "updatedAt": "2025-06-24T00:28:41Z",
+      "updatedAt": "2025-06-25T22:00:10Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I'm wondering, what was the change that addressed this issue?\n> Unclear the utility of declaring \"simulate_response\", without more guidance on how it would actually be used.\n\nIMO it's still unclear what the purpose of \"simulate_response\" is, or how it is used (or even if it should be in scope for the spec), which I brought up in the comment here:\nhttps://github.com/mmaker/draft-zkproof-sigma-protocols/issues/38\nI am okay with expanding the scope to include proof composition, but if so we should define this more. Otherwise if that is out of scope, we should remove the proof composition functions altogether. Right now we are in a confusing in-between space.",
+          "createdAt": "2025-06-25T22:00:10Z",
+          "updatedAt": "2025-06-25T22:00:10Z"
+        }
+      ]
     },
     {
       "number": 44,
       "id": "I_kwDONyiw_863vF1X",
       "title": "NIST Feedback: Hash function (if specifying the Fiat-Shamir transformation in this spec)",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/44",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [],
@@ -762,9 +785,17 @@
       ],
       "body": "> \n> - 1. Consider initially explaining the required properties of the (cryptographic) hash function used by FS transformation.\nMention the requirement of the random oracle as we start talking about Fiat-Shamir.\n\n\n\nThen, make more clear that the API design can be made agnostic with respect to the hash function. Some hash function examples are below:\n\n> - 3. If the intention is to allow a single hash function (i.e., XOF), then (compared with SHAKE128):\n> (a) Even though the draft already considers domain separation for the hash function,) might it make more sense to use cSHAKE128 (customizable XOF, see SP 800-185), e.g., with S = \"Fiat-Shamir\", to ensure that the hash function is different from the one used in different applications?\n> (b) might it make more sense to use SHAKE256 or cSHAKE256, to allow up to 256 bits of security [see FIPS 202 Table 4] for several security properties (still depending on the specified output length, and in case other curves are allowed, such as P-521).\n> \n> - 4. Other hash functions?: Might there be applications that would benefit from using \"light(er)weight\" hash functions / XOFs, such as Ascon-based (See SP 800-232, with Ascon-Hash256 and Ascon-[C]XOF128)?\n> \n> - 5. There are conceivable scenarios where one could use a purposefully expensive hash function (akin to a key-derivation function with many hashing iterations), as a way of slightly reducing the proof size while retaining a given level of soundness. If those cases are deemed pertinent in the future, would one allow those hash functions via an update to this spec, or in a separate spec about hash functions compatible with FS?\n> ",
       "createdAt": "2025-05-22T08:48:46Z",
-      "updatedAt": "2025-05-22T09:01:17Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-26T00:28:49Z",
+      "closedAt": "2025-06-26T00:28:49Z",
+      "comments": [
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think there's some confusion (maybe leftover text) due to the fact that the Sigma spec still has references to hash functions. If I understand the division between Sigma/Fiat-Shamir correctly, this should not be the case and the Fiat-Shamir spec should be the one making all decisions on the hash functions. Therefore if we are following that split correctly in the writing of the spec, the NIST feedback should be addressed because there would be no confusion around the API design being agnostic of the hash function.",
+          "createdAt": "2025-06-25T20:28:09Z",
+          "updatedAt": "2025-06-25T20:28:09Z"
+        }
+      ]
     },
     {
       "number": 45,
@@ -790,7 +821,7 @@
       "id": "I_kwDONyiw_863vJF2",
       "title": "NIST Feedback: C3. Zero-knowledge",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/46",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [],
@@ -800,8 +831,8 @@
       ],
       "body": "When talking about zero-knowledge, write in a separate sentence that the transformation will make the proof transferable.\n\n>  For better awareness of privacy properties, consider clarifying the cases in which the proofs become transferable (publicly verifiable, namely when using a Fiat-Shamir transformation) or remain deniable (e.g., if interactive, with a honest verifier, and without transferable message authenticity).",
       "createdAt": "2025-05-22T08:53:03Z",
-      "updatedAt": "2025-05-22T09:01:35Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-26T00:28:28Z",
+      "closedAt": "2025-06-26T00:28:28Z",
       "comments": []
     },
     {
@@ -809,7 +840,7 @@
       "id": "I_kwDONyiw_863vVxi",
       "title": "NIST Feedback: C2. Title versus content/scope",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/47",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [],
@@ -819,8 +850,8 @@
       ],
       "body": "For the quoted sentences, refrain from calling \"sigma protocols\" non-interactive\n\n> The draft seems to be conflating \"Sigma Protocols\" (which can be [are?] interactive) with a Sigma-inspired non-interactive (NI) ZKPoK obtained using the Fiat-Shamir (FS) transformation. Note that the draft says:\n> \"Sigma protocols, a [...] *non-interactive* zero-knowledge proof of knowledge\"\n> \"Any sigma protocols must define [...] A challenge, computed using the *Fiat-Shamir transformation* using a hash function.\"\n> \n> Concern: This title might induce ambiguity in the future when referred to in the scope of other specifications/discussions about (i) interactive sigma protocols, or (ii) sigma-protocol-based NIZKP[oK]s that use a transformation different from FS?\n> ",
       "createdAt": "2025-05-22T09:11:35Z",
-      "updatedAt": "2025-06-20T21:59:30Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-25T17:14:40Z",
+      "closedAt": "2025-06-25T17:14:40Z",
       "comments": [
         {
           "author": "cathieyun",
@@ -1353,10 +1384,10 @@
       "labels": [],
       "body": "Fixes #25 ",
       "createdAt": "2025-06-14T16:49:17Z",
-      "updatedAt": "2025-06-24T01:02:09Z",
+      "updatedAt": "2025-06-25T18:47:27Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
-      "baseRefOid": "0a5afa8b296504ff3ab186cce1ed0878e015df47",
+      "baseRefOid": "c5709140273172c16da73823810882e6f275d469",
       "headRepository": "mmaker/draft-zkproof-sigma-protocols",
       "headRefName": "feat/short-proofs",
       "headRefOid": "9ffcf865ccda397b60f4b9fb6c2f329cd77791be",
@@ -1378,6 +1409,13 @@
           "body": "Checking my understanding - the short proofs are not interoperable with the normal proofs, and would only be verifiable through the \"short proof verification\" function right? If so, maybe it would be better to have a \"short proof\" vs \"normal proof\" wrapper types so they do not get mixed up with each other, or prepend something to the serialization noting the proof type. Otherwise given a (non-type-specified) proof, it may be hard to know what type it is an how to correctly verify it.",
           "createdAt": "2025-06-17T23:57:14Z",
           "updatedAt": "2025-06-17T23:57:14Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "That's a great point, thank you! I'll update the request following your suggestion.",
+          "createdAt": "2025-06-24T14:59:01Z",
+          "updatedAt": "2025-06-24T14:59:23Z"
         }
       ],
       "reviews": [
@@ -1523,21 +1561,21 @@
       "id": "PR_kwDONyiw_86bfH-y",
       "title": "Rename sigma protocols to proofs",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/54",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "cathieyun",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "To address the NIST feedback (https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/47), and also to improve clarity, renaming from \"Sigma Protocols\" to \"Sigma Proofs\".\r\n\r\nI didn't rename \"sigma protocols\" throughout the core of the spec because at some point, the spec language is actually referring to the _protocol_ instead of the final _proof_. Happy to do a closer pass to differentiate between the two. This is also a very rough suggestion, can bikeshed this more if this rename will cause more confusion and ambiguity than it solves.\r\n\r\n\r\n",
       "createdAt": "2025-06-21T00:43:52Z",
-      "updatedAt": "2025-06-24T01:19:22Z",
+      "updatedAt": "2025-06-25T17:14:57Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
       "baseRefOid": "0a5afa8b296504ff3ab186cce1ed0878e015df47",
       "headRepository": "mmaker/draft-zkproof-sigma-protocols",
       "headRefName": "rename-sigma-protocol",
       "headRefOid": "737501d74ab15912b38b68e72f477242592cfd49",
-      "closedAt": null,
+      "closedAt": "2025-06-25T17:14:57Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -1550,6 +1588,62 @@
           "updatedAt": "2025-06-24T01:19:22Z"
         }
       ],
+      "reviews": []
+    },
+    {
+      "number": 55,
+      "id": "PR_kwDONyiw_86cH07f",
+      "title": "Remove outdated references to hash functions from sigma spec",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/55",
+      "state": "MERGED",
+      "author": "cathieyun",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Addresses https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/44 by removing unnecessary references to hash functions. These should all be defined at the Fiat-Shamir spec level, so are not relevant at the Sigma protocol spec level.\r\n\r\nI'd like to double check that we can remove the section `Serializing the statement for the Fiat-Shamir transformation`. It does not seem like this is used anywhere in the Sigma protocol spec, so it probably does not belong, but want to make sure.\r\n\r\n",
+      "createdAt": "2025-06-25T20:34:29Z",
+      "updatedAt": "2025-06-26T01:17:56Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "c5709140273172c16da73823810882e6f275d469",
+      "headRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "headRefName": "hash-update",
+      "headRefOid": "8615e857e891710213b87de7002464ea1b831efb",
+      "closedAt": "2025-06-26T00:28:48Z",
+      "mergedAt": "2025-06-26T00:28:48Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "560b163974241f2b2c4b76907c27a32f02f61f67"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 56,
+      "id": "PR_kwDONyiw_86cH9Cg",
+      "title": "Add privacy section to sigma proof spec",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/56",
+      "state": "MERGED",
+      "author": "cathieyun",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Addresses https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/46",
+      "createdAt": "2025-06-25T20:50:54Z",
+      "updatedAt": "2025-06-26T01:18:10Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "c5709140273172c16da73823810882e6f275d469",
+      "headRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "headRefName": "zero-knowledge",
+      "headRefOid": "a8c49506fdbe63ca0bddd885bdce65a271c1b770",
+      "closedAt": "2025-06-26T00:28:27Z",
+      "mergedAt": "2025-06-26T00:28:27Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "13ec5deeff23a63c45ed04dd290176ef45a4eaf0"
+      },
+      "comments": [],
       "reviews": []
     }
   ]
