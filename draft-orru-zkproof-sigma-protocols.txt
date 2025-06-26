@@ -79,8 +79,6 @@ Table of Contents
        2.2.7.  Example: Schnorr proofs
        2.2.8.  Example: DLEQ proofs
        2.2.9.  Example: Pedersen commitments
-       2.2.10. Serializing the statement for the Fiat-Shamir
-               transformation
      2.3.  Ciphersuites
        2.3.1.  P-256 (secp256r1)
    3.  Security Considerations
@@ -103,8 +101,8 @@ Table of Contents
    *  A commitment.  This message is computed by the prover using secret
       nonces.
 
-   *  A challenge, computed using the Fiat-Shamir transformation using a
-      hash function.
+   *  A challenge, computed using the Fiat-Shamir transformation (using
+      a hash function, which is defined by the transformation).
 
    *  A response, computed by the prover, which depends on the
       commitment and the challenge.
@@ -137,7 +135,8 @@ Table of Contents
       function.  This function takes as input an instance generated via
       the LinearRelation, the public information shared between prover
       and verifier.  This function should pre-compute parts of the
-      statement, or initialize the state of the hash function.
+      statement, or initialize the state of the Fiat-Shamir
+      transformation.
 
    *  prover_commit(self, witness: Witness, rng) -> (commitment,
       prover_state), denoting the *commitment phase*, that is, the
@@ -203,12 +202,10 @@ Table of Contents
 2.  Sigma protocols over prime-order groups
 
    The following sub-section present concrete instantiations of sigma
-   protocols over prime-order elliptic curve groups.  It relies on two
-   components: - a prime-order elliptic-curve group as described in
-   Section 2.1, - a hash function.
+   protocols over prime-order elliptic curve groups.  It relies on a
+   prime-order elliptic-curve group as described in Section 2.1.
 
-   Valid choices of elliptic curves and hash functions can be found in
-   Section 2.3.
+   Valid choices of elliptic curves can be found in Section 2.3.
 
    Traditionally, sigma protocols are defined in Camenisch-Stadler
    notation as (for example):
@@ -549,18 +546,6 @@ Procedure:
    var_x, var_r = statement.allocate_scalars(2)
    statement.append_equation(C, [(var_x, G), (var_r, H)])
 
-2.2.10.  Serializing the statement for the Fiat-Shamir transformation
-
-   Let H be a hash object.  The statement is encoded in a stateful hash
-   object as follows.
-
- hasher = H.new(domain_separator)
- hasher.update_usize([cs.num_statements, cs.num_scalars])
- for equation in cs.equations:
-   hasher.update_usize([equation.lhs, equation.rhs[0], equation.rhs[1]])
- hasher.update(generators)
- iv = hasher.digest()
-
 2.3.  Ciphersuites
 
 2.3.1.  P-256 (secp256r1)
@@ -612,11 +597,12 @@ Procedure:
    While theoretical analysis demonstrates that both soundness and zero-
    knowledge properties are statistical in nature, practical security
    depends on the cryptographic strength of the underlying hash
-   function.  It's important to note that the soundness of a zero-
-   knowledge proof provides no guarantees regarding the computational
-   hardness of the relation being proven.  An assessment of the specific
-   hardness properties for relations proven using these protocols falls
-   outside the scope of this document.
+   function, which is defined by the Fiat-Shamir transformation.  It's
+   important to note that the soundness of a zero-knowledge proof
+   provides no guarantees regarding the computational hardness of the
+   relation being proven.  An assessment of the specific hardness
+   properties for relations proven using these protocols falls outside
+   the scope of this document.
 
 3.1.  Privacy Considerations
 

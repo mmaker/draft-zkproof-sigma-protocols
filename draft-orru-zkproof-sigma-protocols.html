@@ -1194,9 +1194,6 @@ svg :is([fill="white"], [fill^="#fff"]) {
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2.2.9">
                     <p id="section-toc.1-1.2.2.2.2.9.1"><a href="#section-2.2.9" class="auto internal xref">2.2.9</a>.  <a href="#name-example-pedersen-commitment" class="internal xref">Example: Pedersen commitments</a></p>
 </li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2.2.10">
-                    <p id="section-toc.1-1.2.2.2.2.10.1"><a href="#section-2.2.10" class="auto internal xref">2.2.10</a>. <a href="#name-serializing-the-statement-f" class="internal xref">Serializing the statement for the Fiat-Shamir transformation</a></p>
-</li>
                 </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.3">
@@ -1264,7 +1261,7 @@ Any sigma protocol must define three objects:<a href="#section-1-1" class="pilcr
           <p id="section-1-2.1.1">A commitment. This message is computed by the prover using secret nonces.<a href="#section-1-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-2.2">
-          <p id="section-1-2.2.1">A challenge, computed using the Fiat-Shamir transformation using a hash function.<a href="#section-1-2.2.1" class="pilcrow">¶</a></p>
+          <p id="section-1-2.2.1">A challenge, computed using the Fiat-Shamir transformation (using a hash function, which is defined by the transformation).<a href="#section-1-2.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-2.3">
           <p id="section-1-2.3.1">A response, computed by the prover, which depends on the commitment and the challenge.<a href="#section-1-2.3.1" class="pilcrow">¶</a></p>
@@ -1298,7 +1295,7 @@ class SigmaProtocol:
 <ul class="normal">
 <li class="normal" id="section-1.1-4.1">
             <p id="section-1.1-4.1.1"><code>new(instance) -&gt; SigmaProtocol</code>, denoting the initialization function. This function takes as input an instance generated via the <code>LinearRelation</code>, the public information shared between prover and verifier.
-This function should pre-compute parts of the statement, or initialize the state of the hash function.<a href="#section-1.1-4.1.1" class="pilcrow">¶</a></p>
+This function should pre-compute parts of the statement, or initialize the state of the Fiat-Shamir transformation.<a href="#section-1.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-1.1-4.2">
             <p id="section-1.1-4.2.1"><code>prover_commit(self, witness: Witness, rng) -&gt; (commitment, prover_state)</code>, denoting the <strong>commitment phase</strong>, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover, the statement to be proven, and a random number generator <code>rng</code>. This step generally requires access to a high-quality entropy source to perform the commitment. Leakage of even just of a few bits of the commitment could allow for the complete recovery of the witness. The commitment is meant to be shared, while <code>prover_state</code> must be kept secret.<a href="#section-1.1-4.2.1" class="pilcrow">¶</a></p>
@@ -1325,7 +1322,7 @@ This function should pre-compute parts of the statement, or initialize the state
 <p id="section-1.1-5">The final two algorithms describe the <strong>zero-knowledge simulator</strong>. In particular, they may be used for proof composition (e.g. OR-composition). The function <code>simulate_commitment</code> is also used when verifying short proofs. We have:<a href="#section-1.1-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-1.1-6.1">
-            <p id="section-1.1-6.1.1"><code>simulate_response(self, rng) -&gt; response</code>, denoting the first stage of the simulator. It is an algorithm drawing a random response given a specified cryptographically secure RNG that follows the same output distribution of the algorithm  <code>prover_response</code>.<a href="#section-1.1-6.1.1" class="pilcrow">¶</a></p>
+            <p id="section-1.1-6.1.1"><code>simulate_response(self, rng) -&gt; response</code>, denoting the first stage of the simulator. It is an algorithm drawing a random response given a specified cryptographically secure RNG that follows the same output distribution of the algorithm <code>prover_response</code>.<a href="#section-1.1-6.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-1.1-6.2">
             <p id="section-1.1-6.2.1"><code>simulate_commitment(self, response, challenge) -&gt; commitment</code>, returning a simulated commitment -- the second phase of the zero-knowledge simulator.<a href="#section-1.1-6.2.1" class="pilcrow">¶</a></p>
@@ -1343,10 +1340,8 @@ This function should pre-compute parts of the statement, or initialize the state
 <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-sigma-protocols-over-prime-" class="section-name selfRef">Sigma protocols over prime-order groups</a>
       </h2>
 <p id="section-2-1">The following sub-section present concrete instantiations of sigma protocols over prime-order elliptic curve groups.
-It relies on two components:
-- a prime-order elliptic-curve group as described in <a href="#group-abstraction" class="auto internal xref">Section 2.1</a>,
-- a hash function.<a href="#section-2-1" class="pilcrow">¶</a></p>
-<p id="section-2-2">Valid choices of elliptic curves and hash functions can be found in <a href="#ciphersuites" class="auto internal xref">Section 2.3</a>.<a href="#section-2-2" class="pilcrow">¶</a></p>
+It relies on a prime-order elliptic-curve group as described in <a href="#group-abstraction" class="auto internal xref">Section 2.1</a>.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<p id="section-2-2">Valid choices of elliptic curves can be found in <a href="#ciphersuites" class="auto internal xref">Section 2.3</a>.<a href="#section-2-2" class="pilcrow">¶</a></p>
 <p id="section-2-3">Traditionally, sigma protocols are defined in Camenisch-Stadler notation as (for example):<a href="#section-2-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-2-4">
 <pre>
@@ -1790,24 +1785,6 @@ statement.append_equation(C, [(var_x, G), (var_r, H)])
 </div>
 </section>
 </div>
-<div id="serializing-the-statement-for-the-fiat-shamir-transformation">
-<section id="section-2.2.10">
-          <h4 id="name-serializing-the-statement-f">
-<a href="#section-2.2.10" class="section-number selfRef">2.2.10. </a><a href="#name-serializing-the-statement-f" class="section-name selfRef">Serializing the statement for the Fiat-Shamir transformation</a>
-          </h4>
-<p id="section-2.2.10-1">Let <code>H</code> be a hash object. The statement is encoded in a stateful hash object as follows.<a href="#section-2.2.10-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-2.2.10-2">
-<pre>
-hasher = H.new(domain_separator)
-hasher.update_usize([cs.num_statements, cs.num_scalars])
-for equation in cs.equations:
-  hasher.update_usize([equation.lhs, equation.rhs[0], equation.rhs[1]])
-hasher.update(generators)
-iv = hasher.digest()
-</pre><a href="#section-2.2.10-2" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
 </section>
 </div>
 <div id="ciphersuites">
@@ -1874,7 +1851,7 @@ iv = hasher.digest()
           <p id="section-3-2.2.1"><strong>Zero-knowledge</strong>: The proof string produced by the <code>prove</code> function does not reveal any information beyond what can be directly inferred from the statement itself. This ensures that verifiers gain no knowledge about the witness.<a href="#section-3-2.2.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-3-3">While theoretical analysis demonstrates that both soundness and zero-knowledge properties are statistical in nature, practical security depends on the cryptographic strength of the underlying hash function. It's important to note that the soundness of a zero-knowledge proof provides no guarantees regarding the computational hardness of the relation being proven. An assessment of the specific hardness properties for relations proven using these protocols falls outside the scope of this document.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-3">While theoretical analysis demonstrates that both soundness and zero-knowledge properties are statistical in nature, practical security depends on the cryptographic strength of the underlying hash function, which is defined by the Fiat-Shamir transformation. It's important to note that the soundness of a zero-knowledge proof provides no guarantees regarding the computational hardness of the relation being proven. An assessment of the specific hardness properties for relations proven using these protocols falls outside the scope of this document.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <div id="privacy-considerations">
 <section id="section-3.1">
         <h3 id="name-privacy-considerations">
