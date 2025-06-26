@@ -57,18 +57,18 @@ Given an interactive protocol and a suitable codec, we describe how to construct
 
 The Fiat-Shamir transformation is a technique that uses a hash function to convert a public-coin interactive protocol between a prover and a verifier into a corresponding non-interactive protocol.
 
-We consider a variant of the Fiat-Shamir transformation, where the hash-function is obtained from a _duplex sponge_ and the interactive protocol is a _3-message protocol_ (where the first message originates from the prover). 
+We specify a variant of the Fiat-Shamir transformation, where the hash-function is obtained from a _duplex sponge_. 
 
 A duplex sponge is a stateful hash object that can absorb inputs incrementally and squeeze variable-length unpredictable messages.
 The duplex sponge is defined over a base alphabet (typically bytes) which might not match the domain over which the prover and verifier messages are defined.
 
-A _codec_ internally uses a duplex sponge and exposes absorb and squeeze operations matching the domain of the prover and verifier messages.
+A _codec_ is a stateful object that can absorb inputs incrementally and squeeze unpredictable challenges. A codec is _compatible_ with a given interactive protocol if the domain of the inputs that the codec can absorb matches the domain of the prover messages and the challenges matches the domain of the verifier messages of the specified protocol. Internally, a codec uses a duplex sponge and performs the appropriate conversion.
 
 The Fiat-Shamir transformation then combines the following ingredients to construct a non-interactive protocol:
 
 - An initialization vector (IV) uniquely identifying the protocol.
-- A 3-message interactive protocol.
-- A codec defined over the prover and verifier message domains and internally using a duplex sponge.
+- A interactive protocol.
+- A codec compatible with the interactive protocol. 
 
 # The Duplex Sponge Interface
 
@@ -279,7 +279,6 @@ The squeeze operation extracts output elements from the sponge state, which are 
 
 # Codecs registry
 
-Once a duplex sponge over a `Unit` type is selected, a codec can uniquely be determined by selecting
 
 ## Elliptic curves
 
@@ -354,3 +353,9 @@ Where the function `scalar_to_bytes` is defined in {#notation}
     1. for i in range(length):
     2.     scalar_bytes = hash_state.squeeze(field_bytes_length + 16)
     3.     scalars.append(bytes_to_scalar_mod_order(scalar_bytes))
+
+
+# Generation of the initialization vector {#iv-generation}
+
+As of now, it is responsibility of the user to pick a unique initialization vector that identifies the proof system and the session being used. This will be expanded in future versions of this specification.
+
