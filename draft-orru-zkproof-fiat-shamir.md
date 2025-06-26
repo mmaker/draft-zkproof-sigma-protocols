@@ -70,22 +70,6 @@ The Fiat-Shamir transformation then combines the following ingredients to constr
 - A 3-message interactive protocol.
 - A codec defined over the prover and verifier message domains and internally using a duplex sponge.
 
-
-# Introduction [OLD]
-
-The Fiat-Shamir transformation relies on a hash function that can absorb inputs incrementally and squeeze variable-length unpredictable messages. On a high level, it puts together:
-
-- An IV uniquely describing the protocol.
-- A function H, in a chosen mode, and instantiated over a chosen domain, which the hash state invokes to execute the actions.
-- An interactive proof that is public-coin.
-
-The core actions supported from the underlying hash function are:
-
-- `absorb` indicates a sequence of elements in input to be absorbed by the underlying hash function.
-- `squeeze` given input `length`, produces that many elements as output.
-
-The API follows the template of duplex sponges.
-
 # The Duplex Sponge Interface
 
 A duplex sponge operates over an abstract `Unit` type and provides the following interface.
@@ -295,6 +279,8 @@ The squeeze operation extracts output elements from the sponge state, which are 
 
 # Codecs registry
 
+Once a duplex sponge over a `Unit` type is selected, a codec can uniquely be determined by selecting
+
 ## Elliptic curves
 
 ### Notation and Terminology {#notation}
@@ -311,22 +297,20 @@ The following functions and notation are used throughout the document.
   We consider the function `bytes_to_in`
 - The function `ecpoint_to_bytes` converts an elliptic curve point in affine-form into an array string of length `ceil(ceil(log2(coordinate_field_order))/ 8) + 1` using `int_to_bytes` prepended by one byte. This is defined as
 
-    ecpoint_to_bytes(element)
+      ecpoint_to_bytes(element)
+      Inputs:
+      - `element`, an elliptic curve element in affine form, with attributes `x` and `y` corresponding to its affine coordinates, represented as integers modulo the coordinate field order.
 
-    Inputs:
+      Outputs:
 
-    - `element`, an elliptic curve element in affine form, with attributes `x` and `y` corresponding to its affine coordinates, represented as integers modulo the coordinate field order.
+      A byte array
 
-    Outputs:
+      Constants:
 
-    A byte array
+      field_bytes_length, the number of bytes to represent the scalar element, equal to `ceil(log2(field.order()))`.
 
-    Constants:
-
-    field_bytes_length, the number of bytes to represent the scalar element, equal to `ceil(log2(field.order()))`.
-
-    1. byte = 2 if sgn0(element.y) == 0 else 3
-    2. return I2OSP(byte, 1) + I2OSP(x, field_bytes_length)
+      1. byte = 2 if sgn0(element.y) == 0 else 3
+      2. return I2OSP(byte, 1) + I2OSP(x, field_bytes_length)
 
 ### Absorb scalars
 
