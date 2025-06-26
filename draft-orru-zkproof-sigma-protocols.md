@@ -87,7 +87,7 @@ A Sigma Protocol is a simple zero-knowledge proof of knowledge.
 Any sigma protocol must define three objects:
 
 - A commitment. This message is computed by the prover using secret nonces.
-- A challenge, computed using the Fiat-Shamir transformation using a hash function.
+- A challenge, computed using the Fiat-Shamir transformation (using a hash function, which is defined by the transformation).
 - A response, computed by the prover, which depends on the commitment and the challenge.
 
 A sigma protocol allows a **prover** to convince a **verifier** of the knowledge of a secret **witness** satisfying a **statement**.
@@ -113,7 +113,7 @@ The public functions are obtained relying on an internal structure containing th
 Where:
 
 - `new(instance) -> SigmaProtocol`, denoting the initialization function. This function takes as input an instance generated via the `LinearRelation`, the public information shared between prover and verifier.
-This function should pre-compute parts of the statement, or initialize the state of the hash function.
+This function should pre-compute parts of the statement, or initialize the state of the Fiat-Shamir transformation.
 
 - `prover_commit(self, witness: Witness, rng) -> (commitment, prover_state)`, denoting the **commitment phase**, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover, the statement to be proven, and a random number generator `rng`. This step generally requires access to a high-quality entropy source to perform the commitment. Leakage of even just of a few bits of the commitment could allow for the complete recovery of the witness. The commitment is meant to be shared, while `prover_state` must be kept secret.
 
@@ -131,7 +131,7 @@ This function should pre-compute parts of the statement, or initialize the state
 
 The final two algorithms describe the **zero-knowledge simulator**. In particular, they may be used for proof composition (e.g. OR-composition). The function `simulate_commitment` is also used when verifying short proofs. We have:
 
-- `simulate_response(self, rng) -> response`, denoting the first stage of the simulator. It is an algorithm drawing a random response given a specified cryptographically secure RNG that follows the same output distribution of the algorithm  `prover_response`.
+- `simulate_response(self, rng) -> response`, denoting the first stage of the simulator. It is an algorithm drawing a random response given a specified cryptographically secure RNG that follows the same output distribution of the algorithm `prover_response`.
 
 - `simulate_commitment(self, response, challenge) -> commitment`, returning a simulated commitment -- the second phase of the zero-knowledge simulator.
 
@@ -142,11 +142,9 @@ The abstraction `SigmaProtocol` allows implementing different types of statement
 # Sigma protocols over prime-order groups {#sigma-protocol-group}
 
 The following sub-section present concrete instantiations of sigma protocols over prime-order elliptic curve groups.
-It relies on two components:
-- a prime-order elliptic-curve group as described in {{group-abstraction}},
-- a hash function.
+It relies on a prime-order elliptic-curve group as described in {{group-abstraction}}.
 
-Valid choices of elliptic curves and hash functions can be found in {{ciphersuites}}.
+Valid choices of elliptic curves can be found in {{ciphersuites}}.
 
 Traditionally, sigma protocols are defined in Camenisch-Stadler notation as (for example):
 
@@ -432,17 +430,6 @@ Given group elements `G`, `H` such that `C = x * G + r * H`, then the statement 
     var_x, var_r = statement.allocate_scalars(2)
     statement.append_equation(C, [(var_x, G), (var_r, H)])
 
-### Serializing the statement for the Fiat-Shamir transformation
-
-Let `H` be a hash object. The statement is encoded in a stateful hash object as follows.
-
-    hasher = H.new(domain_separator)
-    hasher.update_usize([cs.num_statements, cs.num_scalars])
-    for equation in cs.equations:
-      hasher.update_usize([equation.lhs, equation.rhs[0], equation.rhs[1]])
-    hasher.update(generators)
-    iv = hasher.digest()
-
 ## Ciphersuites {#ciphersuites}
 
 ### P-256 (secp256r1)
@@ -468,7 +455,7 @@ Sigma protocols provide the following guarantees in the random oracle model:
 
 - **Zero-knowledge**: The proof string produced by the `prove` function does not reveal any information beyond what can be directly inferred from the statement itself. This ensures that verifiers gain no knowledge about the witness.
 
-While theoretical analysis demonstrates that both soundness and zero-knowledge properties are statistical in nature, practical security depends on the cryptographic strength of the underlying hash function. It's important to note that the soundness of a zero-knowledge proof provides no guarantees regarding the computational hardness of the relation being proven. An assessment of the specific hardness properties for relations proven using these protocols falls outside the scope of this document.
+While theoretical analysis demonstrates that both soundness and zero-knowledge properties are statistical in nature, practical security depends on the cryptographic strength of the underlying hash function, which is defined by the Fiat-Shamir transformation. It's important to note that the soundness of a zero-knowledge proof provides no guarantees regarding the computational hardness of the relation being proven. An assessment of the specific hardness properties for relations proven using these protocols falls outside the scope of this document.
 
 ## Privacy Considerations
 
