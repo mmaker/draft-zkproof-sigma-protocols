@@ -5,8 +5,8 @@
 Network Working Group                                            M. Orrù
 Internet-Draft                                                      CNRS
 Intended status: Informational                                    C. Yun
-Expires: 27 December 2025                                    Apple, Inc.
-                                                            25 June 2025
+Expires: 28 December 2025                                    Apple, Inc.
+                                                            26 June 2025
 
 
                    Sigma Protocols Interactive Proofs
@@ -48,7 +48,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 27 December 2025.
+   This Internet-Draft will expire on 28 December 2025.
 
 Copyright Notice
 
@@ -84,6 +84,7 @@ Table of Contents
      2.3.  Ciphersuites
        2.3.1.  P-256 (secp256r1)
    3.  Security Considerations
+     3.1.  Privacy Considerations
    4.  Post-Quantum Security Considerations
      4.1.  Privacy Considerations
      4.2.  Soundness Considerations
@@ -616,6 +617,21 @@ Procedure:
    hardness of the relation being proven.  An assessment of the specific
    hardness properties for relations proven using these protocols falls
    outside the scope of this document.
+
+3.1.  Privacy Considerations
+
+   The zero-knowledge proofs described are publicly verifiable
+   (transferable) when they are constructed using the Fiat-Shamir
+   transformation, as defined in the spec.  This is because any party
+   can perform the Fiat-Shamir transformation over the contents of the
+   proof, to verify that the challenge was computed properly.
+
+   The zero-knowlege proofs can be deniable if they are constructed with
+   an interactive protocol, with an honest verifier and without
+   transferable message authenticity.  This is because given the
+   contents of a proof, it is impossible to differentiate between an
+   honestly generated or simulated proof.  However, this construction is
+   out of scope for this spec.
 
 4.  Post-Quantum Security Considerations
 
