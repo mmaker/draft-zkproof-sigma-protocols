@@ -64,7 +64,7 @@ The duplex sponge is defined over a base alphabet (typically bytes) which might 
 
 A _codec_ is a stateful object that can absorb inputs incrementally and squeeze unpredictable challenges. A codec is _compatible_ with a given interactive protocol if the domain of the inputs that the codec can absorb matches the domain of the prover messages and the challenges matches the domain of the verifier messages of the specified protocol. Internally, a codec uses a duplex sponge and performs the appropriate conversion.
 
-The Fiat-Shamir transformation then combines the following ingredients to construct a non-interactive protocol:
+The Fiat-Shamir transformation combines the following ingredients to construct a non-interactive protocol:
 
 - An initialization vector (IV) uniquely identifying the protocol.
 - A interactive protocol.
@@ -116,7 +116,7 @@ Upon initialization, the protocol receives as input an `iv` of 32-bytes which un
         Protocol: SigmaProtocol
         Codec: Codec
 
-        def init(self, iv: [], instance):
+        def init(self, iv: bytes, instance):
             self.hash_state = self.Codec(iv)
             self.ip = self.Protocol(instance)
 
@@ -138,7 +138,7 @@ Upon initialization, the protocol receives as input an `iv` of 32-bytes which un
 
 ## Codec for Linear maps {#group-prove}
 
-We describe a codec for Schnorr proofs over groups of prime order `p` that is intended for byte-oriented hash functions.
+We describe a codec for Schnorr proofs over groups of prime order `p` that is intended for duplex sponges where `Unit = u8`.
 
     class LinearMapCodec:
         Group: groups.Group = None
