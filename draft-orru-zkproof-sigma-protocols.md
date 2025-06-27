@@ -461,7 +461,7 @@ While theoretical analysis demonstrates that both soundness and zero-knowledge p
 
 The zero-knowledge proofs described are publicly verifiable (transferable) when they are constructed using the Fiat-Shamir transformation, as defined in the spec. This is because any party can perform the Fiat-Shamir transformation over the contents of the proof, to verify that the challenge was computed properly.
 
-The zero-knowlege proofs can be deniable if they are constructed with an interactive protocol, with an honest verifier and without transferable message authenticity. This is because given the contents of a proof, it is impossible to differentiate between an honestly generated or simulated proof. However, this construction is out of scope for this spec.
+Zero-knowlege proofs can be deniable if they are constructed with an interactive protocol (with an honest verifier, and without transferable message authenticity), or with certain non-interactive transformations (such as by using equivocable commitments). This is because given such a proof, it is impossible to differentiate between an honestly generated or simulated proof. However, these constructions are out of scope for this spec.
 
 # Post-Quantum Security Considerations
 
