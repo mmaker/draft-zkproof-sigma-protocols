@@ -74,6 +74,12 @@ informative:
         fullname: Dan Boneh
       -
         fullname: Victor Schoup
+  Stern93:
+    title: "A New Identification Scheme Based on Syndrome Decoding"
+    target: https://link.springer.com/chapter/10.1007/3-540-48329-2_2
+    date: 1993
+    author:
+      - fullname: "Jacques Stern"
 
 --- abstract
 
@@ -141,7 +147,7 @@ The abstraction `SigmaProtocol` allows implementing different types of statement
 
 # Sigma protocols over prime-order groups {#sigma-protocol-group}
 
-The following sub-section present concrete instantiations of sigma protocols over prime-order elliptic curve groups.
+The following sub-section presents concrete instantiations of sigma protocols over prime-order elliptic curve groups.
 It relies on a prime-order elliptic-curve group as described in {{group-abstraction}}.
 
 Valid choices of elliptic curves can be found in {{ciphersuites}}.
@@ -332,7 +338,7 @@ class LinearRelation:
 
 #### Element and scalar variables allocation
 
-Two function allow two allocate the new scalars (the witness) and group elements (the instance).
+Two functions allow two allocate the new scalars (the witness) and group elements (the instance).
 
     allocate_scalars(self, n)
 
@@ -436,9 +442,9 @@ Given group elements `G`, `H` such that `C = x * G + r * H`, then the statement 
 
 This ciphersuite uses P-256 {{NISTCurves}} for the Group.
 
-#### Elliptic curve group of P-256 (secp384r1) {{NISTCurves}}
+#### Elliptic curve group of P-256 (secp256r1) {{NISTCurves}}
 
-- `order()`: Return the integer `115792089237316195423570985008687907852837564279074904382605163141518161494337`.
+- `order()`: Return the integer `115792089210356248762697446949407573529996955224135760342422259061068512044369`.
 - `serialize([A])`: Implemented using the compressed Elliptic-Curve-Point-to-Octet-String method according to {{SEC1}}; `Ne = 33`.
 - `deserialize(buf)`: Implemented by attempting to read `buf` into chunks of 32-byte arrays and convert them using the compressed Octet-String-to-Elliptic-Curve-Point method according to {{SEC1}}, and then performs partial public-key validation as defined in section 5.6.2.3.4 of {{!KEYAGREEMENT=DOI.10.6028/NIST.SP.800-56Ar3}}. This includes checking that the coordinates of the resulting point are in the correct range, that the point is on the curve, and that the point is not the point at infinity.
 
@@ -487,6 +493,7 @@ Implementations requiring post-quantum soundness SHOULD transition to alternativ
 
 - MPC-in-the-Head approaches as described in {{GiacomelliMO16}}
 - Lattice-based approaches as described in {{AttemaCK21}}
+- Code-based approaches as described in {{Stern93}} 
 
 Implementations should consider the timeline for quantum computing advances when planning migration to post-quantum sound alternatives.
 Implementers MAY adopt a hybrid approach during migration to post-quantum security by using AND composition of proofs. This approach enables gradual migration while maintaining security against classical adversaries.
