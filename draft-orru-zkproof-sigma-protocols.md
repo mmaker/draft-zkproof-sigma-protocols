@@ -493,7 +493,7 @@ Implementations requiring post-quantum soundness SHOULD transition to alternativ
 
 - MPC-in-the-Head approaches as described in {{GiacomelliMO16}}
 - Lattice-based approaches as described in {{AttemaCK21}}
-- Code-based approaches as described in {{Stern93}} 
+- Code-based approaches as described in {{Stern93}}
 
 Implementations should consider the timeline for quantum computing advances when planning migration to post-quantum sound alternatives.
 Implementers MAY adopt a hybrid approach during migration to post-quantum security by using AND composition of proofs. This approach enables gradual migration while maintaining security against classical adversaries.
