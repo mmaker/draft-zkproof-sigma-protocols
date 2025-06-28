@@ -1254,20 +1254,8 @@ svg :is([fill="white"], [fill^="#fff"]) {
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">A Sigma Protocol is a simple zero-knowledge proof of knowledge.
-Any sigma protocol must define three objects:<a href="#section-1-1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-1-2.1">
-          <p id="section-1-2.1.1">A commitment. This message is computed by the prover using secret nonces.<a href="#section-1-2.1.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="section-1-2.2">
-          <p id="section-1-2.2.1">A challenge, computed using the Fiat-Shamir transformation (using a hash function, which is defined by the transformation).<a href="#section-1-2.2.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="section-1-2.3">
-          <p id="section-1-2.3.1">A response, computed by the prover, which depends on the commitment and the challenge.<a href="#section-1-2.3.1" class="pilcrow">¶</a></p>
-</li>
-      </ul>
-<p id="section-1-3">A sigma protocol allows a <strong>prover</strong> to convince a <strong>verifier</strong> of the knowledge of a secret <strong>witness</strong> satisfying a <strong>statement</strong>.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-1">A Sigma Protocol is a simple zero-knowledge proof of knowledge that allows a <strong>prover</strong> to convince a <strong>verifier</strong> of the knowledge of a secret <strong>witness</strong> satisfying a <strong>statement</strong>.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">Any sigma protocol must define three objects: a <em>commitment</em> (computed by the prover), a <em>challenge</em> (computed by the verifier), and a <em>response</em> (computed by the prover).<a href="#section-1-2" class="pilcrow">¶</a></p>
 <div id="core-interface">
 <section id="section-1.1">
         <h3 id="name-core-interface">
@@ -1294,8 +1282,7 @@ class SigmaProtocol:
 <p id="section-1.1-3">Where:<a href="#section-1.1-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-1.1-4.1">
-            <p id="section-1.1-4.1.1"><code>new(instance) -&gt; SigmaProtocol</code>, denoting the initialization function. This function takes as input an instance generated via the <code>LinearRelation</code>, the public information shared between prover and verifier.
-This function should pre-compute parts of the statement, or initialize the state of the Fiat-Shamir transformation.<a href="#section-1.1-4.1.1" class="pilcrow">¶</a></p>
+            <p id="section-1.1-4.1.1"><code>new(instance) -&gt; SigmaProtocol</code>, denoting the initialization function. This function takes as input an instance generated via the <code>LinearRelation</code>, the public information shared between prover and verifier.<a href="#section-1.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-1.1-4.2">
             <p id="section-1.1-4.2.1"><code>prover_commit(self, witness: Witness, rng) -&gt; (commitment, prover_state)</code>, denoting the <strong>commitment phase</strong>, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover, the statement to be proven, and a random number generator <code>rng</code>. This step generally requires access to a high-quality entropy source to perform the commitment. Leakage of even just of a few bits of the commitment could allow for the complete recovery of the witness. The commitment is meant to be shared, while <code>prover_state</code> must be kept secret.<a href="#section-1.1-4.2.1" class="pilcrow">¶</a></p>

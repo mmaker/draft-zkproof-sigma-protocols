@@ -95,20 +95,13 @@ Table of Contents
 
 1.  Introduction
 
-   A Sigma Protocol is a simple zero-knowledge proof of knowledge.  Any
-   sigma protocol must define three objects:
+   A Sigma Protocol is a simple zero-knowledge proof of knowledge that
+   allows a *prover* to convince a *verifier* of the knowledge of a
+   secret *witness* satisfying a *statement*.
 
-   *  A commitment.  This message is computed by the prover using secret
-      nonces.
-
-   *  A challenge, computed using the Fiat-Shamir transformation (using
-      a hash function, which is defined by the transformation).
-
-   *  A response, computed by the prover, which depends on the
-      commitment and the challenge.
-
-   A sigma protocol allows a *prover* to convince a *verifier* of the
-   knowledge of a secret *witness* satisfying a *statement*.
+   Any sigma protocol must define three objects: a _commitment_
+   (computed by the prover), a _challenge_ (computed by the verifier),
+   and a _response_ (computed by the prover).
 
 1.1.  Core interface
 
@@ -134,9 +127,7 @@ Table of Contents
    *  new(instance) -> SigmaProtocol, denoting the initialization
       function.  This function takes as input an instance generated via
       the LinearRelation, the public information shared between prover
-      and verifier.  This function should pre-compute parts of the
-      statement, or initialize the state of the Fiat-Shamir
-      transformation.
+      and verifier.
 
    *  prover_commit(self, witness: Witness, rng) -> (commitment,
       prover_state), denoting the *commitment phase*, that is, the
