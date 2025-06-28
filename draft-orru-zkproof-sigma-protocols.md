@@ -91,14 +91,9 @@ This document describes Sigma Protocols, a secure, general-purpose zero-knowledg
 
 # Introduction
 
-A Sigma Protocol is a simple zero-knowledge proof of knowledge.
-Any sigma protocol must define three objects:
+A Sigma Protocol is a simple zero-knowledge proof of knowledge that allows a **prover** to convince a **verifier** of the knowledge of a secret **witness** satisfying a **statement**.
 
-- A commitment. This message is computed by the prover using secret nonces.
-- A challenge, computed using the Fiat-Shamir transformation (using a hash function, which is defined by the transformation).
-- A response, computed by the prover, which depends on the commitment and the challenge.
-
-A sigma protocol allows a **prover** to convince a **verifier** of the knowledge of a secret **witness** satisfying a **statement**.
+Any sigma protocol must define three objects: a *commitment* (computed by the prover), a *challenge* (computed by the verifier), and a *response* (computed by the prover).
 
 ## Core interface
 
@@ -121,7 +116,6 @@ The public functions are obtained relying on an internal structure containing th
 Where:
 
 - `new(instance) -> SigmaProtocol`, denoting the initialization function. This function takes as input an instance generated via the `LinearRelation`, the public information shared between prover and verifier.
-This function should pre-compute parts of the statement, or initialize the state of the Fiat-Shamir transformation.
 
 - `prover_commit(self, witness: Witness, rng) -> (commitment, prover_state)`, denoting the **commitment phase**, that is, the computation of the first message sent by the prover in a Sigma protocol. This method outputs a new commitment together with its associated prover state, depending on the witness known to the prover, the statement to be proven, and a random number generator `rng`. This step generally requires access to a high-quality entropy source to perform the commitment. Leakage of even just of a few bits of the commitment could allow for the complete recovery of the witness. The commitment is meant to be shared, while `prover_state` must be kept secret.
 
