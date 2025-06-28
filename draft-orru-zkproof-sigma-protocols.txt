@@ -5,8 +5,8 @@
 Network Working Group                                            M. Orrù
 Internet-Draft                                                      CNRS
 Intended status: Informational                                    C. Yun
-Expires: 29 December 2025                                    Apple, Inc.
-                                                            27 June 2025
+Expires: 30 December 2025                                    Apple, Inc.
+                                                            28 June 2025
 
 
                    Sigma Protocols Interactive Proofs
@@ -48,7 +48,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 December 2025.
+   This Internet-Draft will expire on 30 December 2025.
 
 Copyright Notice
 
@@ -201,7 +201,7 @@ Table of Contents
 
 2.  Sigma protocols over prime-order groups
 
-   The following sub-section present concrete instantiations of sigma
+   The following sub-section presents concrete instantiations of sigma
    protocols over prime-order elliptic curve groups.  It relies on a
    prime-order elliptic-curve group as described in Section 2.1.
 
@@ -442,7 +442,7 @@ Inputs:
 
 2.2.6.1.  Element and scalar variables allocation
 
-   Two function allow two allocate the new scalars (the witness) and
+   Two functions allow two allocate the new scalars (the witness) and
    group elements (the instance).
 
 allocate_scalars(self, n)
@@ -552,10 +552,10 @@ Procedure:
 
    This ciphersuite uses P-256 [NISTCurves] for the Group.
 
-2.3.1.1.  Elliptic curve group of P-256 (secp384r1) [NISTCurves]
+2.3.1.1.  Elliptic curve group of P-256 (secp256r1) [NISTCurves]
 
-   *  order(): Return the integer 11579208923731619542357098500868790785
-      2837564279074904382605163141518161494337.
+   *  order(): Return the integer 11579208921035624876269744694940757352
+      9996955224135760342422259061068512044369.
 
    *  serialize([A]): Implemented using the compressed Elliptic-Curve-
       Point-to-Octet-String method according to [SEC1]; Ne = 33.
@@ -661,6 +661,8 @@ Procedure:
 
    *  Lattice-based approaches as described in [AttemaCK21]
 
+   *  Code-based approaches as described in [Stern93]
+
    Implementations should consider the timeline for quantum computing
    advances when planning migration to post-quantum sound alternatives.
    Implementers MAY adopt a hybrid approach during migration to post-
@@ -725,6 +727,10 @@ Procedure:
    [SEC1]     Standards for Efficient Cryptography Group (SECG), "SEC 1:
               Elliptic Curve Cryptography",
               <https://www.secg.org/sec1-v2.pdf>.
+
+   [Stern93]  Stern, J., "A New Identification Scheme Based on Syndrome
+              Decoding", 1993, <https://link.springer.com/
+              chapter/10.1007/3-540-48329-2_2>.
 
 Authors' Addresses
 

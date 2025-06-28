@@ -1049,7 +1049,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Orrù &amp; Yun</td>
-<td class="center">Expires 29 December 2025</td>
+<td class="center">Expires 30 December 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1062,12 +1062,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-orru-zkproof-sigma-protocols-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-06-27" class="published">27 June 2025</time>
+<time datetime="2025-06-28" class="published">28 June 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-12-29">29 December 2025</time></dd>
+<dd class="expires"><time datetime="2025-12-30">30 December 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1116,7 +1116,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 29 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 30 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1339,7 +1339,7 @@ This function should pre-compute parts of the statement, or initialize the state
       <h2 id="name-sigma-protocols-over-prime-">
 <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-sigma-protocols-over-prime-" class="section-name selfRef">Sigma protocols over prime-order groups</a>
       </h2>
-<p id="section-2-1">The following sub-section present concrete instantiations of sigma protocols over prime-order elliptic curve groups.
+<p id="section-2-1">The following sub-section presents concrete instantiations of sigma protocols over prime-order elliptic curve groups.
 It relies on a prime-order elliptic-curve group as described in <a href="#group-abstraction" class="auto internal xref">Section 2.1</a>.<a href="#section-2-1" class="pilcrow">¶</a></p>
 <p id="section-2-2">Valid choices of elliptic curves can be found in <a href="#ciphersuites" class="auto internal xref">Section 2.3</a>.<a href="#section-2-2" class="pilcrow">¶</a></p>
 <p id="section-2-3">Traditionally, sigma protocols are defined in Camenisch-Stadler notation as (for example):<a href="#section-2-3" class="pilcrow">¶</a></p>
@@ -1643,7 +1643,7 @@ def set_elements(self, elements: list[(int, Group)]) -&gt; None
             <h5 id="name-element-and-scalar-variable">
 <a href="#section-2.2.6.1" class="section-number selfRef">2.2.6.1. </a><a href="#name-element-and-scalar-variable" class="section-name selfRef">Element and scalar variables allocation</a>
             </h5>
-<p id="section-2.2.6.1-1">Two function allow two allocate the new scalars (the witness) and group elements (the instance).<a href="#section-2.2.6.1-1" class="pilcrow">¶</a></p>
+<p id="section-2.2.6.1-1">Two functions allow two allocate the new scalars (the witness) and group elements (the instance).<a href="#section-2.2.6.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-2.2.6.1-2">
 <pre>
 allocate_scalars(self, n)
@@ -1798,14 +1798,14 @@ statement.append_equation(C, [(var_x, G), (var_r, H)])
 <a href="#section-2.3.1" class="section-number selfRef">2.3.1. </a><a href="#name-p-256-secp256r1" class="section-name selfRef">P-256 (secp256r1)</a>
           </h4>
 <p id="section-2.3.1-1">This ciphersuite uses P-256 <span>[<a href="#NISTCurves" class="cite xref">NISTCurves</a>]</span> for the Group.<a href="#section-2.3.1-1" class="pilcrow">¶</a></p>
-<div id="elliptic-curve-group-of-p-256-secp384r1-nistcurves">
+<div id="elliptic-curve-group-of-p-256-secp256r1-nistcurves">
 <section id="section-2.3.1.1">
             <h5 id="name-elliptic-curve-group-of-p-2">
-<a href="#section-2.3.1.1" class="section-number selfRef">2.3.1.1. </a><a href="#name-elliptic-curve-group-of-p-2" class="section-name selfRef">Elliptic curve group of P-256 (secp384r1) <span class="cite xref">[NISTCurves]</span></a>
+<a href="#section-2.3.1.1" class="section-number selfRef">2.3.1.1. </a><a href="#name-elliptic-curve-group-of-p-2" class="section-name selfRef">Elliptic curve group of P-256 (secp256r1) <span class="cite xref">[NISTCurves]</span></a>
             </h5>
 <ul class="normal">
 <li class="normal" id="section-2.3.1.1-1.1">
-                <p id="section-2.3.1.1-1.1.1"><code>order()</code>: Return the integer <code>115792089237316195423570985008687907852837564279074904382605163141518161494337</code>.<a href="#section-2.3.1.1-1.1.1" class="pilcrow">¶</a></p>
+                <p id="section-2.3.1.1-1.1.1"><code>order()</code>: Return the integer <code>115792089210356248762697446949407573529996955224135760342422259061068512044369</code>.<a href="#section-2.3.1.1-1.1.1" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-2.3.1.1-1.2">
                 <p id="section-2.3.1.1-1.2.1"><code>serialize([A])</code>: Implemented using the compressed Elliptic-Curve-Point-to-Octet-String method according to <span>[<a href="#SEC1" class="cite xref">SEC1</a>]</span>; <code>Ne = 33</code>.<a href="#section-2.3.1.1-1.2.1" class="pilcrow">¶</a></p>
@@ -1907,6 +1907,9 @@ Since this problem is known to be efficiently solvable by quantum computers usin
           <li class="normal" id="section-4.2-3.2">
             <p id="section-4.2-3.2.1">Lattice-based approaches as described in <span>[<a href="#AttemaCK21" class="cite xref">AttemaCK21</a>]</span><a href="#section-4.2-3.2.1" class="pilcrow">¶</a></p>
 </li>
+          <li class="normal" id="section-4.2-3.3">
+            <p id="section-4.2-3.3.1">Code-based approaches as described in <span>[<a href="#Stern93" class="cite xref">Stern93</a>]</span><a href="#section-4.2-3.3.1" class="pilcrow">¶</a></p>
+</li>
         </ul>
 <p id="section-4.2-4">Implementations should consider the timeline for quantum computing advances when planning migration to post-quantum sound alternatives.
 Implementers MAY adopt a hybrid approach during migration to post-quantum security by using AND composition of proofs. This approach enables gradual migration while maintaining security against classical adversaries.
@@ -1976,8 +1979,12 @@ This composition retains soundness if <strong>both</strong> problem remains hard
 <span class="refTitle">"Digital Signature Standard (DSS)"</span>, <span class="refContent">National Institute of Standards and Technology (U.S.)</span>, <span class="seriesInfo">DOI 10.6028/nist.fips.186-5</span>, <time datetime="2023-02" class="refDate">February 2023</time>, <span>&lt;<a href="https://doi.org/10.6028/nist.fips.186-5">https://doi.org/10.6028/nist.fips.186-5</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="SEC1">[SEC1]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Standards for Efficient Cryptography Group (SECG)</span>, <span class="refTitle">"SEC 1: Elliptic Curve Cryptography"</span>, <span>&lt;<a href="https://www.secg.org/sec1-v2.pdf">https://www.secg.org/sec1-v2.pdf</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="Stern93">[Stern93]</dt>
+      <dd>
+<span class="refAuthor">Stern, J.</span>, <span class="refTitle">"A New Identification Scheme Based on Syndrome Decoding"</span>, <time datetime="1993" class="refDate">1993</time>, <span>&lt;<a href="https://link.springer.com/chapter/10.1007/3-540-48329-2_2">https://link.springer.com/chapter/10.1007/3-540-48329-2_2</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
