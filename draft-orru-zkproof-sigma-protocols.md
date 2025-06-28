@@ -36,7 +36,9 @@ informative:
     title: "draft-orru-zkproofs-fiat-shamir"
     date: false
     target: https://mmaker.github.io/spfs/draft-orru-zkproof-fiat-shamir.html
-  NISTCurves: DOI.10.6028/NIST.FIPS.186-5
+  SP800:
+    title: "Recommendations for Discrete Logarithm-based Cryptography"
+    target: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-186.pdf
   SEC1:
     title: "SEC 1: Elliptic Curve Cryptography"
     target: https://www.secg.org/sec1-v2.pdf
@@ -440,9 +442,9 @@ Given group elements `G`, `H` such that `C = x * G + r * H`, then the statement 
 
 ### P-256 (secp256r1)
 
-This ciphersuite uses P-256 {{NISTCurves}} for the Group.
+This ciphersuite uses P-256 {{SP800}} for the Group.
 
-#### Elliptic curve group of P-256 (secp256r1) {{NISTCurves}}
+#### Elliptic curve group of P-256 (secp256r1) {{SP800}}
 
 - `order()`: Return the integer `115792089210356248762697446949407573529996955224135760342422259061068512044369`.
 - `serialize([A])`: Implemented using the compressed Elliptic-Curve-Point-to-Octet-String method according to {{SEC1}}; `Ne = 33`.
