@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-26T01:20:19.573581+00:00",
+  "timestamp": "2025-06-29T01:37:13.279311+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -181,16 +181,24 @@
       "id": "I_kwDONyiw_86snh1H",
       "title": "Support for short proofs",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/8",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Right now the non-interactive sigma protocol proving function outputs batchable proofs `(commitment, response)` \nwhich (I think) require point validation and are generally larger than short proofs of the form `(challenge, response)`.\n\nThis issue is to track the addition of a `short_prove` and `short_verify function`",
       "createdAt": "2025-03-05T03:37:32Z",
-      "updatedAt": "2025-03-05T03:48:18Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-27T22:40:52Z",
+      "closedAt": "2025-06-27T22:40:52Z",
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "closing in favor of #25 ",
+          "createdAt": "2025-06-27T22:40:52Z",
+          "updatedAt": "2025-06-27T22:40:52Z"
+        }
+      ]
     },
     {
       "number": 9,
@@ -637,10 +645,13 @@
         "mmaker",
         "cathieyun"
       ],
-      "labels": [],
+      "labels": [
+        "editorial",
+        "easy"
+      ],
       "body": "> Some text sprinkled around the user/implementor pitfalls in the security considerations helps people appreciate the importance of standardising a thing (e.g. proof reuse, constant-time, dealing with the mod bias via the extra bytes, etc). \n",
       "createdAt": "2025-05-03T17:15:13Z",
-      "updatedAt": "2025-05-10T13:51:42Z",
+      "updatedAt": "2025-06-28T23:28:18Z",
       "closedAt": null,
       "comments": []
     },
@@ -684,7 +695,7 @@
       "id": "I_kwDONyiw_862CtXE",
       "title": "Editorial: set expectations correctly in intro",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/38",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -697,8 +708,8 @@
       ],
       "body": "From @wbl: \n\n> More broadly I think there introduction seems to promise a bit much.\n> It discusses OR proofs, t out of n, and ultimately a degree of\n> composibility (maybe), but I think a bit more needs to be said here to\n> make that work. If we just want to do it for linear equations over\n> prime order groups, fine, but then the intro should be revised to make\n> that clear. Ideally we'd include some degree of composibility via the\n> auxilliary data passed in or at least warnings about when and when not\n> to compose. ",
       "createdAt": "2025-05-10T13:53:54Z",
-      "updatedAt": "2025-06-25T20:09:02Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-28T02:04:55Z",
+      "closedAt": "2025-06-28T02:04:55Z",
       "comments": [
         {
           "author": "cathieyun",
@@ -706,6 +717,13 @@
           "body": "This is a good point, we never explicitly state that proof composition (e.g. OR-composition) is out of scope for the spec - and if anything, the intro implies that it should be part of the spec, if we are supporting a zero-knowledge simulator.\n\nWe should decide if proof composition is actually in scope, and update the spec accordingly. If it's out of scope (which seems to be the case from other conversations) then we should remove these optional functions, for simplicity. But if it's in scope (which could also be plausible, given that the proof of concept does composition for AND and OR proofs?) we should add that to the spec. There's a bit of a mismatch right now.",
           "createdAt": "2025-06-25T20:09:02Z",
           "updatedAt": "2025-06-25T20:09:02Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "A few factual points here. \n\n- The initial scope did *explicitly exclude* OR proofs as you agreed on the text in FAQ.md . (I don't mean that I'm against them). \n- The simulator is there also to support short proofs. \n\nOR proofs are only an element in the list. I think we can close this issue by making sure the technical spec does not overpromise or mention any of these for now.\n\n",
+          "createdAt": "2025-06-28T02:04:55Z",
+          "updatedAt": "2025-06-28T02:04:55Z"
         }
       ]
     },
@@ -714,7 +732,7 @@
       "id": "I_kwDONyiw_862CuIT",
       "title": "Editorial: explain where elements are tested for being in the EC subgroup",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/39",
-      "state": "CLOSED",
+      "state": "OPEN",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -724,8 +742,8 @@
       "labels": [],
       "body": "From @wbl:\n\n> We might also need to tackle not-prime order points: verifying order is\n> expensive, but there are some tricks on BLS 12 to speed it up, but\n> when doing a batched proof cofactor clearing is comparatively cheap.\n\nThis is already discussed in the TeX specification -- perhaps one can just test that the instance is in the group, and not the commitment?",
       "createdAt": "2025-05-10T13:56:59Z",
-      "updatedAt": "2025-06-25T20:21:04Z",
-      "closedAt": "2025-06-25T20:21:04Z",
+      "updatedAt": "2025-06-27T21:45:42Z",
+      "closedAt": null,
       "comments": [
         {
           "author": "mmaker",
@@ -740,6 +758,13 @@
           "body": "I agree that you could skip the check that the commitment is on the curve, if you know the underlying instance is on the curve. However it seems like better practice to always check, to make it harder to \"shoot yourself in the foot\" or as a failsafe if you forget to check that the instance is on the curve. How expensive is the check that the commitment is on the curve? Unless we can show that it is prohibitive/impractical, I would recommend keeping the check that the commitment is on the curve, for security.",
           "createdAt": "2025-06-25T20:21:04Z",
           "updatedAt": "2025-06-25T20:21:04Z"
+        },
+        {
+          "author": "wbl",
+          "authorAssociation": "NONE",
+          "body": "The curve check is very cheap. The group check might not be.",
+          "createdAt": "2025-06-27T21:08:39Z",
+          "updatedAt": "2025-06-27T21:08:39Z"
         }
       ]
     },
@@ -748,7 +773,7 @@
       "id": "I_kwDONyiw_863uwA0",
       "title": "NIST Feedback: C6. Miscellaneous editorial",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/43",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [],
@@ -756,10 +781,10 @@
         "editorial",
         "easy"
       ],
-      "body": "Typos: challange, commmit, Stadtler\n\n- [x] Define acronyms: SHO, VRF, ...\n\n- [x] Define terms, e.g., batchable, ...\n\n- [ ] Ref [NISTCurves]: if wanting to cite DSS, consider updating from FIPS 186-4 (2013) to FIPS 186-5 (2023); consider citing SP 800-186 (2023) as a reference for the P-* elliptic curves (such as P-384).\n\n- [ ] The expression \"A commitment, sometimes also called nonce\" is a bit confusing. Isn't nonce also being used to denote the (seed of) the discrete-log of the \"commitment\". It might be clearer to distinguish between secret nonce and public nonce.\n\n- [ ] Section 2.4: why is the nonce algorithm shown after the challenge algorithm (if the nonce is introduced before the challenge)?\n\n- [x] Unclear the utility of declaring \"simulate_response\", without more guidance on how it would actually be used.\n\n- [ ] The draft uses \"Equations\" to specify the \"constraints\". Does that mean that range constraints (e.g., based on inequalities) are not allowed? Consider clarifying the relation between \"constraints\" and \"equations\".\n\n- [ ] Consider adding textual explanation of the syntax of each function, e.g., where the output length of SHAKE128 is specified.",
+      "body": "Typos: challange, commmit, Stadtler\n\n- [x] Define acronyms: SHO, VRF, ...\n\n- [x] Define terms, e.g., batchable, ...\n\n- [x] Ref [NISTCurves]: if wanting to cite DSS, consider updating from FIPS 186-4 (2013) to FIPS 186-5 (2023); consider citing SP 800-186 (2023) as a reference for the P-* elliptic curves (such as P-384).\n\n- [x] The expression \"A commitment, sometimes also called nonce\" is a bit confusing. Isn't nonce also being used to denote the (seed of) the discrete-log of the \"commitment\". It might be clearer to distinguish between secret nonce and public nonce.\n\n- [x] Section 2.4: why is the nonce algorithm shown after the challenge algorithm (if the nonce is introduced before the challenge)?\n\n- [x] Unclear the utility of declaring \"simulate_response\", without more guidance on how it would actually be used.\n\n- [x] The draft uses \"Equations\" to specify the \"constraints\". Does that mean that range constraints (e.g., based on inequalities) are not allowed? Consider clarifying the relation between \"constraints\" and \"equations\".\n\n- [x] Consider adding textual explanation of the syntax of each function, e.g., where the output length of SHAKE128 is specified.",
       "createdAt": "2025-05-22T08:17:31Z",
-      "updatedAt": "2025-06-25T22:00:10Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-28T02:35:44Z",
+      "closedAt": "2025-06-28T02:35:44Z",
       "comments": [
         {
           "author": "cathieyun",
@@ -767,6 +792,27 @@
           "body": "I'm wondering, what was the change that addressed this issue?\n> Unclear the utility of declaring \"simulate_response\", without more guidance on how it would actually be used.\n\nIMO it's still unclear what the purpose of \"simulate_response\" is, or how it is used (or even if it should be in scope for the spec), which I brought up in the comment here:\nhttps://github.com/mmaker/draft-zkproof-sigma-protocols/issues/38\nI am okay with expanding the scope to include proof composition, but if so we should define this more. Otherwise if that is out of scope, we should remove the proof composition functions altogether. Right now we are in a confusing in-between space.",
           "createdAt": "2025-06-25T22:00:10Z",
           "updatedAt": "2025-06-25T22:00:10Z"
+        },
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Marking this entry as \"done\", as I don't see this expression in the spec anymore and all references to nonces are explicitly referring to secret nonces.\n> The expression \"A commitment, sometimes also called nonce\" is a bit confusing. Isn't nonce also being used to denote the (seed of) the discrete-log of the \"commitment\". It might be clearer to distinguish between secret nonce and public nonce.",
+          "createdAt": "2025-06-26T01:49:16Z",
+          "updatedAt": "2025-06-26T01:49:16Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Making this entry as \"done\", since it's described in the codec section of the Fiat-Shamir document\n> Consider adding textual explanation of the syntax of each function, e.g., where the output length of SHAKE128 is specified.\n\n",
+          "createdAt": "2025-06-28T02:08:21Z",
+          "updatedAt": "2025-06-28T02:08:21Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Making this entry as \"done\", since it's not correct: \n> The draft uses \"Equations\" to specify the \"constraints\". Does that mean that range constraints (e.g., based on inequalities) are not allowed? Consider clarifying the relation between \"constraints\" and \"equations\".\n\nRange constraints can be implemented via standard linearization techniques. It's true however that, for proving a preimage of a linear relation, one is not strictly proving \"inqualities\". This part of scoping is well defined in FAQ.md and in the call for adoption email.",
+          "createdAt": "2025-06-28T02:15:22Z",
+          "updatedAt": "2025-06-28T02:15:22Z"
         }
       ]
     },
@@ -802,7 +848,7 @@
       "id": "I_kwDONyiw_863vIZl",
       "title": "NIST Feedback: C4. Other non-interactive transformations",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/45",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [],
@@ -812,9 +858,24 @@
       ],
       "body": "> The Fiat-Shamir transformation (although being the most popular) is not the only possibility for converting a Sigma protocol into a non-interactive ZKP. For example, using an equivocable commitment (e.g., see [ia.cr/2014/710](http://ia.cr/2014/710)) instead of a hash function may facilitate obtaining zero-knowledge of the non-transferable kind, i.e., proofs that are not publicly verifiable). Thus, consider whether it may be beneficial to adjust the title to directly refer to the Fiat-Shamir transformation. (An alternative would be to leave the current spec be about sigma protocols, and do another [related] spec about the FS transformation.)\n\nCreate a paragraph that mentions briefly what are types of Fiat--Shamir transformations are possible.",
       "createdAt": "2025-05-22T08:52:09Z",
-      "updatedAt": "2025-05-22T09:01:27Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-27T22:39:57Z",
+      "closedAt": "2025-06-27T22:39:57Z",
+      "comments": [
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I'm a bit confused by this feedback, since this is the current status of the sigma spec:\n> An alternative would be to leave the current spec be about sigma protocols, and do another [related] spec about the FS transformation.\n\nThe related spec for the FS transformation is available here:\nhttps://mmaker.github.io/draft-zkproof-sigma-protocols/draft-orru-zkproof-fiat-shamir.html\n\nThis feedback may be arising from the same confusion as what prompted other feedback items, such as https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/44, which I addressed with https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/44#issuecomment-3006051267. Hopefully that confusion is resolved by being clearer about the relationship between the sigma spec and FS transformation spec.",
+          "createdAt": "2025-06-26T01:24:31Z",
+          "updatedAt": "2025-06-26T01:25:24Z"
+        },
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "We can add a note that the sigma protocol spec defines sigma protocols with a FS transformation, and add a section of other ways that one could make an interactive protocol non-interactive (but make it clear that these are outside the scope of the spec).",
+          "createdAt": "2025-06-26T01:32:29Z",
+          "updatedAt": "2025-06-26T01:32:29Z"
+        }
+      ]
     },
     {
       "number": 46,
@@ -1313,7 +1374,7 @@
       "labels": [],
       "body": "A draft of what statement serialization could look like!!",
       "createdAt": "2025-06-09T01:40:44Z",
-      "updatedAt": "2025-06-14T15:47:15Z",
+      "updatedAt": "2025-06-28T02:36:22Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
       "baseRefOid": "4bbc93182bda4713c3b5db2680a766dbfabcf6b6",
@@ -1341,7 +1402,7 @@
       "labels": [],
       "body": "Closes #33.",
       "createdAt": "2025-06-14T15:02:56Z",
-      "updatedAt": "2025-06-18T05:16:26Z",
+      "updatedAt": "2025-06-28T02:36:24Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
       "baseRefOid": "d9bc49bceaa9caff7045e4c00bc3ba2167536c06",
@@ -1384,7 +1445,7 @@
       "labels": [],
       "body": "Fixes #25 ",
       "createdAt": "2025-06-14T16:49:17Z",
-      "updatedAt": "2025-06-25T18:47:27Z",
+      "updatedAt": "2025-06-26T01:45:40Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
       "baseRefOid": "c5709140273172c16da73823810882e6f275d469",
@@ -1416,6 +1477,13 @@
           "body": "That's a great point, thank you! I'll update the request following your suggestion.",
           "createdAt": "2025-06-24T14:59:01Z",
           "updatedAt": "2025-06-24T14:59:23Z"
+        },
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Are there updates to this PR following the suggestion (some kind of differentiator between normal and short proofs)? Asking because I'm not sure if I missed any changes due to the force-pushing to the `main` branch.",
+          "createdAt": "2025-06-26T01:45:40Z",
+          "updatedAt": "2025-06-26T01:45:40Z"
         }
       ],
       "reviews": [
@@ -1642,6 +1710,104 @@
       "mergedBy": "mmaker",
       "mergeCommit": {
         "oid": "13ec5deeff23a63c45ed04dd290176ef45a4eaf0"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 57,
+      "id": "PR_kwDONyiw_86cJnMz",
+      "title": "Mention equivocable commitments in discussion of deniability",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/57",
+      "state": "MERGED",
+      "author": "cathieyun",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Addresses (part of) the concern in https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/45.\r\n\r\nThough I think the majority of the feedback arises from confusion of the relationship between the sigma protocol spec and the Fiat-Shamir spec (or a lack of knowledge of the existence of the Fiat-Shamir spec?), this PR addresses the feedback to mention other ways to construct sigma protocols other than through the Fiat-Shamir transform, and mentions equivocable commitments as another way to achieve deniability.",
+      "createdAt": "2025-06-26T01:42:44Z",
+      "updatedAt": "2025-06-27T22:39:57Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "560b163974241f2b2c4b76907c27a32f02f61f67",
+      "headRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "headRefName": "NI-transformations",
+      "headRefOid": "dcb7d1dda7a7de59b4e95c2c38db86de54f8daf3",
+      "closedAt": "2025-06-27T22:39:57Z",
+      "mergedAt": "2025-06-27T22:39:56Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "19725fb44883434ae8f5e05d22c7f66b615e8d70"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 58,
+      "id": "PR_kwDONyiw_86cMyBN",
+      "title": "Editorial changes to FS spec",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/58",
+      "state": "MERGED",
+      "author": "WizardOfMenlo",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-06-26T09:11:30Z",
+      "updatedAt": "2025-06-27T22:39:40Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "560b163974241f2b2c4b76907c27a32f02f61f67",
+      "headRepository": "WizardOfMenlo/draft-zkproof-sigma-protocols",
+      "headRefName": "main",
+      "headRefOid": "2c7a64e4ba26cf92d5372a2447b5d3ae920f668f",
+      "closedAt": "2025-06-27T22:39:40Z",
+      "mergedAt": "2025-06-27T22:39:40Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "f137691c4e5669fc79e702f52f56c6682ace9b38"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDONyiw_86w6ZKt",
+          "commit": {
+            "abbreviatedOid": "ac65de3"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-06-27T22:29:05Z",
+          "updatedAt": "2025-06-27T22:29:05Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 59,
+      "id": "PR_kwDONyiw_86cOYEi",
+      "title": "Pass over Sigma protocols draft and address Issue #31",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/59",
+      "state": "MERGED",
+      "author": "martin-ochoa",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "General pass over draft:\r\n\r\n- Minor typos \r\n- Fixed order of secp256r1 (before there was the prime of the base field)\r\n- Addressed literature review for post-quantum soundness\r\n  - ZKBoo indeed appears to be the first application of MPC-in-the-head for Sigma protocols\r\n  - One could argue that there are earlier applications of lattices for some specific sigma protocols (i.e. Lyubashevsky has various papers cited by Attema et al. in this direction), but the Attema paper seems the first to be general purpose.\r\n  - Added Stern93 for an example of code-based approaches which are also quite popular within post-quantum solutions ",
+      "createdAt": "2025-06-26T12:05:59Z",
+      "updatedAt": "2025-06-28T01:30:49Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "560b163974241f2b2c4b76907c27a32f02f61f67",
+      "headRepository": "martin-ochoa/draft-zkproof-sigma-protocols",
+      "headRefName": "literature-pass-issue31",
+      "headRefOid": "9edb1530a901e887a748224bd04ee8398e03be5f",
+      "closedAt": "2025-06-28T01:30:49Z",
+      "mergedAt": "2025-06-28T01:30:49Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "61f5ca82464291f695bf7b7d431f3e58b600f791"
       },
       "comments": [],
       "reviews": []
