@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-29T01:37:13.279311+00:00",
+  "timestamp": "2025-07-01T01:38:54.153832+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -742,7 +742,7 @@
       "labels": [],
       "body": "From @wbl:\n\n> We might also need to tackle not-prime order points: verifying order is\n> expensive, but there are some tricks on BLS 12 to speed it up, but\n> when doing a batched proof cofactor clearing is comparatively cheap.\n\nThis is already discussed in the TeX specification -- perhaps one can just test that the instance is in the group, and not the commitment?",
       "createdAt": "2025-05-10T13:56:59Z",
-      "updatedAt": "2025-06-27T21:45:42Z",
+      "updatedAt": "2025-06-30T22:45:07Z",
       "closedAt": null,
       "comments": [
         {
@@ -765,6 +765,13 @@
           "body": "The curve check is very cheap. The group check might not be.",
           "createdAt": "2025-06-27T21:08:39Z",
           "updatedAt": "2025-06-27T21:08:39Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "To add on that, following discussions with Ian:\n\n1. the prover should do its best at catching trivial relations. It should return an error. \n2. we should explicit more the check on the instance\n\n@cathieyun thanks for your recommendations.\n@wbl I agree group check can be expensive, and that this cost can be amortized in the case of repeated verifications . \nI agree that verifying N proofs will cost O(N * large_curve_operations) instead of O(N * subgroup_operations).\nI'll comment for now this as \"optional\" (in the same way we do for verifying the proof after proving it), and consider the change sufficient",
+          "createdAt": "2025-06-30T22:44:30Z",
+          "updatedAt": "2025-06-30T22:45:07Z"
         }
       ]
     },
