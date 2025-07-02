@@ -7,6 +7,9 @@ import hashlib
 
 class TestDRNG(object):
     def __init__(self, seed):
+        seed_bytes = hashlib.sha256(seed).digest()
+        for elem in seed_bytes:
+            print(elem)
         self.seed = int.from_bytes(hashlib.sha256(seed).digest(), 'big')
 
     def randint(self, l, h):

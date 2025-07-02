@@ -12,7 +12,10 @@ def test_vector(test_vector_function):
     from sagelib.ciphersuite import NISchnorrProofKeccakDuplexSpongeP256 as NIZK
 
     def inner(vectors):
-        rng = TestDRNG("test vector seed".encode('utf-8'))
+        seed = "hello world".encode('utf-8')
+        another_rng = TestDRNG(seed)
+        print(another_rng.randint(0, 2 ** 32 - 1))
+        rng = TestDRNG(seed)
         test_vector_name = f"{test_vector_function.__name__}"
 
         instance, witness = test_vector_function(rng, NIZK.Codec.GG)
