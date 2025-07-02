@@ -62,10 +62,10 @@ More formally, for each prover message a codec specifies how many native sponge 
 
 The Fiat-Shamir transformation combines the following ingredients to construct a non-interactive protocol:
 
-- An initialization vector (IV) uniquely identifying the protocol;
-- A interactive protocol;
-- A duplex sponge; and
-- A codec compatible with the interactive protocol and the duplex sponge.
+- an initialization vector (IV) uniquely identifying the protocol;
+- a interactive protocol;
+- a duplex sponge; and
+- a codec compatible with the interactive protocol and the duplex sponge.
 
 # The Duplex Sponge Interface
 
