@@ -121,7 +121,7 @@ Upon initialization, the protocol receives as input an `iv` of 32-bytes which un
 
         def prove(self, witness, rng):
             (prover_state, commitment) = self.ip.prover_commit(witness, rng)
-            challenge = self.coded.prover_message(self.hash_state, commitment).verifier_challenge(self.hash_state)
+            challenge = self.codec.prover_message(self.hash_state, commitment).verifier_challenge(self.hash_state)
             response = self.ip.prover_response(prover_state, challenge)
 
             assert self.ip.verifier(commitment, challenge, response)
