@@ -220,6 +220,7 @@ This is the constructor for a duplex sponge object. It is initialized with a 32-
     2. self.squeeze_index = self.permutation_state.R
     3. self.rate = self.permutation_state.R
     4. self.capacity = self.permutation_state.N - self.permutation_state.R
+    5. self.permutation_state[self.rate: self.rate + 32] = iv
 
 ### Absorb
 
