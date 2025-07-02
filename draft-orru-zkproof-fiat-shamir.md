@@ -75,7 +75,7 @@ The Fiat-Shamir transformation combines the following ingredients to construct a
 A duplex sponge operates over an abstract `Unit` type and provides the following interface.
 
     class DuplexSponge:
-      def new(iv: bytes) -> DuplexSponge
+      def init(iv: bytes) -> DuplexSponge
       def absorb(self, x: list[Unit])
       def squeeze(self, length: int) -> list[Unit]
 
@@ -91,38 +91,40 @@ Where:
 A codec provides the following interface.
 
     class Codec:
-        def new(iv: bytes) -> Codec
-        def prover_message(self, prover_message)
-        def verifier_challenge(self) -> verifier_challenge
+        def init() -> Codec
+        def prover_message(self, hash_state, prover_message)
+        def verifier_challenge(self, hash_state) -> verifier_challenge
 
 Where:
 
-- `init(iv: bytes) -> DuplexSponge` denotes the initialization function. This function takes as input a 32-byte initialization vector `iv` and initializes the state of the codec.
-- `prover_message(self, prover_message) -> self` denotes the absorb operation of the codec. This function takes as input a prover message `prover_message` and mutates the codec's internal state.
-- `verifier_challenge(self) -> verifier_challenge` denotes the squeeze operation of the codec. This function takes no inputs and uses the codec's internal state to produce an unpredictable verifier challenge `verifier_challenge`.
-
+- `init() -> DuplexSponge` denotes the initialization function. This function initializes the state of the codec.
+- `prover_message(self, hash_state, prover_message) -> self` denotes the absorb operation of the codec. This function takes as input the `hash_state` of a duplex sponge and a prover message `prover_message`. `hash_state` may be mutated.
+- `verifier_challenge(self, hash_state) -> verifier_challenge` denotes the squeeze operation of the codec. This function takes as input the `hash_state` of a duplex sponge and produces an unpredictable verifier challenge `verifier_challenge`. `hash_state` may be mutated.
 
 # Fiat-Shamir transformation for Sigma Protocols
 
 We describe how to construct non-interactive proofs for sigma protocols.
 The Fiat-Shamir transformation is parametrized by:
 
-- a `Codec`, which specifies how to absorb prover messages and how to squeeze verifier challenges;
+- a `DuplexSponge`, which is the duplex sponge used by the transformation;
+- a `Codec`, which specifies how to absorb prover messages and how to squeeze verifier challenges; and
 - a `SigmaProtocol`, which specifies an interactive 3-message protocol.
 
 Upon initialization, the protocol receives as input an `iv` of 32-bytes which uniquely identifies the protocol and the session being proven and (optionally) pre-processes some information about the protocol using the instance.
 
     class NISigmaProtocol:
+        DuplexSponge: DuplexSponge
         Protocol: SigmaProtocol
         Codec: Codec
 
         def init(self, iv: bytes, instance):
-            self.hash_state = self.Codec(iv)
+            self.hash_state = self.DuplexSponge(iv)
+            self.codec = self.Codec()
             self.ip = self.Protocol(instance)
 
         def prove(self, witness, rng):
             (prover_state, commitment) = self.ip.prover_commit(witness, rng)
-            challenge = self.hash_state.prover_message(commitment).verifier_challenge()
+            challenge = self.coded.prover_message(self.hash_state, commitment).verifier_challenge(self.hash_state)
             response = self.ip.prover_response(prover_state, challenge)
 
             assert self.ip.verifier(commitment, challenge, response)
@@ -133,7 +135,7 @@ Upon initialization, the protocol receives as input an `iv` of 32-bytes which un
             response_bytes = proof[self.ip.instance.commit_bytes_len:]
             commitment = self.ip.deserialize_commitment(commitment_bytes)
             response = self.ip.deserialize_response(response_bytes)
-            challenge = self.hash_state.prover_message(commitment).verifier_challenge()
+            challenge = self.codec.prover_message(self.hash_state, commitment).verifier_challenge(self.hash_state)
             return self.ip.verifier(commitment, challenge, response)
 
 ## Codec for Linear maps {#group-prove}
@@ -142,18 +144,17 @@ We describe a codec for Schnorr proofs over groups of prime order `p` that is in
 
     class LinearMapCodec:
         Group: groups.Group = None
-        DuplexSponge: DuplexSpongeInterface = None
 
-        def init(self, iv: bytes):
-            self.hash_state = self.DuplexSponge(iv)
+        def init(self):
+            pass
 
-        def prover_message(self, elements: list):
-            self.hash_state.absorb(self.Group.serialize(elements))
+        def prover_message(self, hash_state: DuplexSponge, elements: list):
+            hash_state.absorb(self.Group.serialize(elements))
             # calls can be chained
             return self
 
-        def verifier_challenge(self):
-            uniform_bytes = self.hash_state.squeeze(
+        def verifier_challenge(self, hash_state: DuplexSponge):
+            uniform_bytes = hash_state.squeeze(
                 self.Group.ScalarField.scalar_byte_length() + 16
             )
             scalar = OS2IP(uniform_bytes) % self.Group.ScalarField.order
@@ -167,7 +168,7 @@ SHAKE128 is a variable-length hash function based on the Keccak sponge construct
 
 ### Initialization
 
-    new(self, iv)
+    init(self, iv)
 
     Inputs:
 
@@ -212,7 +213,7 @@ A duplex sponge in overwrite mode is based on a permutation function that operat
 
 This is the constructor for a duplex sponge object. It is initialized with a 32-byte initialization vector.
 
-    new(iv)
+    init(iv)
 
     Inputs:
     - iv, a 32-byte initialization vector
