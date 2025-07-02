@@ -15,6 +15,7 @@ def test_vector(test_vector_function):
         seed = "hello world".encode('utf-8')
         another_rng = TestDRNG(seed)
         print(another_rng.randint(0, 2 ** 32 - 1))
+        print(another_rng.randint(0, 2 ** 32 - 1))
         rng = TestDRNG(seed)
         test_vector_name = f"{test_vector_function.__name__}"
 
