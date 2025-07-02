@@ -41,16 +41,9 @@ informative:
 
 --- abstract
 
-This document describes the Fiat-Shamir transformation, a generic procedure to compile an interactive protocol into a non-interactive protocol by combining the interactive protocol with a duplex sponge.
+This document describes the Fiat-Shamir transformation: a generic transformation to convert an interactive protocol into a non-interactive protocol with equivalent functionality.
 
-We describe a generic duplex sponge interface that support "absorb" and "squeeze" operations over a elements of a specified base type.
-The absorb operation supports incrementally updating the hash state of the sponge, and the squeeze operation enables squeezing variable-length unpredictable messages.
-The sponge interface supports a number of different hash functions.
-
-In addition, the specification introduces codecs, a mechanism to extend the functionality of a duplex sponge to support elements of other domains.
-
-Given an interactive protocol and a suitable codec, we describe how to construct a non-interactive protocol.
-
+This specification describes duplex sponges and codecs, which are the cryptographic components of the Fiat-Shamir transformation. Given the two and a interactive protocol, we specify how to compile the ingredients into a non-interactive protocol.
 --- middle
 
 # Introduction
@@ -59,16 +52,20 @@ The Fiat-Shamir transformation is a technique that uses a hash function to conve
 
 We specify a variant of the Fiat-Shamir transformation, where the hash-function is obtained from a _duplex sponge_.
 
-A duplex sponge is a stateful hash object that can absorb inputs incrementally and squeeze variable-length unpredictable messages.
-The duplex sponge is defined over a base alphabet (typically bytes) which might not match the domain over which the prover and verifier messages are defined.
+A duplex sponge is a stateful hash object that can absorb inputs incrementally and squeeze variable-length unpredictable messages. The sponge operates over an alphabet that we refer to as the _native sponge alphabet_. That is, the sponge can incrementally absorb variables length message of native sponge alphabet elements, and can squeeze unpredictable vectors over the same native sponge alphabet.
+The native alphabet of a sponge is typically bytes and is fixed by the choice of the sponge.
 
-A _codec_ is a stateful object that can absorb inputs incrementally and squeeze unpredictable challenges. A codec is _compatible_ with a given interactive protocol if the domain of the inputs that the codec can absorb matches the domain of the prover messages and the challenges matches the domain of the verifier messages of the specified protocol. Internally, a codec uses a duplex sponge and performs the appropriate conversion.
+In contrast, the messages of an interactive protocol can vary alphabet between prover and verifier messages or even within a round. We mandate that protocols specify the alphabet of *each* of its prover and verifier messages, and refer to said alphabets as the _message alphabets_.
+
+A _codec_ performs the conversion of native sponge alphabets to and from message alphabets.
+More formally, for each prover message a codec specifies how many native sponge elements are to be absorbed and how to convert the prover message to those native sponge elements. Similary, for each verifier message the codec specifies how many native sponge elements are to be squeezed, and how to convert those native sponge elements into a verifier message.
 
 The Fiat-Shamir transformation combines the following ingredients to construct a non-interactive protocol:
 
-- An initialization vector (IV) uniquely identifying the protocol.
-- A interactive protocol.
-- A codec compatible with the interactive protocol.
+- An initialization vector (IV) uniquely identifying the protocol;
+- A interactive protocol;
+- A duplex sponge; and
+- A codec compatible with the interactive protocol and the duplex sponge.
 
 # The Duplex Sponge Interface
 
