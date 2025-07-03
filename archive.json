@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-01T01:38:54.153832+00:00",
+  "timestamp": "2025-07-03T01:21:03.883025+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -1816,6 +1816,32 @@
       "mergeCommit": {
         "oid": "61f5ca82464291f695bf7b7d431f3e58b600f791"
       },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 60,
+      "id": "PR_kwDONyiw_86dDkAF",
+      "title": "Editorial changes to FS spec",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/60",
+      "state": "OPEN",
+      "author": "WizardOfMenlo",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Important to check:\r\n\r\n- The duplex sponge API in 5.2.1 did not use the IV in any way, I have added it now. \r\n- In Section 4, the instance is never included in the FS. Is this by design because it should be included in the IV or is this an oversight?\r\n- What did we want here? These functions MUST raise an exception if the integer over which they We consider the function bytes_to_in ",
+      "createdAt": "2025-07-02T10:04:22Z",
+      "updatedAt": "2025-07-02T10:56:43Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "970a5fa8d0c13fc6bd67920c822064c00ad33e51",
+      "headRepository": "WizardOfMenlo/draft-zkproof-sigma-protocols",
+      "headRefName": "giacomo/new",
+      "headRefOid": "6de995679125735513142de6cf97cb13dfe4370f",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
       "comments": [],
       "reviews": []
     }
