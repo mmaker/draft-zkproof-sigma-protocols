@@ -41,16 +41,9 @@ informative:
 
 --- abstract
 
-This document describes the Fiat-Shamir transformation, a generic procedure to compile an interactive protocol into a non-interactive protocol by combining the interactive protocol with a duplex sponge.
+This document describes the Fiat-Shamir transformation: a generic transformation to convert an interactive protocol into a non-interactive protocol with equivalent functionality.
 
-We describe a generic duplex sponge interface that support "absorb" and "squeeze" operations over a elements of a specified base type.
-The absorb operation supports incrementally updating the hash state of the sponge, and the squeeze operation enables squeezing variable-length unpredictable messages.
-The sponge interface supports a number of different hash functions.
-
-In addition, the specification introduces codecs, a mechanism to extend the functionality of a duplex sponge to support elements of other domains.
-
-Given an interactive protocol and a suitable codec, we describe how to construct a non-interactive protocol.
-
+This specification describes duplex sponges and codecs, which are the cryptographic components of the Fiat-Shamir transformation. Given the two and a interactive protocol, we specify how to compile the ingredients into a non-interactive protocol.
 --- middle
 
 # Introduction
@@ -59,23 +52,27 @@ The Fiat-Shamir transformation is a technique that uses a hash function to conve
 
 We specify a variant of the Fiat-Shamir transformation, where the hash-function is obtained from a _duplex sponge_.
 
-A duplex sponge is a stateful hash object that can absorb inputs incrementally and squeeze variable-length unpredictable messages.
-The duplex sponge is defined over a base alphabet (typically bytes) which might not match the domain over which the prover and verifier messages are defined.
+A duplex sponge is a stateful hash object that can absorb inputs incrementally and squeeze variable-length unpredictable messages. The sponge operates over an alphabet that we refer to as the _native sponge alphabet_. That is, the sponge can incrementally absorb variables length message of native sponge alphabet elements, and can squeeze unpredictable vectors over the same native sponge alphabet.
+The native alphabet of a sponge is typically bytes and is fixed by the choice of the sponge.
 
-A _codec_ is a stateful object that can absorb inputs incrementally and squeeze unpredictable challenges. A codec is _compatible_ with a given interactive protocol if the domain of the inputs that the codec can absorb matches the domain of the prover messages and the challenges matches the domain of the verifier messages of the specified protocol. Internally, a codec uses a duplex sponge and performs the appropriate conversion.
+In contrast, the messages of an interactive protocol can vary alphabet between prover and verifier messages or even within a round. We mandate that protocols specify the alphabet of *each* of its prover and verifier messages, and refer to said alphabets as the _message alphabets_.
+
+A _codec_ performs the conversion of native sponge alphabets to and from message alphabets.
+More formally, for each prover message a codec specifies how many native sponge elements are to be absorbed and how to convert the prover message to those native sponge elements. Similary, for each verifier message the codec specifies how many native sponge elements are to be squeezed, and how to convert those native sponge elements into a verifier message.
 
 The Fiat-Shamir transformation combines the following ingredients to construct a non-interactive protocol:
 
-- An initialization vector (IV) uniquely identifying the protocol.
-- A interactive protocol.
-- A codec compatible with the interactive protocol.
+- an initialization vector (IV) uniquely identifying the protocol;
+- a interactive protocol;
+- a duplex sponge; and
+- a codec compatible with the interactive protocol and the duplex sponge.
 
 # The Duplex Sponge Interface
 
 A duplex sponge operates over an abstract `Unit` type and provides the following interface.
 
     class DuplexSponge:
-      def new(iv: bytes) -> DuplexSponge
+      def init(iv: bytes) -> DuplexSponge
       def absorb(self, x: list[Unit])
       def squeeze(self, length: int) -> list[Unit]
 
@@ -91,38 +88,43 @@ Where:
 A codec provides the following interface.
 
     class Codec:
-        def new(iv: bytes) -> Codec
-        def prover_message(self, prover_message)
-        def verifier_challenge(self) -> verifier_challenge
+        def init() -> Codec
+        def prover_message(self, hash_state, prover_message)
+        def verifier_challenge(self, hash_state) -> verifier_challenge
+        def public_message(self, hash_state, public_message)
 
 Where:
 
-- `init(iv: bytes) -> DuplexSponge` denotes the initialization function. This function takes as input a 32-byte initialization vector `iv` and initializes the state of the codec.
-- `prover_message(self, prover_message) -> self` denotes the absorb operation of the codec. This function takes as input a prover message `prover_message` and mutates the codec's internal state.
-- `verifier_challenge(self) -> verifier_challenge` denotes the squeeze operation of the codec. This function takes no inputs and uses the codec's internal state to produce an unpredictable verifier challenge `verifier_challenge`.
-
+- `init() -> DuplexSponge` denotes the initialization function. This function initializes the state of the codec.
+- `prover_message(self, hash_state, prover_message) -> self` denotes the operation that converts a prover message to native sponge elements and absorbs the results. This function takes as input the `hash_state` of a duplex sponge and a prover message `prover_message`. `hash_state` may be mutated.
+- `verifier_challenge(self, hash_state) -> verifier_challenge` denotes the operation that squeezes native sponge elements and converts them to a verifier message. This function takes as input the `hash_state` of a duplex sponge and produces an unpredictable verifier challenge `verifier_challenge`. `hash_state` may be mutated.
+- `public_message(self, hash_state, public_message) -> self` denotes the operation that converts a public message to native sponge elements and absorbs the results. This function takes as input the `hash_state` of a duplex sponge and a public message `public_message`. `hash_state` may be mutated.
 
 # Fiat-Shamir transformation for Sigma Protocols
 
 We describe how to construct non-interactive proofs for sigma protocols.
 The Fiat-Shamir transformation is parametrized by:
 
-- a `Codec`, which specifies how to absorb prover messages and how to squeeze verifier challenges;
+- a `DuplexSponge`, which is the duplex sponge used by the transformation;
+- a `Codec`, which specifies how to absorb prover messages and how to squeeze verifier challenges; and
 - a `SigmaProtocol`, which specifies an interactive 3-message protocol.
 
 Upon initialization, the protocol receives as input an `iv` of 32-bytes which uniquely identifies the protocol and the session being proven and (optionally) pre-processes some information about the protocol using the instance.
 
     class NISigmaProtocol:
+        DuplexSponge: DuplexSponge
         Protocol: SigmaProtocol
         Codec: Codec
 
         def init(self, iv: bytes, instance):
-            self.hash_state = self.Codec(iv)
+            self.hash_state = self.DuplexSponge(iv)
+            self.codec = self.Codec()
             self.ip = self.Protocol(instance)
 
         def prove(self, witness, rng):
+            self.codec.public_message(self.hash_state, self.ip.instance)
             (prover_state, commitment) = self.ip.prover_commit(witness, rng)
-            challenge = self.hash_state.prover_message(commitment).verifier_challenge()
+            challenge = self.codec.prover_message(self.hash_state, commitment).verifier_challenge(self.hash_state)
             response = self.ip.prover_response(prover_state, challenge)
 
             assert self.ip.verifier(commitment, challenge, response)
@@ -133,7 +135,8 @@ Upon initialization, the protocol receives as input an `iv` of 32-bytes which un
             response_bytes = proof[self.ip.instance.commit_bytes_len:]
             commitment = self.ip.deserialize_commitment(commitment_bytes)
             response = self.ip.deserialize_response(response_bytes)
-            challenge = self.hash_state.prover_message(commitment).verifier_challenge()
+            self.codec.public_message(self.hash_state, self.ip.instance)
+            challenge = self.codec.prover_message(self.hash_state, commitment).verifier_challenge(self.hash_state)
             return self.ip.verifier(commitment, challenge, response)
 
 ## Codec for Linear maps {#group-prove}
@@ -142,18 +145,17 @@ We describe a codec for Schnorr proofs over groups of prime order `p` that is in
 
     class LinearMapCodec:
         Group: groups.Group = None
-        DuplexSponge: DuplexSpongeInterface = None
 
-        def init(self, iv: bytes):
-            self.hash_state = self.DuplexSponge(iv)
+        def init(self):
+            pass
 
-        def prover_message(self, elements: list):
-            self.hash_state.absorb(self.Group.serialize(elements))
+        def prover_message(self, hash_state: DuplexSponge, elements: list):
+            hash_state.absorb(self.Group.serialize(elements))
             # calls can be chained
             return self
 
-        def verifier_challenge(self):
-            uniform_bytes = self.hash_state.squeeze(
+        def verifier_challenge(self, hash_state: DuplexSponge):
+            uniform_bytes = hash_state.squeeze(
                 self.Group.ScalarField.scalar_byte_length() + 16
             )
             scalar = OS2IP(uniform_bytes) % self.Group.ScalarField.order
@@ -167,7 +169,7 @@ SHAKE128 is a variable-length hash function based on the Keccak sponge construct
 
 ### Initialization
 
-    new(self, iv)
+    init(self, iv)
 
     Inputs:
 
@@ -212,7 +214,7 @@ A duplex sponge in overwrite mode is based on a permutation function that operat
 
 This is the constructor for a duplex sponge object. It is initialized with a 32-byte initialization vector.
 
-    new(iv)
+    init(iv)
 
     Inputs:
     - iv, a 32-byte initialization vector
@@ -222,6 +224,7 @@ This is the constructor for a duplex sponge object. It is initialized with a 32-
     2. self.squeeze_index = self.permutation_state.R
     3. self.rate = self.permutation_state.R
     4. self.capacity = self.permutation_state.N - self.permutation_state.R
+    5. self.permutation_state[self.rate: self.rate + 32] = iv
 
 ### Absorb
 
