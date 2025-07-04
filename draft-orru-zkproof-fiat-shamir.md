@@ -91,12 +91,14 @@ A codec provides the following interface.
         def init() -> Codec
         def prover_message(self, hash_state, prover_message)
         def verifier_challenge(self, hash_state) -> verifier_challenge
+        def public_message(self, hash_state, public_message)
 
 Where:
 
 - `init() -> DuplexSponge` denotes the initialization function. This function initializes the state of the codec.
-- `prover_message(self, hash_state, prover_message) -> self` denotes the absorb operation of the codec. This function takes as input the `hash_state` of a duplex sponge and a prover message `prover_message`. `hash_state` may be mutated.
-- `verifier_challenge(self, hash_state) -> verifier_challenge` denotes the squeeze operation of the codec. This function takes as input the `hash_state` of a duplex sponge and produces an unpredictable verifier challenge `verifier_challenge`. `hash_state` may be mutated.
+- `prover_message(self, hash_state, prover_message) -> self` denotes the operation that converts a prover message to native sponge elements and absorbs the results. This function takes as input the `hash_state` of a duplex sponge and a prover message `prover_message`. `hash_state` may be mutated.
+- `verifier_challenge(self, hash_state) -> verifier_challenge` denotes the operation that squeezes native sponge elements and converts them to a verifier message. This function takes as input the `hash_state` of a duplex sponge and produces an unpredictable verifier challenge `verifier_challenge`. `hash_state` may be mutated.
+- `public_message(self, hash_state, public_message) -> self` denotes the operation that converts a public message to native sponge elements and absorbs the results. This function takes as input the `hash_state` of a duplex sponge and a public message `public_message`. `hash_state` may be mutated.
 
 # Fiat-Shamir transformation for Sigma Protocols
 
@@ -120,6 +122,7 @@ Upon initialization, the protocol receives as input an `iv` of 32-bytes which un
             self.ip = self.Protocol(instance)
 
         def prove(self, witness, rng):
+            self.codec.public_message(self.hash_state, self.ip.instance)
             (prover_state, commitment) = self.ip.prover_commit(witness, rng)
             challenge = self.codec.prover_message(self.hash_state, commitment).verifier_challenge(self.hash_state)
             response = self.ip.prover_response(prover_state, challenge)
@@ -132,6 +135,7 @@ Upon initialization, the protocol receives as input an `iv` of 32-bytes which un
             response_bytes = proof[self.ip.instance.commit_bytes_len:]
             commitment = self.ip.deserialize_commitment(commitment_bytes)
             response = self.ip.deserialize_response(response_bytes)
+            self.codec.public_message(self.hash_state, self.ip.instance)
             challenge = self.codec.prover_message(self.hash_state, commitment).verifier_challenge(self.hash_state)
             return self.ip.verifier(commitment, challenge, response)
 
