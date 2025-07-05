@@ -22,6 +22,13 @@ class NISigmaProtocol:
         self.sp = self.Protocol(instance)
         self.codec = self.Codec()
 
+    @classmethod
+    def init_with_session_id(cls, session_id, instance):
+        protocol_id = instance.get_protocol_id()
+        instance_label = instance.get_instance_label()
+        iv_from_id = self.Hash.get_iv_from_identifiers(protocol_id, session_id, instance_label)
+        return cls(iv_from_id, instance)
+
     def prove(self, witness, rng):
         (prover_state, commitment) = self.sp.prover_commit(witness, rng)
         self.codec.prover_message(self.hash_state, commitment)
