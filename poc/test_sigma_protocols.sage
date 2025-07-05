@@ -9,10 +9,10 @@ CONTEXT_STRING = b'yellow submarine' * 2
 
 
 def test_vector(test_vector_function):
-    from sagelib.ciphersuite import NISchnorrProofKeccakDuplexSpongeP256 as NIZK
+    from sagelib.ciphersuite import NISchnorrProofKeccakDuplexSpongeBls12381 as NIZK
 
     def inner(vectors):
-        rng = TestDRNG("test vector seed".encode('utf-8'))
+        rng = TestDRNG("hello world".encode('utf-8'))
         test_vector_name = f"{test_vector_function.__name__}"
 
         instance, witness = test_vector_function(rng, NIZK.Codec.GG)
@@ -22,7 +22,7 @@ def test_vector(test_vector_function):
         print(f"{test_vector_name} narg_string: {hex_narg_string}\n")
 
         vectors[test_vector_name] = {
-            "Ciphersuite": "sigma/OWKeccak1600+P256",
+            "Ciphersuite": "sigma/OWKeccak1600+Bls12381",
             "Context": CONTEXT_STRING.hex(),
             "Statement": "TODO",
             "Proof": hex_narg_string,
