@@ -189,10 +189,7 @@ class SchnorrProof(SigmaProtocol):
         self.instance = instance
 
     def prover_commit(self, witness, rng):
-        nonces = [
-            self.instance.Domain.random(rng)
-            for _ in range(self.instance.linear_map.num_scalars)
-        ]
+        nonces = [self.instance.Domain.random(rng) for _ in range(self.instance.linear_map.num_scalars)]
         prover_state = self.ProverState(witness, nonces)
         commitment = self.instance.linear_map(nonces)
         return (prover_state, commitment)
