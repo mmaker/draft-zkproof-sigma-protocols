@@ -26,11 +26,6 @@ author:
     fullname: "Michele Orrù"
     organization: CNRS
     email: "m@orru.net"
--
-
-    fullname: "Giacomo Fenzi"
-    organization: EPFL
-    email: "giacomo.fenzi@epfl.ch"
 
 normative:
 
