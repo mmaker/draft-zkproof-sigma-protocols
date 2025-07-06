@@ -24,9 +24,9 @@ class NISigmaProtocol:
 
     @classmethod
     def init_with_session_id(cls, session_id, instance):
-        protocol_id = instance.get_protocol_id()
-        instance_label = instance.get_instance_label()
-        iv_from_id = self.Hash.get_iv_from_identifiers(protocol_id, session_id, instance_label)
+        protocol_id = cls.Protocol.get_protocol_id()
+        instance_label = cls.Protocol(instance).get_instance_label()
+        iv_from_id = cls.Hash.get_iv_from_identifiers(protocol_id, session_id, instance_label)
         return cls(iv_from_id, instance)
 
     def prove(self, witness, rng):
@@ -46,5 +46,3 @@ class NISigmaProtocol:
         self.codec.prover_message(self.hash_state, commitment)
         challenge = self.codec.verifier_challenge(self.hash_state)
         return self.sp.verifier(commitment, challenge, response)
-
-

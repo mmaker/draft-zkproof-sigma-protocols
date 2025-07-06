@@ -21,6 +21,7 @@ setup:
 test: pyfiles
 	sage test_duplex_sponge.sage
 	sage test_sigma_protocols.sage
+	sage test_sigma_protocols_with_sess_id.sage
 
 vectors: pyfiles
 	@echo "Removing vectors folder, if present"

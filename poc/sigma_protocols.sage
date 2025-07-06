@@ -241,6 +241,6 @@ class SchnorrProof(SigmaProtocol):
 
     def get_instance_label(self):
         return self.instance.get_label()
-    
-    def get_protocol_id(self):
+
+    def get_protocol_id():
         return b'draft-zkproof-fiat-shamir'
