@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-03T01:21:03.883025+00:00",
+  "timestamp": "2025-07-06T01:28:02.506093+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -742,7 +742,7 @@
       "labels": [],
       "body": "From @wbl:\n\n> We might also need to tackle not-prime order points: verifying order is\n> expensive, but there are some tricks on BLS 12 to speed it up, but\n> when doing a batched proof cofactor clearing is comparatively cheap.\n\nThis is already discussed in the TeX specification -- perhaps one can just test that the instance is in the group, and not the commitment?",
       "createdAt": "2025-05-10T13:56:59Z",
-      "updatedAt": "2025-06-30T22:45:07Z",
+      "updatedAt": "2025-07-06T00:46:29Z",
       "closedAt": null,
       "comments": [
         {
@@ -769,9 +769,9 @@
         {
           "author": "mmaker",
           "authorAssociation": "OWNER",
-          "body": "To add on that, following discussions with Ian:\n\n1. the prover should do its best at catching trivial relations. It should return an error. \n2. we should explicit more the check on the instance\n\n@cathieyun thanks for your recommendations.\n@wbl I agree group check can be expensive, and that this cost can be amortized in the case of repeated verifications . \nI agree that verifying N proofs will cost O(N * large_curve_operations) instead of O(N * subgroup_operations).\nI'll comment for now this as \"optional\" (in the same way we do for verifying the proof after proving it), and consider the change sufficient",
+          "body": "To add on that, following discussions with Ian:\n\n1. the prover should do its best at catching trivial relations. It should return an error. \n2. we should explicit how the instance is checked for being in the right space\n\n@wbl I agree group check can be expensive, and that this cost can be amortized in the case of repeated verifications.\nI also agree that verifying N proofs checking for subgroup validity as Cathie says will cost O(N * large_curve_operations) instead of O(N * subgroup_operations).  I'll comment for now this as \"optional\" (in the same way we do for verifying the proof after proving it), and consider the change sufficient.\n@cathieyun thanks for your recommendations. I'll let you close this issue if you agree with my take.",
           "createdAt": "2025-06-30T22:44:30Z",
-          "updatedAt": "2025-06-30T22:45:07Z"
+          "updatedAt": "2025-07-06T00:46:29Z"
         }
       ]
     },
@@ -1831,14 +1831,68 @@
       "labels": [],
       "body": "Important to check:\r\n\r\n- The duplex sponge API in 5.2.1 did not use the IV in any way, I have added it now. \r\n- In Section 4, the instance is never included in the FS. Is this by design because it should be included in the IV or is this an oversight?\r\n- What did we want here? These functions MUST raise an exception if the integer over which they We consider the function bytes_to_in ",
       "createdAt": "2025-07-02T10:04:22Z",
-      "updatedAt": "2025-07-02T10:56:43Z",
+      "updatedAt": "2025-07-04T17:15:45Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
       "baseRefOid": "970a5fa8d0c13fc6bd67920c822064c00ad33e51",
       "headRepository": "WizardOfMenlo/draft-zkproof-sigma-protocols",
       "headRefName": "giacomo/new",
-      "headRefOid": "6de995679125735513142de6cf97cb13dfe4370f",
+      "headRefOid": "1b25b56c906d263ef36c8f8703954dc985e1443c",
       "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 61,
+      "id": "PR_kwDONyiw_86dkiON",
+      "title": "Vishady/match test vectors",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/61",
+      "state": "MERGED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-05T17:19:28Z",
+      "updatedAt": "2025-07-05T21:47:24Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "970a5fa8d0c13fc6bd67920c822064c00ad33e51",
+      "headRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "headRefName": "vishady/match-test-vectors",
+      "headRefOid": "16e0b497b76b6ef3e57f6479997d1c0438aa78ae",
+      "closedAt": "2025-07-05T21:47:24Z",
+      "mergedAt": "2025-07-05T21:47:24Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "41dd5e46bb70cba750a4ea7170503d1e29c272b4"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 62,
+      "id": "PR_kwDONyiw_86dknkO",
+      "title": "Updated the test infrastructure to ensure that generated test vectors match the expected values from the specification",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/62",
+      "state": "CLOSED",
+      "author": "nougzarm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-05T17:45:54Z",
+      "updatedAt": "2025-07-05T21:45:07Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "970a5fa8d0c13fc6bd67920c822064c00ad33e51",
+      "headRepository": "nougzarm/draft-zkproof-sigma-protocols",
+      "headRefName": "main",
+      "headRefOid": "3ea586ba181dd7b856ca05f0cede82cecaee2ccd",
+      "closedAt": "2025-07-05T21:45:07Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
