@@ -4,9 +4,8 @@
 
 Zkproof                                                          M. Orrù
 Internet-Draft                                                      CNRS
-Intended status: Informational                                  G. Fenzi
-Expires: 6 January 2026                                             EPFL
-                                                             5 July 2025
+Intended status: Informational                               6 July 2025
+Expires: 7 January 2026
 
 
                        Fiat-Shamir Transformation
@@ -65,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 January 2026.
+   This Internet-Draft will expire on 7 January 2026.
 
 Copyright Notice
 
@@ -108,7 +107,7 @@ Table of Contents
    8.  References
      8.1.  Normative References
      8.2.  Informative References
-   Authors' Addresses
+   Author's Address
 
 1.  Introduction
 
@@ -494,13 +493,8 @@ field_bytes_length, the number of bytes to represent the scalar element, equal t
               <https://nvlpubs.nist.gov/nistpubs/FIPS/
               NIST.FIPS.202.pdf>.
 
-Authors' Addresses
+Author's Address
 
    Michele Orrù
    CNRS
    Email: m@orru.net
-
-
-   Giacomo Fenzi
-   EPFL
-   Email: giacomo.fenzi@epfl.ch
