@@ -22,12 +22,18 @@ class NISigmaProtocol:
         self.sp = self.Protocol(instance)
         self.codec = self.Codec()
 
+    @classmethod
+    def init_with_session_id(cls, session_id, instance):
+        protocol_id = cls.Protocol.get_protocol_id()
+        instance_label = cls.Protocol(instance).get_instance_label()
+        iv_from_id = cls.Hash.get_iv_from_identifiers(protocol_id, session_id, instance_label)
+        return cls(iv_from_id, instance)
+
     def prove(self, witness, rng):
         (prover_state, commitment) = self.sp.prover_commit(witness, rng)
         self.codec.prover_message(self.hash_state, commitment)
         challenge = self.codec.verifier_challenge(self.hash_state)
         response = self.sp.prover_response(prover_state, challenge)
-
         assert self.sp.verifier(commitment, challenge, response)
         return self.sp.serialize_commitment(commitment) + self.sp.serialize_response(response)
 
@@ -39,5 +45,3 @@ class NISigmaProtocol:
         self.codec.prover_message(self.hash_state, commitment)
         challenge = self.codec.verifier_challenge(self.hash_state)
         return self.sp.verifier(commitment, challenge, response)
-
-

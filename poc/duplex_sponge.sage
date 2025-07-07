@@ -116,6 +116,19 @@ class KeccakDuplexSponge(DuplexSponge):
         self.permutation_state = KeccakPermutationState(iv)
         super().__init__(iv)
 
+    @classmethod
+    def get_iv_from_identifiers(cls, protocol_id: bytes, session_id: bytes, instance_label: bytes):
+        WORD_SIZE = int(32)
+        length_to_bytes = lambda x: int(x).to_bytes(WORD_SIZE, 'big')
+        init = length_to_bytes(0)
+        init.absorb(length_to_bytes(len(protocol_id)))
+        init.absorb(protocol_id)
+        init.absorb(length_to_bytes(len(session_id)))
+        init.absorb(session_id)
+        init.absorb(length_to_bytes(len(instance_label)))
+        init.absorb(instance_label)
+        iv = init.squeeze(32)
+        return iv
 
 class SHAKE128(DuplexSpongeInterface):
     def __init__(self, iv: bytes):
