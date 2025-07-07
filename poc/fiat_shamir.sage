@@ -34,7 +34,6 @@ class NISigmaProtocol:
         self.codec.prover_message(self.hash_state, commitment)
         challenge = self.codec.verifier_challenge(self.hash_state)
         response = self.sp.prover_response(prover_state, challenge)
-        challenge_serialized = self.sp.serialize_challenge(challenge)
         assert self.sp.verifier(commitment, challenge, response)
         return self.sp.serialize_commitment(commitment) + self.sp.serialize_response(response)
 
