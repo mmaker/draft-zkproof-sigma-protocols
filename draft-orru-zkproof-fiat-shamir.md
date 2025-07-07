@@ -36,15 +36,11 @@ informative:
 
 --- abstract
 
-This document describes the Fiat-Shamir transformation, a generic procedure to compile an interactive protocol into a non-interactive protocol by combining the interactive protocol with a duplex sponge.
+This document describes how to construct a non-interactive proof via the Fiat–Shamir transformation, using a generic procedure that compiles an interactive protocol into a non-interactive one by relying on a stateful hash object that provides a duplex sponge interface.
 
-We describe a generic duplex sponge interface that support "absorb" and "squeeze" operations over elements of a specified base type.
-The absorb operation supports incrementally updating the hash state of the sponge, and the squeeze operation enables squeezing variable-length unpredictable messages.
-The sponge interface supports a number of different hash functions.
+The duplex sponge interface requires two methods: absorb and squeeze, which respectively read and write elements of a specified base type. The absorb operation incrementally updates the sponge's internal hash state, while the squeeze operation produces variable-length, unpredictable outputs. This interface can be instantiated with various hash functions based on permutation or compression functions.
 
-In addition, the specification introduces codecs, a mechanism to extend the functionality of a duplex sponge to support elements of other domains.
-
-Given an interactive protocol and a suitable codec, we describe how to construct a non-interactive protocol.
+This specification also defines codecs to securely map elements from the prover into the duplex sponge domain, and from the duplex sponge domain into verifier messages.
 
 --- middle
 
