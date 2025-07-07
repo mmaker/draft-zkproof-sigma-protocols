@@ -85,13 +85,11 @@ informative:
 
 --- abstract
 
-This document describes Sigma Protocols, a secure, general-purpose zero-knowledge proof of knowledge. Concretely, the scheme allows proving knowledge of a witness, without revealing any information about the undisclosed messages or the signature itself, while at the same time, guarantying soundness of the overall protocols.
+This document describes interactive sigma protocols—secure, general-purpose zero-knowledge proofs of knowledge consisting of three moves: commitment, challenge, and response. Concretely, the protocol allows one to prove knowledge of a witness without revealing any information about it.
 
 --- middle
 
 # Introduction
-
-A Sigma Protocol is a simple zero-knowledge proof of knowledge that allows a **prover** to convince a **verifier** of the knowledge of a secret **witness** satisfying a **statement**.
 
 Any sigma protocol must define three objects: a *commitment* (computed by the prover), a *challenge* (computed by the verifier), and a *response* (computed by the prover).
 
