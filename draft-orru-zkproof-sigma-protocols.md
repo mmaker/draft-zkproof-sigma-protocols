@@ -150,7 +150,7 @@ Traditionally, sigma protocols are defined in Camenisch-Stadler notation as (for
 
     1. DLEQ(G, H, X, Y) = PoK{
     2.   (x):        // Secret variables
-    3.   X = x * G, Y = x * H
+    3.   X = x * G, Y = x * H        // Predicates to satisfy
     4. }
 
 In the above, line 1 declares that the proof name is "DLEQ", the public information (the **instance**) consists of the group elements `(G, X, H, Y)` denoted in upper-case.
@@ -197,7 +197,7 @@ This defines the object `SchnorrProof`. The initialization function takes as inp
 
 ### Prover procedures
 
-The prover of a sigma protocol is stateful and will send two message, a "commitment" and a "response" message, described below.
+The prover of a sigma protocol is stateful and will send two messages, a "commitment" and a "response" message, described below.
 
 #### Prover commitment
 
@@ -268,7 +268,7 @@ A witness is simply a list of `num_scalars` elements.
 
 ### Linear map {#linear-map}
 
-A `LinearMap` represents a function (a _linear map_ from the scalar field to the elliptic curve group) that, given as input an array of `Scalar` elements, outputs an array of `Group` element. This can be represented as matrix-vector (scalar) product using group multi-scalar multiplication. However, since the matrix is often times sparse, it is often more convenient to store the matrix in Yale sparse matrix.
+A `LinearMap` represents a function (a _linear map_ from the scalar field to the elliptic curve group) that, given as input an array of `Scalar` elements, outputs an array of `Group` elements. This can be represented as matrix-vector (scalar) product using group multi-scalar multiplication. However, since the matrix is oftentimes sparse, it is often more convenient to store the matrix in Yale sparse matrix format.
 
 Here is an example:
 
@@ -304,7 +304,7 @@ A witness can be mapped to a group element via:
 
     Inputs:
 
-    - self, the current sate of the constraint system
+    - self, the current state of the constraint system
     - witness,
 
     1. image = []
@@ -332,7 +332,7 @@ class LinearRelation:
 
 #### Element and scalar variables allocation
 
-Two functions allow two allocate the new scalars (the witness) and group elements (the instance).
+Two functions allow to allocate the new scalars (the witness) and group elements (the instance).
 
     allocate_scalars(self, n)
 
@@ -440,7 +440,7 @@ This ciphersuite uses P-256 {{SP800}} for the Group.
 
 - `order()`: Return the integer `115792089210356248762697446949407573529996955224135760342422259061068512044369`.
 - `serialize([A])`: Implemented using the compressed Elliptic-Curve-Point-to-Octet-String method according to {{SEC1}}; `Ne = 33`.
-- `deserialize(buf)`: Implemented by attempting to read `buf` into chunks of 32-byte arrays and convert them using the compressed Octet-String-to-Elliptic-Curve-Point method according to {{SEC1}}, and then performs partial public-key validation as defined in section 5.6.2.3.4 of {{!KEYAGREEMENT=DOI.10.6028/NIST.SP.800-56Ar3}}. This includes checking that the coordinates of the resulting point are in the correct range, that the point is on the curve, and that the point is not the point at infinity.
+- `deserialize(buf)`: Implemented by attempting to read `buf` into chunks of 33-byte arrays and convert them using the compressed Octet-String-to-Elliptic-Curve-Point method according to {{SEC1}}, and then performs partial public-key validation as defined in section 5.6.2.3.4 of {{!KEYAGREEMENT=DOI.10.6028/NIST.SP.800-56Ar3}}. This includes checking that the coordinates of the resulting point are in the correct range, that the point is on the curve, and that the point is not the point at infinity.
 
 #### Scalar Field of P-256
 
@@ -492,7 +492,7 @@ Implementations requiring post-quantum soundness SHOULD transition to alternativ
 
 Implementations should consider the timeline for quantum computing advances when planning migration to post-quantum sound alternatives.
 Implementers MAY adopt a hybrid approach during migration to post-quantum security by using AND composition of proofs. This approach enables gradual migration while maintaining security against classical adversaries.
-This composition retains soundness if **both** problem remains hard. AND composition of proofs is NOT described in this specification, but examples may be found in the proof-of-concept implementation and in {{BonehS23}}.
+This composition retains soundness if **both** problems remain hard. AND composition of proofs is NOT described in this specification, but examples may be found in the proof-of-concept implementation and in {{BonehS23}}.
 
 # Generation of the protocol identifier {#protocol-id-generation}
 

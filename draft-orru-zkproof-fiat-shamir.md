@@ -50,8 +50,8 @@ The Fiat-Shamir transformation is a technique that uses a hash function to conve
 It depends on:
 
 - An _initialization vector_ (IV) uniquely identifying the protocol, the session, and the statement being proven.
-- An _interactive protocol_ supporting a family of statement to be proven.
-- A _hash function_ implementing the duplex sponge interface, capable of absorbing inputs incrementally and squeeze variable-length unpredictable messages.
+- An _interactive protocol_ supporting a family of statements to be proven.
+- A _hash function_ implementing the duplex sponge interface, capable of absorbing inputs incrementally and squeezing variable-length unpredictable messages.
 - A _codec_, which securely remaps prover elements into the base alphabet, and outputs of the duplex sponge into verifier messages (preserving the distribution).
 
 # The Duplex Sponge Interface
@@ -66,8 +66,8 @@ A duplex sponge operates over an abstract `Unit` type and provides the following
 Where:
 
 - `init(iv: bytes) -> DuplexSponge` denotes the initialization function. This function takes as input a 32-byte initialization vector `iv` and initializes the state of the duplex sponge.
-- `absorb(self, values: list[Unit])` denotes the absorb operation of the sponge. This function takes as input a list of `Unit` elements and mutates the `DuplexSponge` internal state;
-- `squeeze(self, length: int)` denotes the squeeze operation of the sponge. This function takes as input a integral `length` and squeezes a list of `Unit` elements of length `length`.
+- `absorb(self, values: list[Unit])` denotes the absorb operation of the sponge. This function takes as input a list of `Unit` elements and mutates the `DuplexSponge` internal state.
+- `squeeze(self, length: int)` denotes the squeeze operation of the sponge. This function takes as input an integral `length` and squeezes a list of `Unit` elements of length `length`.
 
 # The Codec interface
 
@@ -273,7 +273,7 @@ The squeeze operation extracts output elements from the sponge state, which are 
 
 `Keccak-f` is the permutation function underlying {{SHA3}}.
 
-`KeccakDuplexSponge` instantiated `DuplexSponge` with `Keccak-f[1600]`, using rate `R = 136` bytes and capacity `C = 64` bytes.
+`KeccakDuplexSponge` instantiates `DuplexSponge` with `Keccak-f[1600]`, using rate `R = 136` bytes and capacity `C = 64` bytes.
 
 # Codecs registry
 
@@ -289,8 +289,7 @@ The following functions and notation are used throughout the document.
 - `bytes_to_int` and `scalar_to_bytes`: Convert a byte string to and from a non-negative integer.
   `bytes_to_int` and `scalar_to_bytes` are implemented as `OS2IP` and `I2OSP` as described in
   {{!RFC8017}}, respectively. Note that these functions operate on byte strings
-  in big-endian byte order. These functions MUST raise an exception if the integer over which they
-  We consider the function `bytes_to_in`
+  in big-endian byte order.
 - The function `ecpoint_to_bytes` converts an elliptic curve point in affine-form into an array string of length `ceil(ceil(log2(coordinate_field_order))/ 8) + 1` using `int_to_bytes` prepended by one byte. This is defined as
 
       ecpoint_to_bytes(element)
@@ -324,7 +323,7 @@ The following functions and notation are used throughout the document.
     1. for scalar in scalars:
     2.     hash_state.absorb(scalar_to_bytes(scalar))
 
-Where the function `scalar_to_bytes` is defined in {#notation}
+Where the function `scalar_to_bytes` is defined in {{notation}}
 
 ### Absorb elements
 
@@ -345,7 +344,7 @@ Where the function `scalar_to_bytes` is defined in {#notation}
     Inputs:
 
     - hash_state, the hash state
-    - length, an unsiged integer of 64 bits determining the output length.
+    - length, an unsigned integer of 64 bits determining the output length.
 
     1. for i in range(length):
     2.     scalar_bytes = hash_state.squeeze(field_bytes_length + 16)
