@@ -72,7 +72,7 @@ Table of Contents
      2.2.  Proofs of preimage of a linear map
        2.2.1.  Core protocol
        2.2.2.  Prover procedures
-       2.2.3.  Verifier procedure
+       2.2.3.  Verifier
        2.2.4.  Witness representation
        2.2.5.  Linear map
        2.2.6.  Statements for linear relations
@@ -329,7 +329,7 @@ Procedure:
 1. witness, nonces = prover_state
 2. return [nonces[i] + witness[i] * challenge for i in range(self.instance.linear_map.num_scalars)]
 
-2.2.3.  Verifier procedure
+2.2.3.  Verifier
 
 verify(self, commitment, challenge, response)
 
