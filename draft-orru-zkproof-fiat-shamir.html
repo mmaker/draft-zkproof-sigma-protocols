@@ -8,7 +8,7 @@
 <meta content="Michele Orrù" name="author">
 <meta content='
        This document describes the Fiat-Shamir transformation, a generic procedure to compile an interactive protocol into a non-interactive protocol by combining the interactive protocol with a duplex sponge. 
-       We describe a generic duplex sponge interface that support "absorb" and "squeeze" operations over a elements of a specified base type.
+       We describe a generic duplex sponge interface that support "absorb" and "squeeze" operations over elements of a specified base type.
 The absorb operation supports incrementally updating the hash state of the sponge, and the squeeze operation enables squeezing variable-length unpredictable messages.
 The sponge interface supports a number of different hash functions. 
        In addition, the specification introduces codecs, a mechanism to extend the functionality of a duplex sponge to support elements of other domains. 
@@ -1086,7 +1086,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">This document describes the Fiat-Shamir transformation, a generic procedure to compile an interactive protocol into a non-interactive protocol by combining the interactive protocol with a duplex sponge.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
-<p id="section-abstract-2">We describe a generic duplex sponge interface that support "absorb" and "squeeze" operations over a elements of a specified base type.
+<p id="section-abstract-2">We describe a generic duplex sponge interface that support "absorb" and "squeeze" operations over elements of a specified base type.
 The absorb operation supports incrementally updating the hash state of the sponge, and the squeeze operation enables squeezing variable-length unpredictable messages.
 The sponge interface supports a number of different hash functions.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 <p id="section-abstract-3">In addition, the specification introduces codecs, a mechanism to extend the functionality of a duplex sponge to support elements of other domains.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
@@ -1268,10 +1268,13 @@ The duplex sponge is defined over a base alphabet (typically bytes) which might 
           <p id="section-1-6.1.1">An initialization vector (IV) uniquely identifying the protocol.<a href="#section-1-6.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-6.2">
-          <p id="section-1-6.2.1">A interactive protocol.<a href="#section-1-6.2.1" class="pilcrow">¶</a></p>
+          <p id="section-1-6.2.1">An interactive protocol.<a href="#section-1-6.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-6.3">
-          <p id="section-1-6.3.1">A codec compatible with the interactive protocol.<a href="#section-1-6.3.1" class="pilcrow">¶</a></p>
+          <p id="section-1-6.3.1">A hash function.<a href="#section-1-6.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-1-6.4">
+          <p id="section-1-6.4.1">A codec for the interactive protocol, compatible with the hash function.<a href="#section-1-6.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
