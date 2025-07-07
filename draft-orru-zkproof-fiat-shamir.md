@@ -47,11 +47,11 @@ This specification also defines codecs to securely map elements from the prover 
 # Introduction
 
 The Fiat-Shamir transformation is a technique that uses a hash function to convert a public-coin interactive protocol between a prover and a verifier into a corresponding non-interactive protocol.
-This is done with the following ingredients:
+It depends on:
 
-- An initialization vector (IV) uniquely identifying the protocol, the session, and the statement being proven.
-- An interactive protocol.
-- A stateful hash object that implements the _duplex sponge interface_, capable of absorbing inputs incrementally and squeeze variable-length unpredictable messages. It is defined over a base alphabet (typically bytes).
+- An _initialization vector_ (IV) uniquely identifying the protocol, the session, and the statement being proven.
+- An _interactive protocol_ supporting a family of statement to be proven.
+- A _hash function_ implementing the duplex sponge interface, capable of absorbing inputs incrementally and squeeze variable-length unpredictable messages.
 - A _codec_, which securely remaps prover elements into the base alphabet, and outputs of the duplex sponge into verifier messages (preserving the distribution).
 
 # The Duplex Sponge Interface
@@ -65,7 +65,6 @@ A duplex sponge operates over an abstract `Unit` type and provides the following
 
 Where:
 
-- The type `Unit` MUST have fixed size in memory, partial ordering, and at least two elements.
 - `init(iv: bytes) -> DuplexSponge` denotes the initialization function. This function takes as input a 32-byte initialization vector `iv` and initializes the state of the duplex sponge.
 - `absorb(self, values: list[Unit])` denotes the absorb operation of the sponge. This function takes as input a list of `Unit` elements and mutates the `DuplexSponge` internal state;
 - `squeeze(self, length: int)` denotes the squeeze operation of the sponge. This function takes as input a integral `length` and squeezes a list of `Unit` elements of length `length`.
@@ -205,7 +204,6 @@ SHAKE128 is a variable-length hash function based on the Keccak sponge construct
 
 A duplex sponge in overwrite mode is based on a permutation function that operates on a state vector. It implements the `DuplexSpongeInterface` and maintains internal state to support incremental absorption and variable-length output generation.
 
-
 ### Initialization
 
 This is the constructor for a duplex sponge object. It is initialized with a 32-byte initialization vector.
@@ -276,7 +274,6 @@ The squeeze operation extracts output elements from the sponge state, which are 
 `KeccakDuplexSponge` instantiated `DuplexSponge` with `Keccak-f[1600]`, using rate `R = 136` bytes and capacity `C = 64` bytes.
 
 # Codecs registry
-
 
 ## Elliptic curves
 
@@ -351,7 +348,6 @@ Where the function `scalar_to_bytes` is defined in {#notation}
     1. for i in range(length):
     2.     scalar_bytes = hash_state.squeeze(field_bytes_length + 16)
     3.     scalars.append(bytes_to_scalar_mod_order(scalar_bytes))
-
 
 # Generation of the initialization vector {#iv-generation}
 
