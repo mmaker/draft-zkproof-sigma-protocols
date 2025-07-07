@@ -1828,23 +1828,24 @@ statement.append_equation(C, [(var_x, G), (var_r, H)])
       <h2 id="name-security-considerations">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-3-1">Sigma protocols provide the following guarantees in the random oracle model:<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-1">Interactive sigma proofs are special sound and honest-verifier zero-knowledge. These proofs are deniable (without transferable message authenticity).<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">We focus on the security guarantees of the non-interactive Fiat-Shamir transformation, where they provide the following guarantees (in the random oracle model):<a href="#section-3-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3-2.1">
-          <p id="section-3-2.1.1"><strong>Knowledge soundness</strong>: If the proof is valid, the prover must have knowledge of a secret witness satisfying the proof statement. This property ensures that valid proofs cannot be generated without possession of the corresponding witness.<a href="#section-3-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3-3.1">
+          <p id="section-3-3.1.1"><strong>Knowledge soundness</strong>: If the proof is valid, the prover must have knowledge of a secret witness satisfying the proof statement. This property ensures that valid proofs cannot be generated without possession of the corresponding witness.<a href="#section-3-3.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-3-2.2">
-          <p id="section-3-2.2.1"><strong>Zero-knowledge</strong>: The proof string produced by the <code>prove</code> function does not reveal any information beyond what can be directly inferred from the statement itself. This ensures that verifiers gain no knowledge about the witness.<a href="#section-3-2.2.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-3-3.2">
+          <p id="section-3-3.2.1"><strong>Zero-knowledge</strong>: The proof string produced by the <code>prove</code> function does not reveal any information beyond what can be directly inferred from the statement itself. This ensures that verifiers gain no knowledge about the witness.<a href="#section-3-3.2.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-3-3">While theoretical analysis demonstrates that both soundness and zero-knowledge properties are statistical in nature, practical security depends on the cryptographic strength of the underlying hash function, which is defined by the Fiat-Shamir transformation. It's important to note that the soundness of a zero-knowledge proof provides no guarantees regarding the computational hardness of the relation being proven. An assessment of the specific hardness properties for relations proven using these protocols falls outside the scope of this document.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">While theoretical analysis demonstrates that both soundness and zero-knowledge properties are statistical in nature, practical security depends on the cryptographic strength of the underlying hash function, which is defined by the Fiat-Shamir transformation. It's important to note that the soundness of a zero-knowledge proof provides no guarantees regarding the computational hardness of the relation being proven. An assessment of the specific hardness properties for relations proven using these protocols falls outside the scope of this document.<a href="#section-3-4" class="pilcrow">¶</a></p>
 <div id="privacy-considerations">
 <section id="section-3.1">
         <h3 id="name-privacy-considerations">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
         </h3>
-<p id="section-3.1-1">The zero-knowledge proofs described are publicly verifiable (transferable) when they are constructed using the Fiat-Shamir transformation, as defined in the spec. This is because any party can perform the Fiat-Shamir transformation over the contents of the proof, to verify that the challenge was computed properly.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
-<p id="section-3.1-2">Zero-knowlege proofs can be deniable if they are constructed with an interactive protocol (with an honest verifier, and without transferable message authenticity), or with certain non-interactive transformations (such as by using equivocable commitments). This is because given such a proof, it is impossible to differentiate between an honestly generated or simulated proof. However, these constructions are out of scope for this spec.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-1">Interactive sigma proofs are insecure against malicious verifiers and should not be used.
+The non-interactive Fiat-Shamir transformation leads to publicly verifiable (transferable) proofs that are statistically zero-knowledge.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
