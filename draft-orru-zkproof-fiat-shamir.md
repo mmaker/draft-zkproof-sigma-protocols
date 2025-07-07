@@ -84,7 +84,7 @@ Where:
 - `prover_message(self, prover_message) -> self` denotes the absorb operation of the codec. This function takes as input a prover message `prover_message` and mutates the codec's internal state.
 - `verifier_challenge(self) -> verifier_challenge` denotes the squeeze operation of the codec. This function takes no inputs and uses the codec's internal state to produce an unpredictable verifier challenge `verifier_challenge`.
 
-# Generation of the Initialization Vector
+# Generation of the Initialization Vector {#iv-generation}
 
 The initialization vector is a 32-bytes string that embeds:
 
@@ -99,6 +99,8 @@ It is implemented as follows.
     hash_state.absorb(protocol_id)
     hash_state.absorb(I2OSP(len(session_id), 4))
     hash_state.absorb(session_id)
+
+This will be expanded in future versions of this specification.
 
 # Fiat-Shamir transformation for Sigma Protocols
 
@@ -349,7 +351,11 @@ Where the function `scalar_to_bytes` is defined in {#notation}
     2.     scalar_bytes = hash_state.squeeze(field_bytes_length + 16)
     3.     scalars.append(bytes_to_scalar_mod_order(scalar_bytes))
 
-# Generation of the initialization vector {#iv-generation}
 
-As of now, it is responsibility of the user to pick a unique initialization vector that identifies the proof system and the session being used. This will be expanded in future versions of this specification.
+--- back
 
+# Test Vectors
+{:numbered="false"}
+
+Test vectors will be made available in future versions of this specification.
+They are currently developed in the [proof-of-concept implementation](https://github.com/mmaker/draft-zkproof-sigma-protocols/tree/main/poc/vectors).
