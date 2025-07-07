@@ -449,7 +449,9 @@ This ciphersuite uses P-256 {{SP800}} for the Group.
 
 # Security Considerations
 
-Sigma protocols provide the following guarantees in the random oracle model:
+Interactive sigma proofs are special sound and honest-verifier zero-knowledge. These proofs are deniable (without transferable message authenticity).
+
+We focus on the security guarantees of the non-interactive Fiat-Shamir transformation, where they provide the following guarantees (in the random oracle model):
 
 - **Knowledge soundness**: If the proof is valid, the prover must have knowledge of a secret witness satisfying the proof statement. This property ensures that valid proofs cannot be generated without possession of the corresponding witness.
 
@@ -459,9 +461,8 @@ While theoretical analysis demonstrates that both soundness and zero-knowledge p
 
 ## Privacy Considerations
 
-The zero-knowledge proofs described are publicly verifiable (transferable) when they are constructed using the Fiat-Shamir transformation, as defined in the spec. This is because any party can perform the Fiat-Shamir transformation over the contents of the proof, to verify that the challenge was computed properly.
-
-Zero-knowlege proofs can be deniable if they are constructed with an interactive protocol (with an honest verifier, and without transferable message authenticity), or with certain non-interactive transformations (such as by using equivocable commitments). This is because given such a proof, it is impossible to differentiate between an honestly generated or simulated proof. However, these constructions are out of scope for this spec.
+Interactive sigma proofs are insecure against malicious verifiers and should not be used.
+The non-interactive Fiat-Shamir transformation leads to publicly verifiable (transferable) proofs that are statistically zero-knowledge.
 
 # Post-Quantum Security Considerations
 
