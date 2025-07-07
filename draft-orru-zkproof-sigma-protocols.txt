@@ -5,20 +5,20 @@
 Network Working Group                                            M. Orrù
 Internet-Draft                                                      CNRS
 Intended status: Informational                                    C. Yun
-Expires: 7 January 2026                                      Apple, Inc.
-                                                             6 July 2025
+Expires: 8 January 2026                                      Apple, Inc.
+                                                             7 July 2025
 
 
-                   Sigma Protocols Interactive Proofs
+                        Interactive Sigma Proofs
                draft-orru-zkproof-sigma-protocols-latest
 
 Abstract
 
-   This document describes Sigma Protocols, a secure, general-purpose
-   zero-knowledge proof of knowledge.  Concretely, the scheme allows
-   proving knowledge of a witness, without revealing any information
-   about the undisclosed messages or the signature itself, while at the
-   same time, guarantying soundness of the overall protocols.
+   This document describes interactive sigma protocols—secure, general-
+   purpose zero-knowledge proofs of knowledge consisting of three moves:
+   commitment, challenge, and response.  Concretely, the protocol allows
+   one to prove knowledge of a witness without revealing any information
+   about it.
 
 About This Document
 
@@ -48,7 +48,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 7 January 2026.
+   This Internet-Draft will expire on 8 January 2026.
 
 Copyright Notice
 
@@ -94,10 +94,6 @@ Table of Contents
    Authors' Addresses
 
 1.  Introduction
-
-   A Sigma Protocol is a simple zero-knowledge proof of knowledge that
-   allows a *prover* to convince a *verifier* of the knowledge of a
-   secret *witness* satisfying a *statement*.
 
    Any sigma protocol must define three objects: a _commitment_
    (computed by the prover), a _challenge_ (computed by the verifier),
