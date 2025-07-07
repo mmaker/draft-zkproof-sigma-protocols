@@ -237,11 +237,10 @@ class SchnorrProof(SigmaProtocol):
 
     def prover_response(self, prover_state: ProverState, challenge):
         witness, nonces = prover_state
-        response = [
+        return [
             nonces[i] + witness[i] * challenge
             for i in range(self.instance.linear_map.num_scalars)
         ]
-        return response
 
     def verifier(self, commitment, challenge, response):
         assert len(commitment) == self.instance.linear_map.num_constraints
