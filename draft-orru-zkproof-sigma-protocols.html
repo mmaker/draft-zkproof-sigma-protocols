@@ -1339,7 +1339,7 @@ It relies on a prime-order elliptic-curve group as described in <a href="#group-
 <pre>
 1. DLEQ(G, H, X, Y) = PoK{
 2.   (x):        // Secret variables
-3.   X = x * G, Y = x * H
+3.   X = x * G, Y = x * H        // Predicates to satisfy
 4. }
 </pre><a href="#section-2-4" class="pilcrow">¶</a>
 </div>
@@ -1439,7 +1439,7 @@ Finally, line 3 states that the linear relation that need to be proven is
           <h4 id="name-prover-procedures">
 <a href="#section-2.2.2" class="section-number selfRef">2.2.2. </a><a href="#name-prover-procedures" class="section-name selfRef">Prover procedures</a>
           </h4>
-<p id="section-2.2.2-1">The prover of a sigma protocol is stateful and will send two message, a "commitment" and a "response" message, described below.<a href="#section-2.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-2.2.2-1">The prover of a sigma protocol is stateful and will send two messages, a "commitment" and a "response" message, described below.<a href="#section-2.2.2-1" class="pilcrow">¶</a></p>
 <div id="prover-commitment">
 <section id="section-2.2.2.1">
             <h5 id="name-prover-commitment">
@@ -1545,7 +1545,7 @@ Witness = [Scalar; num_scalars]
           <h4 id="name-linear-map">
 <a href="#section-2.2.5" class="section-number selfRef">2.2.5. </a><a href="#name-linear-map" class="section-name selfRef">Linear map</a>
           </h4>
-<p id="section-2.2.5-1">A <code>LinearMap</code> represents a function (a <em>linear map</em> from the scalar field to the elliptic curve group) that, given as input an array of <code>Scalar</code> elements, outputs an array of <code>Group</code> element. This can be represented as matrix-vector (scalar) product using group multi-scalar multiplication. However, since the matrix is often times sparse, it is often more convenient to store the matrix in Yale sparse matrix.<a href="#section-2.2.5-1" class="pilcrow">¶</a></p>
+<p id="section-2.2.5-1">A <code>LinearMap</code> represents a function (a <em>linear map</em> from the scalar field to the elliptic curve group) that, given as input an array of <code>Scalar</code> elements, outputs an array of <code>Group</code> elements. This can be represented as matrix-vector (scalar) product using group multi-scalar multiplication. However, since the matrix is oftentimes sparse, it is often more convenient to store the matrix in Yale sparse matrix format.<a href="#section-2.2.5-1" class="pilcrow">¶</a></p>
 <p id="section-2.2.5-2">Here is an example:<a href="#section-2.2.5-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-2.2.5-3">
 <pre>
@@ -1595,7 +1595,7 @@ map(self, scalars: [Scalar; num_scalars])
 
 Inputs:
 
-- self, the current sate of the constraint system
+- self, the current state of the constraint system
 - witness,
 
 1. image = []
@@ -1635,7 +1635,7 @@ def set_elements(self, elements: list[(int, Group)]) -&gt; None
             <h5 id="name-element-and-scalar-variable">
 <a href="#section-2.2.6.1" class="section-number selfRef">2.2.6.1. </a><a href="#name-element-and-scalar-variable" class="section-name selfRef">Element and scalar variables allocation</a>
             </h5>
-<p id="section-2.2.6.1-1">Two functions allow two allocate the new scalars (the witness) and group elements (the instance).<a href="#section-2.2.6.1-1" class="pilcrow">¶</a></p>
+<p id="section-2.2.6.1-1">Two functions allow to allocate the new scalars (the witness) and group elements (the instance).<a href="#section-2.2.6.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-2.2.6.1-2">
 <pre>
 allocate_scalars(self, n)
@@ -1803,7 +1803,7 @@ statement.append_equation(C, [(var_x, G), (var_r, H)])
                 <p id="section-2.3.1.1-1.2.1"><code>serialize([A])</code>: Implemented using the compressed Elliptic-Curve-Point-to-Octet-String method according to <span>[<a href="#SEC1" class="cite xref">SEC1</a>]</span>; <code>Ne = 33</code>.<a href="#section-2.3.1.1-1.2.1" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-2.3.1.1-1.3">
-                <p id="section-2.3.1.1-1.3.1"><code>deserialize(buf)</code>: Implemented by attempting to read <code>buf</code> into chunks of 32-byte arrays and convert them using the compressed Octet-String-to-Elliptic-Curve-Point method according to <span>[<a href="#SEC1" class="cite xref">SEC1</a>]</span>, and then performs partial public-key validation as defined in section 5.6.2.3.4 of <span>[<a href="#KEYAGREEMENT" class="cite xref">KEYAGREEMENT</a>]</span>. This includes checking that the coordinates of the resulting point are in the correct range, that the point is on the curve, and that the point is not the point at infinity.<a href="#section-2.3.1.1-1.3.1" class="pilcrow">¶</a></p>
+                <p id="section-2.3.1.1-1.3.1"><code>deserialize(buf)</code>: Implemented by attempting to read <code>buf</code> into chunks of 33-byte arrays and convert them using the compressed Octet-String-to-Elliptic-Curve-Point method according to <span>[<a href="#SEC1" class="cite xref">SEC1</a>]</span>, and then performs partial public-key validation as defined in section 5.6.2.3.4 of <span>[<a href="#KEYAGREEMENT" class="cite xref">KEYAGREEMENT</a>]</span>. This includes checking that the coordinates of the resulting point are in the correct range, that the point is on the curve, and that the point is not the point at infinity.<a href="#section-2.3.1.1-1.3.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
 </section>
@@ -1906,7 +1906,7 @@ Since this problem is known to be efficiently solvable by quantum computers usin
         </ul>
 <p id="section-4.2-4">Implementations should consider the timeline for quantum computing advances when planning migration to post-quantum sound alternatives.
 Implementers MAY adopt a hybrid approach during migration to post-quantum security by using AND composition of proofs. This approach enables gradual migration while maintaining security against classical adversaries.
-This composition retains soundness if <strong>both</strong> problem remains hard. AND composition of proofs is NOT described in this specification, but examples may be found in the proof-of-concept implementation and in <span>[<a href="#BonehS23" class="cite xref">BonehS23</a>]</span>.<a href="#section-4.2-4" class="pilcrow">¶</a></p>
+This composition retains soundness if <strong>both</strong> problems remain hard. AND composition of proofs is NOT described in this specification, but examples may be found in the proof-of-concept implementation and in <span>[<a href="#BonehS23" class="cite xref">BonehS23</a>]</span>.<a href="#section-4.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>

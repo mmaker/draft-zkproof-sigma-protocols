@@ -118,11 +118,11 @@ Table of Contents
    *  An _initialization vector_ (IV) uniquely identifying the protocol,
       the session, and the statement being proven.
 
-   *  An _interactive protocol_ supporting a family of statement to be
+   *  An _interactive protocol_ supporting a family of statements to be
       proven.
 
    *  A _hash function_ implementing the duplex sponge interface,
-      capable of absorbing inputs incrementally and squeeze variable-
+      capable of absorbing inputs incrementally and squeezing variable-
       length unpredictable messages.
 
    *  A _codec_, which securely remaps prover elements into the base
@@ -147,10 +147,10 @@ Table of Contents
 
    *  absorb(self, values: list[Unit]) denotes the absorb operation of
       the sponge.  This function takes as input a list of Unit elements
-      and mutates the DuplexSponge internal state;
+      and mutates the DuplexSponge internal state.
 
    *  squeeze(self, length: int) denotes the squeeze operation of the
-      sponge.  This function takes as input a integral length and
+      sponge.  This function takes as input an integral length and
       squeezes a list of Unit elements of length length.
 
 3.  The Codec interface
@@ -389,7 +389,7 @@ Procedure:
 
    Keccak-f is the permutation function underlying [SHA3].
 
-   KeccakDuplexSponge instantiated DuplexSponge with Keccak-f[1600],
+   KeccakDuplexSponge instantiates DuplexSponge with Keccak-f[1600],
    using rate R = 136 bytes and capacity C = 64 bytes.
 
 7.  Codecs registry
@@ -412,9 +412,7 @@ Procedure:
    from a non-negative integer. bytes_to_int and scalar_to_bytes are
    implemented as OS2IP and I2OSP as described in [RFC8017],
    respectively.  Note that these functions operate on byte strings
-   in big-endian byte order.  These functions MUST raise an exception
-   if the integer over which they We consider the function
-   bytes_to_in
+   in big-endian byte order.
 
 *  The function ecpoint_to_bytes converts an elliptic curve point in
    affine-form into an array string of length
@@ -452,7 +450,7 @@ field_bytes_length, the number of bytes to represent the scalar element, equal t
    1. for scalar in scalars:
    2.     hash_state.absorb(scalar_to_bytes(scalar))
 
-   Where the function scalar_to_bytes is defined in {#notation}
+   Where the function scalar_to_bytes is defined in Section 7.1.1
 
 7.1.3.  Absorb elements
 
@@ -468,16 +466,16 @@ field_bytes_length, the number of bytes to represent the scalar element, equal t
 
 7.1.4.  Squeeze scalars
 
-  squeeze_scalars(hash_state, length)
+ squeeze_scalars(hash_state, length)
 
-  Inputs:
+ Inputs:
 
-  - hash_state, the hash state
-  - length, an unsiged integer of 64 bits determining the output length.
+ - hash_state, the hash state
+ - length, an unsigned integer of 64 bits determining the output length.
 
-  1. for i in range(length):
-  2.     scalar_bytes = hash_state.squeeze(field_bytes_length + 16)
-  3.     scalars.append(bytes_to_scalar_mod_order(scalar_bytes))
+ 1. for i in range(length):
+ 2.     scalar_bytes = hash_state.squeeze(field_bytes_length + 16)
+ 3.     scalars.append(bytes_to_scalar_mod_order(scalar_bytes))
 
 8.  References
 
