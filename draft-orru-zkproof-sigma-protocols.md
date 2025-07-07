@@ -494,11 +494,23 @@ Implementations should consider the timeline for quantum computing advances when
 Implementers MAY adopt a hybrid approach during migration to post-quantum security by using AND composition of proofs. This approach enables gradual migration while maintaining security against classical adversaries.
 This composition retains soundness if **both** problem remains hard. AND composition of proofs is NOT described in this specification, but examples may be found in the proof-of-concept implementation and in {{BonehS23}}.
 
-# Generation of the initialization vector {#iv-generation}
+# Generation of the protocol identifier {#protocol-id-generation}
 
-As of now, it is responsibility of the user to pick a unique initialization vector that identifies the proof system and the session being used. This will be expanded in future versions of this specification.
+As of now, it is responsibility of the user to pick a unique protocol identifier that identifies the proof system. This will be expanded in future versions of this specification.
+
+# Generation of the instance identifier {#instance-id-generation}
+
+As of now, it is responsibility of the user to pick a unique instance identifier that identifies the statement being proven.
+
+--- back
 
 # Acknowledgments
 {:numbered ="false"}
 
 The authors thank Jan Bobolz, Stephan Krenn, Mary Maller, Ivan Visconti, Yuwen Zhang for reviewing a previous edition of this specification.
+
+# Test Vectors
+{:numbered="false"}
+
+Test vectors will be made available in future versions of this specification.
+They are currently developed in the [proof-of-concept implementation](https://github.com/mmaker/draft-zkproof-sigma-protocols/tree/main/poc/vectors).
