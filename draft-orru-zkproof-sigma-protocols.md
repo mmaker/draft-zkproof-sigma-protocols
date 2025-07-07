@@ -238,7 +238,7 @@ The prover of a sigma protocol is stateful and will send two message, a "commitm
     1. witness, nonces = prover_state
     2. return [nonces[i] + witness[i] * challenge for i in range(self.instance.linear_map.num_scalars)]
 
-### Verifier procedure
+### Verifier
 
     verify(self, commitment, challenge, response)
 
