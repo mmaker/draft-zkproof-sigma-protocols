@@ -125,7 +125,6 @@ class KeccakDuplexSponge(DuplexSponge):
         init.absorb(session_id)
         init.ratchet()
         init.absorb(instance_label)
-        init.ratchet()
         iv = init.squeeze(32)
         return iv
 

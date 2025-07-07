@@ -7,7 +7,7 @@ import json
 
 CONTEXT_STRING = b'yellow submarine' * 2
 
-def test_vector_with_session_id(test_vector_function):
+def test_vector_with_fixed_label(test_vector_function):
     from sagelib.ciphersuite import NISchnorrProofKeccakDuplexSpongeBls12381 as NIZK
 
     def inner(vectors):
@@ -24,7 +24,7 @@ def test_vector_with_session_id(test_vector_function):
 
         vectors[test_vector_name] = {
             "Ciphersuite": "sigma/OWKeccak1600+Bls12381",
-            "Context": CONTEXT_STRING.hex(),
+            "Context": session_id.hex(),
             "Statement": instance.get_label().hex(),
             "Proof": hex_narg_string,
         }
@@ -53,7 +53,7 @@ def write_group_vectors(fh, label, vector):
     print("~~~", file=fh, end="\n\n")
 
 
-@test_vector_with_session_id
+@test_vector_with_fixed_label
 def discrete_logarithm(rng, group):
     """
     Proves the following statement:
@@ -78,7 +78,7 @@ def discrete_logarithm(rng, group):
     return statement, [x]
 
 
-@test_vector_with_session_id
+@test_vector_with_fixed_label
 def dleq(rng, group):
     """
     Proves the following statement:
@@ -103,7 +103,7 @@ def dleq(rng, group):
     return statement, [x]
 
 
-@test_vector_with_session_id
+@test_vector_with_fixed_label
 def pedersen_commitment(rng, group):
     """
     Proves the following statement:
@@ -127,7 +127,7 @@ def pedersen_commitment(rng, group):
     return statement, witness
 
 
-@test_vector_with_session_id
+@test_vector_with_fixed_label
 def pedersen_commitment_dleq(rng, group):
     """
     Proves the following statement:
@@ -157,7 +157,7 @@ def pedersen_commitment_dleq(rng, group):
     return statement, witness
 
 
-@test_vector_with_session_id
+@test_vector_with_fixed_label
 def bbs_blind_commitment_computation(rng, group):
     """
     This example test vector is meant to replace:
@@ -207,20 +207,20 @@ def bbs_blind_commitment_computation(rng, group):
 
 def main(path="vectors"):
     vectors = {}
-    test_vectors_with_session_id = [
+    test_vectors_with_fixed_label = [
         discrete_logarithm,
         dleq,
         pedersen_commitment,
         pedersen_commitment_dleq,
         bbs_blind_commitment_computation,
     ]
-    for test_vector in test_vectors_with_session_id:
+    for test_vector in test_vectors_with_fixed_label:
         test_vector(vectors)
 
-    with open(path + "/sessionIdVectors.json", 'wt') as f:
+    with open(path + "/fixedLabelVectors.json", 'wt') as f:
         json.dump(vectors, f, sort_keys=True, indent=2)
 
-    with open(path + "/sessionIdVectors.txt", 'wt') as f:
+    with open(path + "/fixedLabelVectors.txt", 'wt') as f:
         for proof_type in vectors:
             write_group_vectors(f, proof_type, vectors[proof_type])
 
