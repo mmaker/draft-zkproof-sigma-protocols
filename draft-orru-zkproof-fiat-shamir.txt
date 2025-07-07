@@ -113,17 +113,17 @@ Table of Contents
    The Fiat-Shamir transformation is a technique that uses a hash
    function to convert a public-coin interactive protocol between a
    prover and a verifier into a corresponding non-interactive protocol.
-   This is done with the following ingredients:
+   It depends on:
 
-   *  An initialization vector (IV) uniquely identifying the protocol,
+   *  An _initialization vector_ (IV) uniquely identifying the protocol,
       the session, and the statement being proven.
 
-   *  An interactive protocol.
+   *  An _interactive protocol_ supporting a family of statement to be
+      proven.
 
-   *  A stateful hash object that implements the _duplex sponge
-      interface_, capable of absorbing inputs incrementally and squeeze
-      variable-length unpredictable messages.  It is defined over a base
-      alphabet (typically bytes).
+   *  A _hash function_ implementing the duplex sponge interface,
+      capable of absorbing inputs incrementally and squeeze variable-
+      length unpredictable messages.
 
    *  A _codec_, which securely remaps prover elements into the base
       alphabet, and outputs of the duplex sponge into verifier messages
@@ -140,9 +140,6 @@ Table of Contents
      def squeeze(self, length: int) -> list[Unit]
 
    Where:
-
-   *  The type Unit MUST have fixed size in memory, partial ordering,
-      and at least two elements.
 
    *  init(iv: bytes) -> DuplexSponge denotes the initialization
       function.  This function takes as input a 32-byte initialization
