@@ -205,9 +205,50 @@ def bbs_blind_commitment_computation(rng, group):
     return statement, witness
 
 
+def test_challenge_response_format():
+    """Test the challenge-response format for sigma protocols."""
+    from sagelib.sigma_protocols import LinearRelation
+    from sagelib.ciphersuite import NISchnorrProofKeccakDuplexSpongeP256 as NIZK
+    from sagelib.test_drng import TestDRNG
+    from sagelib import groups
+
+    rng = TestDRNG("challenge_response_test".encode('utf-8'))
+    group = groups.GroupP256()
+    CONTEXT_STRING = b'yellow submarine' * 2
+
+    # Create a simple discrete log statement
+    statement = LinearRelation(group)
+    [var_x] = statement.allocate_scalars(1)
+    [var_G, var_X] = statement.allocate_elements(2)
+    statement.append_equation(var_X, [(var_x, var_G)])
+
+    G = group.generator()
+    statement.set_elements([(var_G, G)])
+
+    x = group.ScalarField.random(rng)
+    X = G * x
+    statement.set_elements([(var_X, X)])
+
+    # Test the challenge-response format using NISigmaProtocol
+    nizk = NIZK(CONTEXT_STRING, statement)
+    witness = [x]
+
+    # Generate proof using prove_short
+    proof = nizk.prove_short(witness, rng)
+
+    # Verify using verify_short (no commitment parameter needed)
+    result = nizk.verify_short(proof)
+    assert result, "Challenge-response verification failed"
+
+    print("Challenge-response format test passed!")
+
+
 
 
 def main(path="vectors"):
+    # Run the challenge-response test first
+    test_challenge_response_format()
+
     vectors = {}
     test_vectors = [
         discrete_logarithm,
