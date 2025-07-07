@@ -6,14 +6,11 @@
 <meta content="initial-scale=1.0" name="viewport">
 <title>Fiat-Shamir Transformation</title>
 <meta content="Michele Orrù" name="author">
-<meta content='
-       This document describes the Fiat-Shamir transformation, a generic procedure to compile an interactive protocol into a non-interactive protocol by combining the interactive protocol with a duplex sponge. 
-       We describe a generic duplex sponge interface that support "absorb" and "squeeze" operations over elements of a specified base type.
-The absorb operation supports incrementally updating the hash state of the sponge, and the squeeze operation enables squeezing variable-length unpredictable messages.
-The sponge interface supports a number of different hash functions. 
-       In addition, the specification introduces codecs, a mechanism to extend the functionality of a duplex sponge to support elements of other domains. 
-       Given an interactive protocol and a suitable codec, we describe how to construct a non-interactive protocol. 
-    ' name="description">
+<meta content="
+       This document describes how to construct a non-interactive proof via the Fiat–Shamir transformation, using a generic procedure that compiles an interactive protocol into a non-interactive one by relying on a stateful hash object that provides a duplex sponge interface. 
+       The duplex sponge interface requires two methods: absorb and squeeze, which respectively read and write elements of a specified base type. The absorb operation incrementally updates the sponge's internal hash state, while the squeeze operation produces variable-length, unpredictable outputs. This interface can be instantiated with various hash functions based on permutation or compression functions. 
+       This specification also defines codecs to securely map elements from the prover into the duplex sponge domain, and from the duplex sponge domain into verifier messages. 
+    " name="description">
 <meta content="xml2rfc 3.29.0" name="generator">
 <meta content="zero knowledge" name="keyword">
 <meta content="hash" name="keyword">
@@ -1085,12 +1082,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <h1 id="title">Fiat-Shamir Transformation</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document describes the Fiat-Shamir transformation, a generic procedure to compile an interactive protocol into a non-interactive protocol by combining the interactive protocol with a duplex sponge.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
-<p id="section-abstract-2">We describe a generic duplex sponge interface that support "absorb" and "squeeze" operations over elements of a specified base type.
-The absorb operation supports incrementally updating the hash state of the sponge, and the squeeze operation enables squeezing variable-length unpredictable messages.
-The sponge interface supports a number of different hash functions.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
-<p id="section-abstract-3">In addition, the specification introduces codecs, a mechanism to extend the functionality of a duplex sponge to support elements of other domains.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
-<p id="section-abstract-4">Given an interactive protocol and a suitable codec, we describe how to construct a non-interactive protocol.<a href="#section-abstract-4" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document describes how to construct a non-interactive proof via the Fiat–Shamir transformation, using a generic procedure that compiles an interactive protocol into a non-interactive one by relying on a stateful hash object that provides a duplex sponge interface.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-2">The duplex sponge interface requires two methods: absorb and squeeze, which respectively read and write elements of a specified base type. The absorb operation incrementally updates the sponge's internal hash state, while the squeeze operation produces variable-length, unpredictable outputs. This interface can be instantiated with various hash functions based on permutation or compression functions.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+<p id="section-abstract-3">This specification also defines codecs to securely map elements from the prover into the duplex sponge domain, and from the duplex sponge domain into verifier messages.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
