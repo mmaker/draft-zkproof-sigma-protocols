@@ -119,7 +119,7 @@ class KeccakDuplexSponge(DuplexSponge):
     @classmethod
     def get_iv_from_identifiers(cls, protocol_id: bytes, session_id: bytes, instance_label: bytes):
         WORD_SIZE = 32
-        init = cls(0.to_bytes(WORD_SIZE, 'big'))
+        init = cls(int(0).to_bytes(WORD_SIZE, 'big'))
         init.absorb(protocol_id)
         init.ratchet()
         init.absorb(session_id)
