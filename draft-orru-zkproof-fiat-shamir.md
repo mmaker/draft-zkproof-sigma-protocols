@@ -47,20 +47,12 @@ This specification also defines codecs to securely map elements from the prover 
 # Introduction
 
 The Fiat-Shamir transformation is a technique that uses a hash function to convert a public-coin interactive protocol between a prover and a verifier into a corresponding non-interactive protocol.
+This is done with the following ingredients:
 
-We specify a variant of the Fiat-Shamir transformation, where the hash-function is obtained from a _duplex sponge_.
-
-A duplex sponge is a stateful hash object that can absorb inputs incrementally and squeeze variable-length unpredictable messages.
-The duplex sponge is defined over a base alphabet (typically bytes) which might not match the domain over which the prover and verifier messages are defined.
-
-A _codec_ is a stateful object that can absorb inputs incrementally and squeeze unpredictable challenges. A codec is _compatible_ with a given interactive protocol if the domain of the inputs that the codec can absorb matches the domain of the prover messages and the challenges matches the domain of the verifier messages of the specified protocol. Internally, a codec uses a duplex sponge and performs the appropriate conversion.
-
-The Fiat-Shamir transformation combines the following ingredients to construct a non-interactive protocol:
-
-- An initialization vector (IV) uniquely identifying the protocol.
+- An initialization vector (IV) uniquely identifying the protocol, the session, and the statement being proven.
 - An interactive protocol.
-- A hash function.
-- A codec for the interactive protocol, compatible with the hash function.
+- A stateful hash object that implements the _duplex sponge interface_, capable of absorbing inputs incrementally and squeeze variable-length unpredictable messages. It is defined over a base alphabet (typically bytes).
+- A _codec_, which securely remaps prover elements into the base alphabet, and outputs of the duplex sponge into verifier messages (preserving the distribution).
 
 # The Duplex Sponge Interface
 
@@ -93,6 +85,21 @@ Where:
 - `prover_message(self, prover_message) -> self` denotes the absorb operation of the codec. This function takes as input a prover message `prover_message` and mutates the codec's internal state.
 - `verifier_challenge(self) -> verifier_challenge` denotes the squeeze operation of the codec. This function takes no inputs and uses the codec's internal state to produce an unpredictable verifier challenge `verifier_challenge`.
 
+# Initialization Vector Generation
+
+The initialization vector is a 32-bytes string that embeds:
+
+- A `protocol_id`: the unique identifier for the interactive protocol and the associated relation being proven.
+- A `session_id`: the session identifier, for user-provided contextual information about the context where the proof is made (e.g. a URL, or a timestamp).
+- An `instance_label`: the instance identifier for the statement being proven.
+
+It is implemented as follows.
+
+    hash_state = DuplexSponge.init([0] * 32)
+    hash_state.absorb(I2OSP(len(protocol_id), 4))
+    hash_state.absorb(protocol_id)
+    hash_state.absorb(I2OSP(len(session_id), 4))
+    hash_state.absorb(session_id)
 
 # Fiat-Shamir transformation for Sigma Protocols
 
@@ -193,7 +200,6 @@ SHAKE128 is a variable-length hash function based on the Keccak sponge construct
     - length, the number of elements to be squeezed
 
     1. h.copy().digest(length)
-
 
 ## Duplex Sponge
 
