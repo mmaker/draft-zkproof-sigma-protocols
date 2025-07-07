@@ -1,5 +1,5 @@
 ---
-title: "Sigma Protocols Interactive Proofs"
+title: "Interactive Sigma Proofs"
 category: info
 
 docname: draft-orru-zkproof-sigma-protocols-latest
