@@ -15,9 +15,8 @@ Abstract
 
    This document describes how to construct a non-interactive proof via
    the Fiat–Shamir transformation, using a generic procedure that
-   compiles an interactive protocol into a non-interactive one by
-   relying on a stateful hash object that provides a duplex sponge
-   interface.
+   compiles an interactive proof into a non-interactive one by relying
+   on a stateful hash object that provides a duplex sponge interface.
 
    The duplex sponge interface requires two methods: absorb and squeeze,
    which respectively read and write elements of a specified base type.

@@ -7,7 +7,7 @@
 <title>Fiat-Shamir Transformation</title>
 <meta content="Michele Orrù" name="author">
 <meta content="
-       This document describes how to construct a non-interactive proof via the Fiat–Shamir transformation, using a generic procedure that compiles an interactive protocol into a non-interactive one by relying on a stateful hash object that provides a duplex sponge interface. 
+       This document describes how to construct a non-interactive proof via the Fiat–Shamir transformation, using a generic procedure that compiles an interactive proof into a non-interactive one by relying on a stateful hash object that provides a duplex sponge interface. 
        The duplex sponge interface requires two methods: absorb and squeeze, which respectively read and write elements of a specified base type. The absorb operation incrementally updates the sponge's internal hash state, while the squeeze operation produces variable-length, unpredictable outputs. This interface can be instantiated with various hash functions based on permutation or compression functions. 
        This specification also defines codecs to securely map elements from the prover into the duplex sponge domain, and from the duplex sponge domain into verifier messages. 
     " name="description">
@@ -1082,7 +1082,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <h1 id="title">Fiat-Shamir Transformation</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document describes how to construct a non-interactive proof via the Fiat–Shamir transformation, using a generic procedure that compiles an interactive protocol into a non-interactive one by relying on a stateful hash object that provides a duplex sponge interface.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document describes how to construct a non-interactive proof via the Fiat–Shamir transformation, using a generic procedure that compiles an interactive proof into a non-interactive one by relying on a stateful hash object that provides a duplex sponge interface.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 <p id="section-abstract-2">The duplex sponge interface requires two methods: absorb and squeeze, which respectively read and write elements of a specified base type. The absorb operation incrementally updates the sponge's internal hash state, while the squeeze operation produces variable-length, unpredictable outputs. This interface can be instantiated with various hash functions based on permutation or compression functions.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 <p id="section-abstract-3">This specification also defines codecs to securely map elements from the prover into the duplex sponge domain, and from the duplex sponge domain into verifier messages.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
 </section>
