@@ -85,7 +85,7 @@ informative:
 
 --- abstract
 
-This document describes interactive sigma protocols—secure, general-purpose zero-knowledge proofs of knowledge consisting of three moves: commitment, challenge, and response. Concretely, the protocol allows one to prove knowledge of a witness without revealing any information about it.
+This document describes interactive sigma protocols, a class of secure, general-purpose zero-knowledge proofs of knowledge consisting of three moves: commitment, challenge, and response. Concretely, the protocol allows one to prove knowledge of a secret witness without revealing any information about it.
 
 --- middle
 
