@@ -85,7 +85,7 @@ Where:
 - `prover_message(self, prover_message) -> self` denotes the absorb operation of the codec. This function takes as input a prover message `prover_message` and mutates the codec's internal state.
 - `verifier_challenge(self) -> verifier_challenge` denotes the squeeze operation of the codec. This function takes no inputs and uses the codec's internal state to produce an unpredictable verifier challenge `verifier_challenge`.
 
-# Initialization Vector Generation
+# Generation of the Initialization Vector
 
 The initialization vector is a 32-bytes string that embeds:
 
@@ -269,7 +269,7 @@ The squeeze operation extracts output elements from the sponge state, which are 
     10.    length -= chunk_size
     11. return output
 
-### Keccak-f[1600] Implementation
+### Keccak-f\[1600\] Implementation
 
 `Keccak-f` is the permutation function underlying {{SHA3}}.
 
