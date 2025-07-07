@@ -38,7 +38,7 @@ informative:
 
 This document describes the Fiat-Shamir transformation, a generic procedure to compile an interactive protocol into a non-interactive protocol by combining the interactive protocol with a duplex sponge.
 
-We describe a generic duplex sponge interface that support "absorb" and "squeeze" operations over a elements of a specified base type.
+We describe a generic duplex sponge interface that support "absorb" and "squeeze" operations over elements of a specified base type.
 The absorb operation supports incrementally updating the hash state of the sponge, and the squeeze operation enables squeezing variable-length unpredictable messages.
 The sponge interface supports a number of different hash functions.
 
@@ -62,8 +62,9 @@ A _codec_ is a stateful object that can absorb inputs incrementally and squeeze 
 The Fiat-Shamir transformation combines the following ingredients to construct a non-interactive protocol:
 
 - An initialization vector (IV) uniquely identifying the protocol.
-- A interactive protocol.
-- A codec compatible with the interactive protocol.
+- An interactive protocol.
+- A hash function.
+- A codec for the interactive protocol, compatible with the hash function.
 
 # The Duplex Sponge Interface
 
