@@ -7,7 +7,6 @@ import json
 
 CONTEXT_STRING = b'yellow submarine' * 2
 
-
 def test_vector(test_vector_function):
     from sagelib.ciphersuite import NISchnorrProofKeccakDuplexSpongeBls12381 as NIZK
 
