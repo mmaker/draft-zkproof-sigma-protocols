@@ -120,14 +120,14 @@ class KeccakDuplexSponge(DuplexSponge):
     def get_iv_from_identifiers(cls, protocol_id: bytes, session_id: bytes, instance_label: bytes):
         WORD_SIZE = int(32)
         length_to_bytes = lambda x: int(x).to_bytes(WORD_SIZE, 'big')
-        init = length_to_bytes(0)
-        init.absorb(length_to_bytes(len(protocol_id)))
-        init.absorb(protocol_id)
-        init.absorb(length_to_bytes(len(session_id)))
-        init.absorb(session_id)
-        init.absorb(length_to_bytes(len(instance_label)))
-        init.absorb(instance_label)
-        iv = init.squeeze(32)
+        tmp = KeccakDuplexSponge(length_to_bytes(0))
+        tmp.absorb(length_to_bytes(len(protocol_id)))
+        tmp.absorb(protocol_id)
+        tmp.absorb(length_to_bytes(len(session_id)))
+        tmp.absorb(session_id)
+        tmp.absorb(length_to_bytes(len(instance_label)))
+        tmp.absorb(instance_label)
+        iv = tmp.squeeze(32)
         return iv
 
 class SHAKE128(DuplexSpongeInterface):
