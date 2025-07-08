@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-06T01:28:02.506093+00:00",
+  "timestamp": "2025-07-08T01:21:31.660537+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -584,7 +584,7 @@
       "id": "I_kwDONyiw_86zBCBm",
       "title": "Correct citations for MPCitH approaches",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/31",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mmaker",
       "authorAssociation": "OWNER",
       "assignees": [],
@@ -594,8 +594,8 @@
       ],
       "body": "In the current spec we refer to ZKBoo as sigma protocol based on MPCitH. Is this the first appearance of the two? \nDo some bibliography work and review this part of the literature in the spec.",
       "createdAt": "2025-04-17T20:30:51Z",
-      "updatedAt": "2025-05-22T09:11:50Z",
-      "closedAt": null,
+      "updatedAt": "2025-07-07T05:45:44Z",
+      "closedAt": "2025-07-07T05:45:44Z",
       "comments": []
     },
     {
@@ -1824,21 +1824,21 @@
       "id": "PR_kwDONyiw_86dDkAF",
       "title": "Editorial changes to FS spec",
       "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/60",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "WizardOfMenlo",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Important to check:\r\n\r\n- The duplex sponge API in 5.2.1 did not use the IV in any way, I have added it now. \r\n- In Section 4, the instance is never included in the FS. Is this by design because it should be included in the IV or is this an oversight?\r\n- What did we want here? These functions MUST raise an exception if the integer over which they We consider the function bytes_to_in ",
       "createdAt": "2025-07-02T10:04:22Z",
-      "updatedAt": "2025-07-04T17:15:45Z",
+      "updatedAt": "2025-07-06T15:38:11Z",
       "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
       "baseRefName": "main",
       "baseRefOid": "970a5fa8d0c13fc6bd67920c822064c00ad33e51",
       "headRepository": "WizardOfMenlo/draft-zkproof-sigma-protocols",
       "headRefName": "giacomo/new",
       "headRefOid": "1b25b56c906d263ef36c8f8703954dc985e1443c",
-      "closedAt": null,
+      "closedAt": "2025-07-06T15:38:11Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -1898,6 +1898,255 @@
       "mergeCommit": null,
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 63,
+      "id": "PR_kwDONyiw_86dqsMV",
+      "title": "Vishady/match test vectors",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/63",
+      "state": "MERGED",
+      "author": "vishady721",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-07T01:03:15Z",
+      "updatedAt": "2025-07-07T22:14:09Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "4faed5061a36264afae4b2562f617096325bb6c8",
+      "headRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "headRefName": "vishady/match-test-vectors",
+      "headRefOid": "87cf11a7e1f99bebdbd9d714f2d224ad47f86a26",
+      "closedAt": "2025-07-07T22:14:09Z",
+      "mergedAt": "2025-07-07T22:14:08Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "62444ac6d030b5f33e984ebe4491f17946724f5f"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDONyiw_86yVKTy",
+          "commit": {
+            "abbreviatedOid": "3fba777"
+          },
+          "author": "vishady721",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T01:05:04Z",
+          "updatedAt": "2025-07-07T01:05:05Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "not sure if we like this name",
+              "createdAt": "2025-07-07T01:05:05Z",
+              "updatedAt": "2025-07-07T01:05:05Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yVKkz",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "vishady721",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T01:06:15Z",
+          "updatedAt": "2025-07-07T01:06:15Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "same as above, not sure if we like this name",
+              "createdAt": "2025-07-07T01:06:15Z",
+              "updatedAt": "2025-07-07T01:06:15Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yVKpn",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "vishady721",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T01:06:33Z",
+          "updatedAt": "2025-07-07T01:06:34Z",
+          "comments": [
+            {
+              "originalPosition": 7,
+              "body": "did this to match the ordering in which variables are assigned indices in rust",
+              "createdAt": "2025-07-07T01:06:34Z",
+              "updatedAt": "2025-07-07T01:06:34Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yVKwD",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "vishady721",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T01:07:04Z",
+          "updatedAt": "2025-07-07T01:07:05Z",
+          "comments": [
+            {
+              "originalPosition": 129,
+              "body": "just for now : )",
+              "createdAt": "2025-07-07T01:07:05Z",
+              "updatedAt": "2025-07-07T01:07:05Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yVK0_",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "vishady721",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T01:07:27Z",
+          "updatedAt": "2025-07-07T01:07:27Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "not sure if context = session_id, wasn't sure what to keep here",
+              "createdAt": "2025-07-07T01:07:27Z",
+              "updatedAt": "2025-07-07T01:07:27Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yVK4y",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "vishady721",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T01:07:44Z",
+          "updatedAt": "2025-07-07T01:07:45Z",
+          "comments": [
+            {
+              "originalPosition": 28,
+              "body": "likewise, i assumed statement = instance label?",
+              "createdAt": "2025-07-07T01:07:44Z",
+              "updatedAt": "2025-07-07T01:07:45Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yhNcn",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T19:25:31Z",
+          "updatedAt": "2025-07-07T19:25:31Z",
+          "comments": [
+            {
+              "originalPosition": 28,
+              "body": "correct! Will rephrase for consistency.",
+              "createdAt": "2025-07-07T19:25:31Z",
+              "updatedAt": "2025-07-07T19:25:47Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yhNml",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T19:25:49Z",
+          "updatedAt": "2025-07-07T19:25:49Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "The \"Context\" was inherited by @cathieyun's implementation, it's supposed to be the IV (the \"domain separator\") that we must generate from 3 things: \r\n- protocol identifier\r\n- session identifier \r\n- instance\r\n\r\nI'll take care of adjusting this, thank you so much for now.",
+              "createdAt": "2025-07-07T19:25:49Z",
+              "updatedAt": "2025-07-07T19:25:49Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yhOXk",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T19:27:18Z",
+          "updatedAt": "2025-07-07T19:27:19Z",
+          "comments": [
+            {
+              "originalPosition": 129,
+              "body": "`b'draft-zkproof-fiat-shamir'` might be more elegant, was utf-8 on purpose to be more verbose?",
+              "createdAt": "2025-07-07T19:27:18Z",
+              "updatedAt": "2025-07-07T19:27:19Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yhOt9",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T19:27:59Z",
+          "updatedAt": "2025-07-07T19:27:59Z",
+          "comments": [
+            {
+              "originalPosition": 7,
+              "body": "great thanks. I think the naming in rust is less descriptive, but will take care of making sure they're consistent thanks.",
+              "createdAt": "2025-07-07T19:27:59Z",
+              "updatedAt": "2025-07-07T19:27:59Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yhO-w",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T19:28:31Z",
+          "updatedAt": "2025-07-07T19:28:31Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "I don't and I think we should just have this be the new `test_sigma_protocols.sage`, but it's really useful for this review. thanks.",
+              "createdAt": "2025-07-07T19:28:31Z",
+              "updatedAt": "2025-07-07T19:28:31Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
