@@ -14,7 +14,7 @@ def test_vector_with_fixed_label(test_vector_function):
         rng = TestDRNG("hello world".encode('utf-8'))
         test_vector_name = f"{test_vector_function.__name__}_with_session_ID"
 
-        session_id = "hello world".encode('utf-8')
+        session_id = CONTEXT_STRING
         instance, witness = test_vector_function(rng, NIZK.Codec.GG)
 
         narg_string = NIZK.init_with_session_id(session_id, instance).prove(witness, rng)
