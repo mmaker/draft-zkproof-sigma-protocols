@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-08T01:21:31.660537+00:00",
+  "timestamp": "2025-07-10T01:22:21.942968+00:00",
   "repo": "mmaker/draft-zkproof-sigma-protocols",
   "labels": [
     {
@@ -2143,6 +2143,53 @@
               "body": "I don't and I think we should just have this be the new `test_sigma_protocols.sage`, but it's really useful for this review. thanks.",
               "createdAt": "2025-07-07T19:28:31Z",
               "updatedAt": "2025-07-07T19:28:31Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 64,
+      "id": "PR_kwDONyiw_86d7flI",
+      "title": "Fix get_iv_from_identifiers() method of KeccakDuplexSponge",
+      "url": "https://github.com/mmaker/draft-zkproof-sigma-protocols/pull/64",
+      "state": "OPEN",
+      "author": "nougzarm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-08T11:46:30Z",
+      "updatedAt": "2025-07-08T12:55:10Z",
+      "baseRepository": "mmaker/draft-zkproof-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "39a2978787fbc561cbcfe5fac2be52d7896ec05f",
+      "headRepository": "nougzarm/draft-zkproof-sigma-protocols",
+      "headRefName": "main",
+      "headRefOid": "7ab9b2b7867e0abe53183c1920acdef29eeab5bf",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDONyiw_86yqqNA",
+          "commit": {
+            "abbreviatedOid": "7ab9b2b"
+          },
+          "author": "nougzarm",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-08T12:55:10Z",
+          "updatedAt": "2025-07-08T12:55:10Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "init should instead be a KeccakDuplexSponge initialized via length_to_bytes(0) right? and instead be called tmp",
+              "createdAt": "2025-07-08T12:55:10Z",
+              "updatedAt": "2025-07-08T12:55:10Z"
             }
           ]
         }
