@@ -118,16 +118,18 @@ class KeccakDuplexSponge(DuplexSponge):
 
     @classmethod
     def get_iv_from_identifiers(cls, protocol_id: bytes, session_id: bytes, instance_label: bytes):
-        WORD_SIZE = int(32)
-        length_to_bytes = lambda x: int(x).to_bytes(WORD_SIZE, 'big')
-        init = length_to_bytes(0)
-        init.absorb(length_to_bytes(len(protocol_id)))
-        init.absorb(protocol_id)
-        init.absorb(length_to_bytes(len(session_id)))
-        init.absorb(session_id)
-        init.absorb(length_to_bytes(len(instance_label)))
-        init.absorb(instance_label)
-        iv = init.squeeze(32)
+        # I2OSP function: Integer to Octet String Primitive
+        def I2OSP(x, length):
+            return int(x).to_bytes(length, 'big')
+
+        hash_state = cls(bytes([0] * 32))
+        hash_state.absorb(I2OSP(len(protocol_id), 4))
+        hash_state.absorb(protocol_id)
+        hash_state.absorb(I2OSP(len(session_id), 4))
+        hash_state.absorb(session_id)
+        hash_state.absorb(I2OSP(len(instance_label), 4))
+        hash_state.absorb(instance_label)
+        iv = hash_state.squeeze(32)
         return iv
 
 class SHAKE128(DuplexSpongeInterface):
