@@ -7,24 +7,36 @@ import json
 
 CONTEXT_STRING = b'yellow submarine' * 2
 
-
 def test_vector(test_vector_function):
     from sagelib.ciphersuite import NISchnorrProofKeccakDuplexSpongeBls12381 as NIZK
 
     def inner(vectors):
-        rng = TestDRNG("hello world".encode('utf-8'))
-        test_vector_name = f"{test_vector_function.__name__}"
+        instance_witness_rng = TestDRNG(b"instance_witness_generation_seed")
+        proof_generation_rng = TestDRNG(b"proof_generation_seed")
 
-        instance, witness = test_vector_function(rng, NIZK.Codec.GG)
-        narg_string = NIZK(CONTEXT_STRING, instance).prove(witness, rng)
-        assert NIZK(CONTEXT_STRING, instance).verify(narg_string)
+        test_vector_name = f"{test_vector_function.__name__}"
+        instance, witness = test_vector_function(instance_witness_rng, NIZK.Codec.GG)
+
+        session_id = test_vector_name.encode('utf-8')
+        narg_string = NIZK.init_with_session_id(session_id, instance).prove(witness, proof_generation_rng)
+        assert NIZK.init_with_session_id(session_id, instance).verify(narg_string)
         hex_narg_string = narg_string.hex()
         print(f"{test_vector_name} narg_string: {hex_narg_string}\n")
 
+        # Serialize the entire witness list at once
+        witness_bytes = NIZK.Codec.GG.ScalarField.serialize(witness)
+
+        # Get the IV using get_iv_from_identifiers
+        protocol_id = NIZK.Protocol.get_protocol_id()
+        instance_label = NIZK.Protocol(instance).get_instance_label()
+        iv = NIZK.Hash.get_iv_from_identifiers(protocol_id, session_id, instance_label)
+
         vectors[test_vector_name] = {
             "Ciphersuite": "sigma/OWKeccak1600+Bls12381",
-            "Context": CONTEXT_STRING.hex(),
-            "Statement": "TODO",
+            "SessionId": session_id.hex(),
+            "Statement": instance.get_label().hex(),
+            "Witness": witness_bytes.hex(),
+            "IV": iv.hex(),
             "Proof": hex_narg_string,
         }
 
@@ -204,9 +216,6 @@ def bbs_blind_commitment_computation(rng, group):
     witness = [secret_prover_blind, msg_1, msg_2, msg_3]
     return statement, witness
 
-
-
-
 def main(path="vectors"):
     vectors = {}
     test_vectors = [
@@ -219,11 +228,10 @@ def main(path="vectors"):
     for test_vector in test_vectors:
         test_vector(vectors)
 
-
-    with open(path + "/allVectors.json", 'wt') as f:
+    with open(path + "/testSigmaProtocols.json", 'wt') as f:
         json.dump(vectors, f, sort_keys=True, indent=2)
 
-    with open(path + "/allVectors.txt", 'wt') as f:
+    with open(path + "/testSigmaProtocols.txt", 'wt') as f:
         for proof_type in vectors:
             write_group_vectors(f, proof_type, vectors[proof_type])
 
