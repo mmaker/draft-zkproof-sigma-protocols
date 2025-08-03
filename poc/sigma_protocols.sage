@@ -137,8 +137,51 @@ class LinearRelation:
     @property
     def image(self):
         return [self.linear_map.group_elements[i] for i in self._image]
+    
+    def convert_linear_map_to_repr(self):
+        """
+        Convert this linear map into a standard representation. Called during serialization.
+        """
+        assert all(x is not None for x in self.linear_map.group_elements), "All group elements must be set before serialization."
 
-    def get_description(self):
+        # Map from current state index to the index in the representation
+        linear_map_idx_to_repr_idx_map = {}
+        linear_map_repr = []
+        rearranged_group_elements = []
+        
+        for i, linear_combination in enumerate(self.linear_map.linear_combinations):
+            equations = []
+            element_indices = linear_combination.element_indices
+            scalar_indices = linear_combination.scalar_indices
+            assert(len(element_indices) == len(scalar_indices)), "The number of scalars and elements must be the same in a linear combination"
+            
+            for (element_idx, scalar_idx) in zip(element_indices, scalar_indices):
+                # Assign the next available index to the repr.
+                repr_element_idx = len(linear_map_idx_to_repr_idx_map)
+                if element_idx in linear_map_idx_to_repr_idx_map:
+                    repr_element_idx = linear_map_idx_to_repr_idx_map[element_idx]
+                # Or used the existing value if we are reusing a group element.
+                else: 
+                    rearranged_group_elements.append(self.linear_map.group_elements[element_idx])
+                    linear_map_idx_to_repr_idx_map[element_idx] = repr_element_idx
+                equations.append((scalar_idx, repr_element_idx))
+            
+            target_element_idx = self._image[i]
+            repr_target_element_idx = len(linear_map_idx_to_repr_idx_map)
+            # Assign the next available index to the repr.
+            if target_element_idx in linear_map_idx_to_repr_idx_map:
+                repr_target_element_idx = linear_map_idx_to_repr_idx_map[element_idx]
+            # Or used the existing value if we are reusing a group element.
+            else: 
+                rearranged_group_elements.append(self.linear_map.group_elements[target_element_idx])
+                linear_map_idx_to_repr_idx_map[target_element_idx] = repr_target_element_idx
+            linear_map_repr.append((repr_target_element_idx, equations))
+        
+        # The rearranged group elements are simply a permutation of those in the linear map.
+        assert(len(rearranged_group_elements) == len(self.linear_map.group_elements))
+        return (rearranged_group_elements, linear_map_repr)
+
+    def get_label(self):
         """
         Generate a canonical description that uniquely identifies this linear relation.
 
@@ -147,34 +190,32 @@ class LinearRelation:
         Returns:
             bytes: Canonical byte representation of the linear relation
         """
-        assert all(x is not None for x in self.morphism.group_elements), "All group elements must be set before serialization."
 
-        # All integers are serialized as 32-byte big-endian values for consistency
-        WORD_SIZE = 32
+        (group_elements, linear_equations) = self.convert_linear_map_to_repr()
 
+        # All integers are serialized as 32-bit big-endian values for consistency
+        WORD_SIZE_BITS = 32
+        WORD_SIZE = WORD_SIZE_BITS // 8
         serialization_parts = []
 
-        # Encode the structure dimensions
-        serialization_parts.append(self.morphism.num_scalars.to_bytes(WORD_SIZE, 'big'))
-        serialization_parts.append(self.morphism.num_elements.to_bytes(WORD_SIZE, 'big'))
-        serialization_parts.append(self.morphism.num_statements.to_bytes(WORD_SIZE, 'big'))
+        # Encode the number of equations
+        serialization_parts.append(len(self.linear_map.linear_combinations).to_bytes(WORD_SIZE, 'little'))
 
         # Encode each linear combination constraint
-        for i, linear_combination in enumerate(self.morphism.linear_combinations):
+        for (target_element_idx, linear_combination) in linear_equations:
             # The target group element index for this constraint
-            target_element_idx = self._image[i]
-            serialization_parts.append(target_element_idx.to_bytes(WORD_SIZE, 'big'))
+            serialization_parts.append(target_element_idx.to_bytes(WORD_SIZE, 'little'))
 
-            # Indices of scalars participating in this linear combination
-            for scalar_idx in linear_combination.scalar_indices:
-                serialization_parts.append(scalar_idx.to_bytes(WORD_SIZE, 'big'))
+            # Encode the dimension of the equation.
+            serialization_parts.append(len(linear_combination).to_bytes(WORD_SIZE, 'little'))
 
-            # Indices of group elements participating in this linear combination
-            for element_idx in linear_combination.element_indices:
-                serialization_parts.append(element_idx.to_bytes(WORD_SIZE, 'big'))
+            # Indices of scalars and group elements participating in this linear combination
+            for (scalar_idx, element_idx) in linear_combination:
+                serialization_parts.append(scalar_idx.to_bytes(WORD_SIZE, 'little'))
+                serialization_parts.append(element_idx.to_bytes(WORD_SIZE, 'little'))
 
         # Encode the actual group element values
-        for group_element in self.morphism.group_elements:
+        for group_element in group_elements:
             serialization_parts.append(self.group.serialize([group_element]))
 
         # Return the canonical description without hashing
@@ -189,10 +230,7 @@ class SchnorrProof(SigmaProtocol):
         self.instance = instance
 
     def prover_commit(self, witness, rng):
-        nonces = [
-            self.instance.Domain.random(rng)
-            for _ in range(self.instance.linear_map.num_scalars)
-        ]
+        nonces = [self.instance.Domain.random(rng) for _ in range(self.instance.linear_map.num_scalars)]
         prover_state = self.ProverState(witness, nonces)
         commitment = self.instance.linear_map(nonces)
         return (prover_state, commitment)
@@ -243,3 +281,9 @@ class SchnorrProof(SigmaProtocol):
         h_c_values = [self.instance.image[i] * challenge for i in range(self.instance.linear_map.num_constraints)]
         # Generate what the correct commitment would be based on the random response and challenge.
         return [self.instance.linear_map(response)[i] - h_c_values[i] for i in range(self.instance.linear_map.num_constraints)]
+
+    def get_instance_label(self):
+        return self.instance.get_label()
+
+    def get_protocol_id():
+        return 'draft-zkproof-fiat-shamir'.encode('utf-8')

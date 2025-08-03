@@ -1,5 +1,5 @@
 ---
-title: "Sigma Protocols Interactive Proofs"
+title: "Interactive Sigma Proofs"
 category: info
 
 docname: draft-orru-zkproof-sigma-protocols-latest
@@ -85,13 +85,11 @@ informative:
 
 --- abstract
 
-This document describes Sigma Protocols, a secure, general-purpose zero-knowledge proof of knowledge. Concretely, the scheme allows proving knowledge of a witness, without revealing any information about the undisclosed messages or the signature itself, while at the same time, guarantying soundness of the overall protocols.
+This document describes interactive sigma protocols, a class of secure, general-purpose zero-knowledge proofs of knowledge consisting of three moves: commitment, challenge, and response. Concretely, the protocol allows one to prove knowledge of a secret witness without revealing any information about it.
 
 --- middle
 
 # Introduction
-
-A Sigma Protocol is a simple zero-knowledge proof of knowledge that allows a **prover** to convince a **verifier** of the knowledge of a secret **witness** satisfying a **statement**.
 
 Any sigma protocol must define three objects: a *commitment* (computed by the prover), a *challenge* (computed by the verifier), and a *response* (computed by the prover).
 
@@ -152,7 +150,7 @@ Traditionally, sigma protocols are defined in Camenisch-Stadler notation as (for
 
     1. DLEQ(G, H, X, Y) = PoK{
     2.   (x):        // Secret variables
-    3.   X = x * G, Y = x * H
+    3.   X = x * G, Y = x * H        // Predicates to satisfy
     4. }
 
 In the above, line 1 declares that the proof name is "DLEQ", the public information (the **instance**) consists of the group elements `(G, X, H, Y)` denoted in upper-case.
@@ -199,7 +197,7 @@ This defines the object `SchnorrProof`. The initialization function takes as inp
 
 ### Prover procedures
 
-The prover of a sigma protocol is stateful and will send two message, a "commitment" and a "response" message, described below.
+The prover of a sigma protocol is stateful and will send two messages, a "commitment" and a "response" message, described below.
 
 #### Prover commitment
 
@@ -240,7 +238,7 @@ The prover of a sigma protocol is stateful and will send two message, a "commitm
     1. witness, nonces = prover_state
     2. return [nonces[i] + witness[i] * challenge for i in range(self.instance.linear_map.num_scalars)]
 
-### Verifier procedure
+### Verifier
 
     verify(self, commitment, challenge, response)
 
@@ -270,7 +268,7 @@ A witness is simply a list of `num_scalars` elements.
 
 ### Linear map {#linear-map}
 
-A `LinearMap` represents a function (a _linear map_ from the scalar field to the elliptic curve group) that, given as input an array of `Scalar` elements, outputs an array of `Group` element. This can be represented as matrix-vector (scalar) product using group multi-scalar multiplication. However, since the matrix is often times sparse, it is often more convenient to store the matrix in Yale sparse matrix.
+A `LinearMap` represents a function (a _linear map_ from the scalar field to the elliptic curve group) that, given as input an array of `Scalar` elements, outputs an array of `Group` elements. This can be represented as matrix-vector (scalar) product using group multi-scalar multiplication. However, since the matrix is oftentimes sparse, it is often more convenient to store the matrix in Yale sparse matrix format.
 
 Here is an example:
 
@@ -306,7 +304,7 @@ A witness can be mapped to a group element via:
 
     Inputs:
 
-    - self, the current sate of the constraint system
+    - self, the current state of the constraint system
     - witness,
 
     1. image = []
@@ -334,7 +332,7 @@ class LinearRelation:
 
 #### Element and scalar variables allocation
 
-Two functions allow two allocate the new scalars (the witness) and group elements (the instance).
+Two functions allow to allocate the new scalars (the witness) and group elements (the instance).
 
     allocate_scalars(self, n)
 
@@ -442,7 +440,7 @@ This ciphersuite uses P-256 {{SP800}} for the Group.
 
 - `order()`: Return the integer `115792089210356248762697446949407573529996955224135760342422259061068512044369`.
 - `serialize([A])`: Implemented using the compressed Elliptic-Curve-Point-to-Octet-String method according to {{SEC1}}; `Ne = 33`.
-- `deserialize(buf)`: Implemented by attempting to read `buf` into chunks of 32-byte arrays and convert them using the compressed Octet-String-to-Elliptic-Curve-Point method according to {{SEC1}}, and then performs partial public-key validation as defined in section 5.6.2.3.4 of {{!KEYAGREEMENT=DOI.10.6028/NIST.SP.800-56Ar3}}. This includes checking that the coordinates of the resulting point are in the correct range, that the point is on the curve, and that the point is not the point at infinity.
+- `deserialize(buf)`: Implemented by attempting to read `buf` into chunks of 33-byte arrays and convert them using the compressed Octet-String-to-Elliptic-Curve-Point method according to {{SEC1}}, and then performs partial public-key validation as defined in section 5.6.2.3.4 of {{!KEYAGREEMENT=DOI.10.6028/NIST.SP.800-56Ar3}}. This includes checking that the coordinates of the resulting point are in the correct range, that the point is on the curve, and that the point is not the point at infinity.
 
 #### Scalar Field of P-256
 
@@ -451,7 +449,9 @@ This ciphersuite uses P-256 {{SP800}} for the Group.
 
 # Security Considerations
 
-Sigma protocols provide the following guarantees in the random oracle model:
+Interactive sigma proofs are special sound and honest-verifier zero-knowledge. These proofs are deniable (without transferable message authenticity).
+
+We focus on the security guarantees of the non-interactive Fiat-Shamir transformation, where they provide the following guarantees (in the random oracle model):
 
 - **Knowledge soundness**: If the proof is valid, the prover must have knowledge of a secret witness satisfying the proof statement. This property ensures that valid proofs cannot be generated without possession of the corresponding witness.
 
@@ -461,9 +461,8 @@ While theoretical analysis demonstrates that both soundness and zero-knowledge p
 
 ## Privacy Considerations
 
-The zero-knowledge proofs described are publicly verifiable (transferable) when they are constructed using the Fiat-Shamir transformation, as defined in the spec. This is because any party can perform the Fiat-Shamir transformation over the contents of the proof, to verify that the challenge was computed properly.
-
-Zero-knowlege proofs can be deniable if they are constructed with an interactive protocol (with an honest verifier, and without transferable message authenticity), or with certain non-interactive transformations (such as by using equivocable commitments). This is because given such a proof, it is impossible to differentiate between an honestly generated or simulated proof. However, these constructions are out of scope for this spec.
+Interactive sigma proofs are insecure against malicious verifiers and should not be used.
+The non-interactive Fiat-Shamir transformation leads to publicly verifiable (transferable) proofs that are statistically zero-knowledge.
 
 # Post-Quantum Security Considerations
 
@@ -493,13 +492,25 @@ Implementations requiring post-quantum soundness SHOULD transition to alternativ
 
 Implementations should consider the timeline for quantum computing advances when planning migration to post-quantum sound alternatives.
 Implementers MAY adopt a hybrid approach during migration to post-quantum security by using AND composition of proofs. This approach enables gradual migration while maintaining security against classical adversaries.
-This composition retains soundness if **both** problem remains hard. AND composition of proofs is NOT described in this specification, but examples may be found in the proof-of-concept implementation and in {{BonehS23}}.
+This composition retains soundness if **both** problems remain hard. AND composition of proofs is NOT described in this specification, but examples may be found in the proof-of-concept implementation and in {{BonehS23}}.
 
-# Generation of the initialization vector {#iv-generation}
+# Generation of the protocol identifier {#protocol-id-generation}
 
-As of now, it is responsibility of the user to pick a unique initialization vector that identifies the proof system and the session being used. This will be expanded in future versions of this specification.
+As of now, it is responsibility of the user to pick a unique protocol identifier that identifies the proof system. This will be expanded in future versions of this specification.
+
+# Generation of the instance identifier {#instance-id-generation}
+
+As of now, it is responsibility of the user to pick a unique instance identifier that identifies the statement being proven.
+
+--- back
 
 # Acknowledgments
 {:numbered ="false"}
 
 The authors thank Jan Bobolz, Stephan Krenn, Mary Maller, Ivan Visconti, Yuwen Zhang for reviewing a previous edition of this specification.
+
+# Test Vectors
+{:numbered="false"}
+
+Test vectors will be made available in future versions of this specification.
+They are currently developed in the [proof-of-concept implementation](https://github.com/mmaker/draft-zkproof-sigma-protocols/tree/main/poc/vectors).

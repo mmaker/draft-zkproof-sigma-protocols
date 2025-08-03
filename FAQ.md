@@ -2,7 +2,7 @@
 
 ## What is the scope of this specification?
 
-The scope of this specification covers non-interactive, 3-message arguments for proving knowledge of a private $x \in \mathbb{F}^n$ such that:
+The scope of this specification covers interactive, 3-message arguments for proving knowledge of a private $x \in \mathbb{F}^n$ such that:
 
 $$Ax = B$$
 
@@ -27,7 +27,7 @@ However, the API and the primitives WILL BE described in such a way that all the
 Sigma protocols have been formalized over 30 years ago. However, due to [a patent](https://patents.google.com/patent/US4995082A/en) from Claus Schnorr they haven't been widely adopted yet. This is also part of the reason why cryptographers designed DSA in the way it is designed.
 
 Previous RFCs that describe how to perform these type of proofs are:
-- [RFC8235](https://datatracker.ietf.org/doc/html/rfc8235), which is a Schnorr proof for proving knowledge of $x$ such that $xG = X$. In other words, it is a proof for 
+- [RFC8235](https://datatracker.ietf.org/doc/html/rfc8235), which is a Schnorr proof for proving knowledge of $x$ such that $xG = X$. In other words, it is a proof for
 ```math
    \begin{bmatrix}G \end{bmatrix} x = \begin{bmatrix} X \end{bmatrix}\enspace.
 ```

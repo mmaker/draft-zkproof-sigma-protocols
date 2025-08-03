@@ -26,11 +26,6 @@ author:
     fullname: "Michele Orrù"
     organization: CNRS
     email: "m@orru.net"
--
-
-    fullname: "Giacomo Fenzi"
-    organization: EPFL
-    email: "giacomo.fenzi@epfl.ch"
 
 normative:
 
@@ -41,34 +36,23 @@ informative:
 
 --- abstract
 
-This document describes the Fiat-Shamir transformation, a generic procedure to compile an interactive protocol into a non-interactive protocol by combining the interactive protocol with a duplex sponge.
+This document describes how to construct a non-interactive proof via the Fiat–Shamir transformation, using a generic procedure that compiles an interactive proof into a non-interactive one by relying on a stateful hash object that provides a duplex sponge interface.
 
-We describe a generic duplex sponge interface that support "absorb" and "squeeze" operations over a elements of a specified base type.
-The absorb operation supports incrementally updating the hash state of the sponge, and the squeeze operation enables squeezing variable-length unpredictable messages.
-The sponge interface supports a number of different hash functions.
+The duplex sponge interface requires two methods: absorb and squeeze, which respectively read and write elements of a specified base type. The absorb operation incrementally updates the sponge's internal hash state, while the squeeze operation produces variable-length, unpredictable outputs. This interface can be instantiated with various hash functions based on permutation or compression functions.
 
-In addition, the specification introduces codecs, a mechanism to extend the functionality of a duplex sponge to support elements of other domains.
-
-Given an interactive protocol and a suitable codec, we describe how to construct a non-interactive protocol.
+This specification also defines codecs to securely map elements from the prover into the duplex sponge domain, and from the duplex sponge domain into verifier messages.
 
 --- middle
 
 # Introduction
 
 The Fiat-Shamir transformation is a technique that uses a hash function to convert a public-coin interactive protocol between a prover and a verifier into a corresponding non-interactive protocol.
+It depends on:
 
-We specify a variant of the Fiat-Shamir transformation, where the hash-function is obtained from a _duplex sponge_.
-
-A duplex sponge is a stateful hash object that can absorb inputs incrementally and squeeze variable-length unpredictable messages.
-The duplex sponge is defined over a base alphabet (typically bytes) which might not match the domain over which the prover and verifier messages are defined.
-
-A _codec_ is a stateful object that can absorb inputs incrementally and squeeze unpredictable challenges. A codec is _compatible_ with a given interactive protocol if the domain of the inputs that the codec can absorb matches the domain of the prover messages and the challenges matches the domain of the verifier messages of the specified protocol. Internally, a codec uses a duplex sponge and performs the appropriate conversion.
-
-The Fiat-Shamir transformation combines the following ingredients to construct a non-interactive protocol:
-
-- An initialization vector (IV) uniquely identifying the protocol.
-- A interactive protocol.
-- A codec compatible with the interactive protocol.
+- An _initialization vector_ (IV) uniquely identifying the protocol, the session, and the statement being proven.
+- An _interactive protocol_ supporting a family of statements to be proven.
+- A _hash function_ implementing the duplex sponge interface, capable of absorbing inputs incrementally and squeezing variable-length unpredictable messages.
+- A _codec_, which securely remaps prover elements into the base alphabet, and outputs of the duplex sponge into verifier messages (preserving the distribution).
 
 # The Duplex Sponge Interface
 
@@ -81,10 +65,9 @@ A duplex sponge operates over an abstract `Unit` type and provides the following
 
 Where:
 
-- The type `Unit` MUST have fixed size in memory, partial ordering, and at least two elements.
 - `init(iv: bytes) -> DuplexSponge` denotes the initialization function. This function takes as input a 32-byte initialization vector `iv` and initializes the state of the duplex sponge.
-- `absorb(self, values: list[Unit])` denotes the absorb operation of the sponge. This function takes as input a list of `Unit` elements and mutates the `DuplexSponge` internal state;
-- `squeeze(self, length: int)` denotes the squeeze operation of the sponge. This function takes as input a integral `length` and squeezes a list of `Unit` elements of length `length`.
+- `absorb(self, values: list[Unit])` denotes the absorb operation of the sponge. This function takes as input a list of `Unit` elements and mutates the `DuplexSponge` internal state.
+- `squeeze(self, length: int)` denotes the squeeze operation of the sponge. This function takes as input an integral `length` and squeezes a list of `Unit` elements of length `length`.
 
 # The Codec interface
 
@@ -101,6 +84,23 @@ Where:
 - `prover_message(self, prover_message) -> self` denotes the absorb operation of the codec. This function takes as input a prover message `prover_message` and mutates the codec's internal state.
 - `verifier_challenge(self) -> verifier_challenge` denotes the squeeze operation of the codec. This function takes no inputs and uses the codec's internal state to produce an unpredictable verifier challenge `verifier_challenge`.
 
+# Generation of the Initialization Vector {#iv-generation}
+
+The initialization vector is a 32-bytes string that embeds:
+
+- A `protocol_id`: the unique identifier for the interactive protocol and the associated relation being proven.
+- A `session_id`: the session identifier, for user-provided contextual information about the context where the proof is made (e.g. a URL, or a timestamp).
+- An `instance_label`: the instance identifier for the statement being proven.
+
+It is implemented as follows.
+
+    hash_state = DuplexSponge.init([0] * 32)
+    hash_state.absorb(I2OSP(len(protocol_id), 4))
+    hash_state.absorb(protocol_id)
+    hash_state.absorb(I2OSP(len(session_id), 4))
+    hash_state.absorb(session_id)
+
+This will be expanded in future versions of this specification.
 
 # Fiat-Shamir transformation for Sigma Protocols
 
@@ -202,11 +202,9 @@ SHAKE128 is a variable-length hash function based on the Keccak sponge construct
 
     1. h.copy().digest(length)
 
-
 ## Duplex Sponge
 
 A duplex sponge in overwrite mode is based on a permutation function that operates on a state vector. It implements the `DuplexSpongeInterface` and maintains internal state to support incremental absorption and variable-length output generation.
-
 
 ### Initialization
 
@@ -271,14 +269,13 @@ The squeeze operation extracts output elements from the sponge state, which are 
     10.    length -= chunk_size
     11. return output
 
-### Keccak-f[1600] Implementation
+### Keccak-f\[1600\] Implementation
 
 `Keccak-f` is the permutation function underlying {{SHA3}}.
 
-`KeccakDuplexSponge` instantiated `DuplexSponge` with `Keccak-f[1600]`, using rate `R = 136` bytes and capacity `C = 64` bytes.
+`KeccakDuplexSponge` instantiates `DuplexSponge` with `Keccak-f[1600]`, using rate `R = 136` bytes and capacity `C = 64` bytes.
 
 # Codecs registry
-
 
 ## Elliptic curves
 
@@ -292,8 +289,7 @@ The following functions and notation are used throughout the document.
 - `bytes_to_int` and `scalar_to_bytes`: Convert a byte string to and from a non-negative integer.
   `bytes_to_int` and `scalar_to_bytes` are implemented as `OS2IP` and `I2OSP` as described in
   {{!RFC8017}}, respectively. Note that these functions operate on byte strings
-  in big-endian byte order. These functions MUST raise an exception if the integer over which they
-  We consider the function `bytes_to_in`
+  in big-endian byte order.
 - The function `ecpoint_to_bytes` converts an elliptic curve point in affine-form into an array string of length `ceil(ceil(log2(coordinate_field_order))/ 8) + 1` using `int_to_bytes` prepended by one byte. This is defined as
 
       ecpoint_to_bytes(element)
@@ -327,7 +323,7 @@ The following functions and notation are used throughout the document.
     1. for scalar in scalars:
     2.     hash_state.absorb(scalar_to_bytes(scalar))
 
-Where the function `scalar_to_bytes` is defined in {#notation}
+Where the function `scalar_to_bytes` is defined in {{notation}}
 
 ### Absorb elements
 
@@ -348,14 +344,17 @@ Where the function `scalar_to_bytes` is defined in {#notation}
     Inputs:
 
     - hash_state, the hash state
-    - length, an unsiged integer of 64 bits determining the output length.
+    - length, an unsigned integer of 64 bits determining the output length.
 
     1. for i in range(length):
     2.     scalar_bytes = hash_state.squeeze(field_bytes_length + 16)
     3.     scalars.append(bytes_to_scalar_mod_order(scalar_bytes))
 
 
-# Generation of the initialization vector {#iv-generation}
+--- back
 
-As of now, it is responsibility of the user to pick a unique initialization vector that identifies the proof system and the session being used. This will be expanded in future versions of this specification.
+# Test Vectors
+{:numbered="false"}
 
+Test vectors will be made available in future versions of this specification.
+They are currently developed in the [proof-of-concept implementation](https://github.com/mmaker/draft-zkproof-sigma-protocols/tree/main/poc/vectors).

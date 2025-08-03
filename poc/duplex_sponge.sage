@@ -116,6 +116,21 @@ class KeccakDuplexSponge(DuplexSponge):
         self.permutation_state = KeccakPermutationState(iv)
         super().__init__(iv)
 
+    @classmethod
+    def get_iv_from_identifiers(cls, protocol_id: bytes, session_id: bytes, instance_label: bytes):
+        # I2OSP function: Integer to Octet String Primitive
+        def I2OSP(x, length):
+            return int(x).to_bytes(length, 'big')
+
+        hash_state = cls(bytes([0] * 32))
+        hash_state.absorb(I2OSP(len(protocol_id), 4))
+        hash_state.absorb(protocol_id)
+        hash_state.absorb(I2OSP(len(session_id), 4))
+        hash_state.absorb(session_id)
+        hash_state.absorb(I2OSP(len(instance_label), 4))
+        hash_state.absorb(instance_label)
+        iv = hash_state.squeeze(32)
+        return iv
 
 class SHAKE128(DuplexSpongeInterface):
     def __init__(self, iv: bytes):
