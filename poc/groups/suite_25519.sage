@@ -3,7 +3,7 @@
 
 import hashlib
 import sys
-from hash_to_field import XMDExpander
+from sagelib.hash_to_field import XMDExpander
 try:
     from sagelib.common import sgn0, test_dst
     from sagelib.h2c_suite import BasicH2CSuiteDef, EdwH2CSuiteDef, EdwH2CSuite, MontyH2CSuite

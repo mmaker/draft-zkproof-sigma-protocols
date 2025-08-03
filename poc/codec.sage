@@ -27,7 +27,7 @@ class ByteSchnorrCodec(Codec):
         hash_state.absorb(self.GG.serialize(elements))
 
     def verifier_challenge(self, hash_state):
-        from hash_to_field import OS2IP
+        from groups.hash_to_field import OS2IP
 
         uniform_bytes = hash_state.squeeze(
             self.GG.ScalarField.scalar_byte_length() + 16

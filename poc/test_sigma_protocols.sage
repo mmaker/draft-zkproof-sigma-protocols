@@ -19,7 +19,7 @@ def test_vector(test_vector_function):
         narg_string = NIZK(CONTEXT_STRING, instance).prove(witness, rng)
         assert NIZK(CONTEXT_STRING, instance).verify(narg_string)
         hex_narg_string = narg_string.hex()
-        print(f"{test_vector_name} narg_string: {hex_narg_string}\n")
+        print(f"{test_vector_name} test vector generated\n")
 
         vectors[test_vector_name] = {
             "Ciphersuite": "sigma/OWKeccak1600+P256",
@@ -216,9 +216,11 @@ def main(path="vectors"):
         pedersen_commitment_dleq,
         bbs_blind_commitment_computation,
     ]
+
+    print("Generating sigma protocol test vectors...\n")
+
     for test_vector in test_vectors:
         test_vector(vectors)
-
 
     with open(path + "/allVectors.json", 'wt') as f:
         json.dump(vectors, f, sort_keys=True, indent=2)
@@ -226,6 +228,8 @@ def main(path="vectors"):
     with open(path + "/allVectors.txt", 'wt') as f:
         for proof_type in vectors:
             write_group_vectors(f, proof_type, vectors[proof_type])
+
+    print(f"Test vectors written to {path}/allVectors.json")
 
 
 if __name__ == "__main__":

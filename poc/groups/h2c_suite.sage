@@ -4,7 +4,7 @@
 from collections import namedtuple
 import sys
 
-from hash_to_field import hash_to_field, XOFExpander
+from sagelib.hash_to_field import hash_to_field, XOFExpander
 
 try:
     from sagelib.curves import EdwardsCurve, MontgomeryCurve
