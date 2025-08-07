@@ -21,7 +21,7 @@ def test_vector(test_vector_function):
         narg_string = NIZK.init_with_session_id(session_id, instance).prove(witness, proof_generation_rng)
         assert NIZK.init_with_session_id(session_id, instance).verify(narg_string)
         hex_narg_string = narg_string.hex()
-        print(f"{test_vector_name} narg_string: {hex_narg_string}\n")
+        print(f"{test_vector_name} test vector generated\n")
 
         # Serialize the entire witness list at once
         witness_bytes = NIZK.Codec.GG.ScalarField.serialize(witness)
@@ -225,6 +225,9 @@ def main(path="vectors"):
         pedersen_commitment_dleq,
         bbs_blind_commitment_computation,
     ]
+
+    print("Generating sigma protocol test vectors...\n")
+
     for test_vector in test_vectors:
         test_vector(vectors)
 
@@ -234,6 +237,8 @@ def main(path="vectors"):
     with open(path + "/testSigmaProtocols.txt", 'wt') as f:
         for proof_type in vectors:
             write_group_vectors(f, proof_type, vectors[proof_type])
+
+    print(f"Test vectors written to {path}/allVectors.json")
 
 
 if __name__ == "__main__":

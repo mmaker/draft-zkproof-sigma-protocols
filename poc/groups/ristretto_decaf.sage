@@ -3,7 +3,7 @@
 
 import binascii
 import hashlib
-from hash_to_field import hash_to_field, expand_message_xmd, expand_message_xof
+from sagelib.hash_to_field import hash_to_field, expand_message_xmd, expand_message_xof
 
 
 class InvalidEncodingException(Exception):
