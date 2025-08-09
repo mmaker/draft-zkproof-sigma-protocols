@@ -173,7 +173,7 @@ We detail the functions that can be invoked on these objects. Example choices ca
 - `serialize(elements: [Group; N])`, serializes a list of group elements and returns a canonical byte array `buf` of fixed length `Ne * N`.
 - `deserialize(buffer)`, attempts to map a byte array `buffer` of size `Ne * N` into `[Group; N]`, and fails if the input is not the valid canonical byte representation of an element of the group. This function can raise a `DeserializeError` if deserialization fails.
 - `add(element: Group)`, implements elliptic curve addition for the two group elements.
-- `equal(element: Group)`, returns `true` if the two elements are the same and false` otherwise.
+- `equal(element: Group)`, returns `true` if the two elements are the same and `false` otherwise.
 - `scalar_mul(scalar: Scalar)`, implements scalar multiplication for a group element by an element in its respective scalar field.
 
 In this spec, instead of `add` we will use `+` with infix notation; instead of `equal` we will use `==`, and instead of `scalar_mul` we will use `*`. A similar behavior can be achieved using operator overloading.
