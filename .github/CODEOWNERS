@@ -1,0 +1,4 @@
+# Automatically generated CODEOWNERS
+# Regenerate with `make update-codeowners`
+draft-irtf-cfrg-fiat-shamir.md m@orru.net
+draft-irtf-cfrg-sigma-protocols.md m@orru.net cathieyun@gmail.com
