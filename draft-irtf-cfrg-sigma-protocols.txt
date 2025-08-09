@@ -10,7 +10,7 @@ Expires: 10 February 2026                                    Apple, Inc.
 
 
                         Interactive Sigma Proofs
-               draft-orru-zkproof-sigma-protocols-latest
+                 draft-irtf-cfrg-sigma-protocols-latest
 
 Abstract
 
@@ -25,13 +25,13 @@ About This Document
    This note is to be removed before publishing as an RFC.
 
    The latest revision of this draft can be found at
-   https://mmaker.github.io/draft-zkproof-sigma-protocols/draft-orru-
-   zkproof-sigma-protocols.html.  Status information for this document
-   may be found at https://datatracker.ietf.org/doc/draft-orru-zkproof-
-   sigma-protocols/.
+   https://mmaker.github.io/draft-irtf-cfrg-sigma-protocols/draft-irtf-
+   cfrg-sigma-protocols.html.  Status information for this document may
+   be found at https://datatracker.ietf.org/doc/draft-irtf-cfrg-sigma-
+   protocols/.
 
    Source for this draft and an issue tracker can be found at
-   https://github.com/mmaker/draft-zkproof-sigma-protocols.
+   https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols.
 
 Status of This Memo
 
@@ -692,8 +692,8 @@ Procedure:
               Cryptography", n.d., <https://toc.cryptobook.us/>.
 
    [fiat-shamir]
-              "draft-orru-zkproofs-fiat-shamir",
-              <https://mmaker.github.io/spfs/draft-orru-zkproof-fiat-
+              "draft-irtf-cfrg-fiat-shamir",
+              <https://mmaker.github.io/spfs/draft-irtf-cfrg-fiat-
               shamir.html>.
 
    [GiacomelliMO16]

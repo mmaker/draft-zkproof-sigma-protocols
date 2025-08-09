@@ -9,7 +9,7 @@ Expires: 10 February 2026
 
 
                        Fiat-Shamir Transformation
-                 draft-orru-zkproof-fiat-shamir-latest
+                   draft-irtf-cfrg-fiat-shamir-latest
 
 Abstract
 
@@ -34,9 +34,9 @@ About This Document
    This note is to be removed before publishing as an RFC.
 
    The latest revision of this draft can be found at
-   https://mmaker.github.io/draft-zkproof-sigma-protocols/draft-orru-
-   zkproof-fiat-shamir.html.  Status information for this document may
-   be found at https://datatracker.ietf.org/doc/draft-orru-zkproof-fiat-
+   https://mmaker.github.io/draft-irtf-cfrg-sigma-protocols/draft-irtf-
+   cfrg-fiat-shamir.html.  Status information for this document may be
+   found at https://datatracker.ietf.org/doc/draft-irtf-cfrg-fiat-
    shamir/.
 
    Discussion of this document takes place on the Crypto Forum mailing
@@ -45,7 +45,7 @@ About This Document
    https://www.ietf.org/mailman/listinfo/cfrg/.
 
    Source for this draft and an issue tracker can be found at
-   https://github.com/mmaker/draft-zkproof-sigma-protocols.
+   https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols.
 
 Status of This Memo
 
@@ -497,7 +497,7 @@ Test Vectors
 
    Test vectors will be made available in future versions of this
    specification.  They are currently developed in the proof-of-concept
-   implementation (https://github.com/mmaker/draft-zkproof-sigma-
+   implementation (https://github.com/mmaker/draft-irtf-cfrg-sigma-
    protocols/tree/main/poc/vectors).
 
 Author's Address
