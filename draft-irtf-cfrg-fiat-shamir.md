@@ -8,14 +8,14 @@ number:
 date:
 consensus: true
 v: 3
-# area: AREA
-workgroup: Zkproof
+area: "IRTF"
+workgroup: "Crypto Forum"
 keyword:
  - zero knowledge
  - hash
 venue:
   group: "Crypto Forum"
-  type: ""
+  type: "Research Group"
   mail: "cfrg@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/cfrg"
   github: "mmaker/draft-irtf-cfrg-sigma-protocols"

@@ -7,15 +7,15 @@ submissiontype: independent
 number:
 date:
 v: 3
-# area: AREA
-# workgroup: WG Working Group
+area: "IRTF"
+workgroup: "Crypto Forum"
 keyword:
  - zero-knowledge
 venue:
-#  group: WG
-#  type: Working Group
-#  mail: WG@examplecom
-#  arch: https://examplecom/WG
+  group: "Crypto Forum"
+  type: "Research Group"
+  mail: "cfrg@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/cfrg"
   github: "mmaker/draft-irtf-cfrg-sigma-protocols"
   latest: "https://mmaker.github.io/draft-irtf-cfrg-sigma-protocols/draft-irtf-cfrg-sigma-protocols.html"
 
