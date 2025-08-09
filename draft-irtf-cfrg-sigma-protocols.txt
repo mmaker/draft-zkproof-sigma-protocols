@@ -2,7 +2,7 @@
 
 
 
-Network Working Group                                            M. Orrù
+Crypto Forum                                                     M. Orrù
 Internet-Draft                                                      CNRS
 Intended status: Informational                                    C. Yun
 Expires: 10 February 2026                                    Apple, Inc.
@@ -29,6 +29,11 @@ About This Document
    cfrg-sigma-protocols.html.  Status information for this document may
    be found at https://datatracker.ietf.org/doc/draft-irtf-cfrg-sigma-
    protocols/.
+
+   Discussion of this document takes place on the Crypto Forum Research
+   Group mailing list (mailto:cfrg@ietf.org), which is archived at
+   https://mailarchive.ietf.org/arch/browse/cfrg.  Subscribe at
+   https://www.ietf.org/mailman/listinfo/cfrg/.
 
    Source for this draft and an issue tracker can be found at
    https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols.

@@ -2,7 +2,7 @@
 
 
 
-Zkproof                                                          M. Orrù
+Crypto Forum                                                     M. Orrù
 Internet-Draft                                                      CNRS
 Intended status: Informational                             9 August 2025
 Expires: 10 February 2026
@@ -39,8 +39,8 @@ About This Document
    found at https://datatracker.ietf.org/doc/draft-irtf-cfrg-fiat-
    shamir/.
 
-   Discussion of this document takes place on the Crypto Forum mailing
-   list (mailto:cfrg@ietf.org), which is archived at
+   Discussion of this document takes place on the Crypto Forum Research
+   Group mailing list (mailto:cfrg@ietf.org), which is archived at
    https://mailarchive.ietf.org/arch/browse/cfrg.  Subscribe at
    https://www.ietf.org/mailman/listinfo/cfrg/.
 
