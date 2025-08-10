@@ -1,0 +1,2256 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2025-08-10T01:40:17.279292+00:00",
+  "repo": "mmaker/draft-irtf-cfrg-sigma-protocols",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "easy",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "editorial",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [
+    {
+      "number": 1,
+      "id": "I_kwDONyiw_86rFQiu",
+      "title": "Add reference implementation, test vectors",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/1",
+      "state": "CLOSED",
+      "author": "cathieyun",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "To facilitate adoption, it would be helpful to add a reference implementation, which produces test vectors. \nThe P384 ciphersuite as suggested in the spec would be sufficient for now.",
+      "createdAt": "2025-02-22T00:34:09Z",
+      "updatedAt": "2025-03-12T07:33:45Z",
+      "closedAt": "2025-03-12T07:33:45Z",
+      "comments": []
+    },
+    {
+      "number": 2,
+      "id": "I_kwDONyiw_86sOPU0",
+      "title": "Isolate `Scalar` structure from `Group` class",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/2",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Currently `Scalar` methods are inside `Group`, which does not allow for an appropriate Fiat-Shamir transform. There should be a separate `ScalarField` type attribute inside `Group`, performing the scalar operations. ",
+      "createdAt": "2025-03-02T08:43:45Z",
+      "updatedAt": "2025-03-12T20:14:17Z",
+      "closedAt": "2025-03-11T09:27:39Z",
+      "comments": [
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "A bit late to this thread, but why doesn't `Scalar` being inside `Group` allow for an appropriate F-S transform? What limitation do you run into when trying to do the F-S transform with `Group.random_scalar()` functions, for instance? I'm trying to better understand the reasoning here, and why it should be propagated back to ARC (https://github.com/mmaker/spfs/pull/6#issuecomment-2713323554).",
+          "createdAt": "2025-03-11T23:10:55Z",
+          "updatedAt": "2025-03-11T23:10:55Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "The Fiat-Shamir transform should allow to squeeze field challenges using one single algorithm, regardless of wether it's the scalar field of an elliptic curve group or not. What I meant (apologies for the quickly-typed answer) is that I can access functions that concern`Scalar` only via `Group`. \n(I was thinking that some proofs, e.g. STARK proofs, have no elliptic curve involved and so no `Group` from which one can access methods concerning `Scalar`).\n\n\nHere's a cleaner argument: it would better match the specification if there was a `Scalar` class that exactly matches the `Scalar` requirements of the spec, right?  ",
+          "createdAt": "2025-03-11T23:42:26Z",
+          "updatedAt": "2025-03-12T00:00:09Z"
+        },
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Ah the example of STARKs not having a Group to pull scalars from, is a good point and I hadn't thought of that. The current \"scalar from group\" is a shorthand (which may be sufficient for ARC, VOPRF, other EC-based protocols) but doesn't generalize too well.",
+          "createdAt": "2025-03-12T20:14:16Z",
+          "updatedAt": "2025-03-12T20:14:16Z"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "id": "I_kwDONyiw_86sQM3f",
+      "title": "Publish proof-of-concept implementation",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/3",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "An ideal proof-of-concept implementation should contain 3 examples: \n- DLEQ proofs\n- proofs of ElGamal encryption\n- Schnorr proof of knowledge of a secret key",
+      "createdAt": "2025-03-03T01:11:46Z",
+      "updatedAt": "2025-03-06T08:55:27Z",
+      "closedAt": "2025-03-06T08:55:27Z",
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Done",
+          "createdAt": "2025-03-06T08:55:27Z",
+          "updatedAt": "2025-03-06T08:55:27Z"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "id": "I_kwDONyiw_86sQNDO",
+      "title": "Create test vectors for implementation",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/4",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Create example test vectors for the examples in the implementation.",
+      "createdAt": "2025-03-03T01:12:37Z",
+      "updatedAt": "2025-03-12T07:33:35Z",
+      "closedAt": "2025-03-12T07:33:34Z",
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "closed by @cathieyun  in #11.",
+          "createdAt": "2025-03-12T07:33:34Z",
+          "updatedAt": "2025-03-12T07:33:34Z"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "id": "I_kwDONyiw_86sQNgc",
+      "title": "Isolate commitment serialization from prove_batchable",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/5",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The method `prove_batchable` and `verify_batchable` should be agnostic wrt the sigma protocol and the choice of the hash function. \nIn order for this to happen, commitment and response serialization must be deferred to a separate procedure in SigmaProtocol.\nTherefore:  move serialization to `serialize_commitment` and `serialize_response`.",
+      "createdAt": "2025-03-03T01:14:39Z",
+      "updatedAt": "2025-06-14T16:15:22Z",
+      "closedAt": "2025-06-14T16:15:22Z",
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "This is currently part of the `SigmaProtocol` interface design.",
+          "createdAt": "2025-06-14T16:15:22Z",
+          "updatedAt": "2025-06-14T16:15:22Z"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "id": "I_kwDONyiw_86snh1H",
+      "title": "Support for short proofs",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/8",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Right now the non-interactive sigma protocol proving function outputs batchable proofs `(commitment, response)` \nwhich (I think) require point validation and are generally larger than short proofs of the form `(challenge, response)`.\n\nThis issue is to track the addition of a `short_prove` and `short_verify function`",
+      "createdAt": "2025-03-05T03:37:32Z",
+      "updatedAt": "2025-06-27T22:40:52Z",
+      "closedAt": "2025-06-27T22:40:52Z",
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "closing in favor of #25 ",
+          "createdAt": "2025-06-27T22:40:52Z",
+          "updatedAt": "2025-06-27T22:40:52Z"
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "id": "I_kwDONyiw_86sniRo",
+      "title": "Support messages as part of the zk proof",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/9",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "it is typical in signatures of knoweldge and sometimes in zk proofs to add a string label to a zkp, which is plugged into the fiat-shamir transformation. After a chat with trevor i have the impression that for him the way to go would be \n\n```\nchallenge = SHAKE128(description || message || commitment)\n```\n\nso i think we should find a way to add the message to the domain separator, if needed.",
+      "createdAt": "2025-03-05T03:39:17Z",
+      "updatedAt": "2025-03-05T03:39:17Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 10,
+      "id": "I_kwDONyiw_86snkVK",
+      "title": "Support deterministic nonce generation",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/10",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "It is good practice in the signature world to re-seed the operating system randomness with the signing key. One such example is [RFC6979](https://datatracker.ietf.org/doc/html/rfc6979). This requires some care because (1) we want to preprocess the information with the challenge generation, (2) we don't want to expose the witness to side-channel attacks, and (3) make the spec more complicated than it needs to be. \n\nFor the case of sigma protocols, something simple as \n```\nnonce     = SHAKE128(description || message || random || PAD || witness)\nchallenge = SHAKE128(description || message || commitment)\n```\n\nwould be ideal, but the problem comes in when thinking of multi-round protocols, each of which might requires extra randomness in the middle of the protocol. \n\nThe approach used in [Nimue](https://github.com/mmaker/nimue) is to have the NARG prover state also hold a private sponge, which is ratcheted seeded with operating system randomness every time an absorb is performed. This seems OK but wasteful.\nA better alternative would be to expect the interactive (ZK) prover to take as input an rng, and seed that rng with the witness and some os randomness once and for all. The downside of this approach is that recovering the initial seed will break the whole protocol, but this does not seem to be such a problem? all in all, there is not much academic literature about leakage in zk proof of these sort.",
+      "createdAt": "2025-03-05T03:47:21Z",
+      "updatedAt": "2025-03-05T03:47:58Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 12,
+      "id": "I_kwDONyiw_86toHvn",
+      "title": "Keccak F-1600 does not work",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/12",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "\ud83d\udea8\ud83d\udea8\ud83d\udea8\ud83d\udea8 Currently we do not invoke the permutation function \ud83d\udea8\ud83d\udea8\ud83d\udea8\n\nhttps://github.com/mmaker/spfs/blob/main/poc/fiat_shamir.sage#L70\n\nThere seems to be a mismatch between python and sage bytewise operators that is leading to inconsistent results. This obviously is a major security issue and needs to be fixed.",
+      "createdAt": "2025-03-12T07:23:32Z",
+      "updatedAt": "2025-03-14T11:54:41Z",
+      "closedAt": "2025-03-14T11:54:41Z",
+      "comments": []
+    },
+    {
+      "number": 15,
+      "id": "I_kwDONyiw_86woNml",
+      "title": "Example: AND composition of sigma protocols",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/15",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "vishady721"
+      ],
+      "labels": [],
+      "body": "The file https://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/test_sigma_protocols.sage should contain an example showing how sigma protocols can be composed using AND composition.  \n\n For now, a \"sketch\" is available in `test_and_composition`, and a previously-reviewed algorithm is available in  https://sigma.zkproof.org/tex-spec.pdf section 2.5.1 ",
+      "createdAt": "2025-04-01T12:41:57Z",
+      "updatedAt": "2025-04-17T20:27:55Z",
+      "closedAt": "2025-04-17T20:27:55Z",
+      "comments": []
+    },
+    {
+      "number": 16,
+      "id": "I_kwDONyiw_86woOJ2",
+      "title": "Example: OR composition of sigma protocols",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/16",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "vishady721"
+      ],
+      "labels": [],
+      "body": "The file https://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/test_sigma_protocols.sage should contain an example showing how sigma protocols can be composed using OR composition.   \n\n\nA previously-reviewed algorithm is described in  https://sigma.zkproof.org/tex-spec.pdf section 2.5.2 ",
+      "createdAt": "2025-04-01T12:42:50Z",
+      "updatedAt": "2025-05-11T04:40:01Z",
+      "closedAt": "2025-05-11T04:40:01Z",
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Thanks @vishady721 !",
+          "createdAt": "2025-05-10T19:04:49Z",
+          "updatedAt": "2025-05-10T19:04:49Z"
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "id": "I_kwDONyiw_86woRJA",
+      "title": "Add elliptic curve BLS12-381 G1 to the ciphersuite.",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/17",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Considering as target BBS presentation proofs, @Wind4Greg requested support for BLS12-381 in the ciphersuite. \n\nTo close this issue: \n- Add test vectors for BLS12-381 G1\n- Add to the spec a description of the ciphersuite.\n\n",
+      "createdAt": "2025-04-01T12:47:42Z",
+      "updatedAt": "2025-04-01T12:47:42Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 18,
+      "id": "I_kwDONyiw_86woV_E",
+      "title": "Example: Linear equations for sigma protocols",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/18",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "A common extension for sigma protocols is to show that a commitment satisfies a given linear equation, without requiring expensive group operations. \n\nThere should be an example in \nhttps://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/test_sigma_protocols.sage that implements linear constraints in addition to morphism preimages.\n\nAn example is available at https://sigma.zkproof.org/tex-spec.pdf, section 3.3 -- but there is no need to use Gaussian elimination!  The math to work out should be pretty straightforward.",
+      "createdAt": "2025-04-01T12:55:25Z",
+      "updatedAt": "2025-04-01T12:55:25Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 19,
+      "id": "I_kwDONyiw_86woXaK",
+      "title": "Add elliptic curve P-384 to the ciphersuite.",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/19",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Considering as target [ARC](https://github.com/chris-wood/draft-arc) presentation proofs, @chris-wood  requested support for P-384 within our ciphersuite. \n\nTo close this issue: add test vectors to the specification.\n\n",
+      "createdAt": "2025-04-01T12:57:37Z",
+      "updatedAt": "2025-06-14T16:16:14Z",
+      "closedAt": "2025-06-14T16:16:14Z",
+      "comments": [
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "FYI we are actually adding P256 to the curves for ARC, and will default to P256 for Privacy Pass. So it would be good to support both P256 (for performance) and P384, though if we have to choose between the two, I would prefer P256 since that is the choice for Privacy Pass deployment.",
+          "createdAt": "2025-04-09T20:09:39Z",
+          "updatedAt": "2025-04-09T20:09:39Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "cf. #29 -- maybe something is wrong with P384?",
+          "createdAt": "2025-04-17T20:28:48Z",
+          "updatedAt": "2025-04-17T20:28:48Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "closing in favor of another issue for P384.",
+          "createdAt": "2025-06-14T16:16:14Z",
+          "updatedAt": "2025-06-14T16:16:14Z"
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "id": "I_kwDONyiw_86woap3",
+      "title": "Clarify scope of the specification in `README.md` and inside the specification.",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/20",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "mmaker"
+      ],
+      "labels": [],
+      "body": "In https://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/draft-orru-zkproof-sigma-protocols.md : \ndescribe what are Maurer proofs, clarify the scope is limited to those\n\nReminder: the scope of this specification are non-interactive, 3-round arguments for:\n\n$Ax = B$\n\nwhere $A \\in \\mathbb{G}^{n \\times m}$ and $B \\in \\mathbb{G}^n$ are the public instance \nand $x \\in \\mathbb{F}^n$ is the private witness.\n\nThe draft is designed NOT TO step in the way of multi-round protocols or log-sized arguments.",
+      "createdAt": "2025-04-01T13:02:36Z",
+      "updatedAt": "2025-04-10T13:11:28Z",
+      "closedAt": "2025-04-10T13:10:59Z",
+      "comments": []
+    },
+    {
+      "number": 21,
+      "id": "I_kwDONyiw_86wofMp",
+      "title": "Add `FAQ.md` that answers the CFRG questions.",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/21",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "mmaker"
+      ],
+      "labels": [],
+      "body": "CFRG's wiki defines some questions which are a great starting point for the specification. \nhttps://wiki.ietf.org/en/group/cfrg/CFRG-Process\n\n\nAdd a markdown file that elaborates the following questions:\n\n> Who in the IETF needs this solution?\n\nList the currently-open drafts from https://datatracker.ietf.org/meeting/122/session/cfrg\n\n> Why isn\u2019t it solved already?\n\nList the drafts closed. Illustrate the lack of interest from the big tech and highlight potential weaknesses in reviewing multiple different solutions in isolation. Show issues in the current BBS draft already reported.\n\n> Is this actually an engineering problem instead of a research problem? \n\nThis draft does not contain any research problem: these topics are well-established in research and not meant to significantly be revised in the future.\n\n> Is the research mature enough for CFRG engagement? \n\nYes; [Schnorr91] and [Maurer09] are still around.\n\n> Scope and impact: Clarify how broad, significant, or urgent the identified cryptographic problem is.\n\nWe see this as the first step in standardizing zk proofs. List the current proposals outside the specification, the NGOs that are needing this specification, and the urgency of the identity folks in relying on a standardization approach. ",
+      "createdAt": "2025-04-01T13:09:08Z",
+      "updatedAt": "2025-04-09T08:11:49Z",
+      "closedAt": "2025-04-09T08:11:49Z",
+      "comments": []
+    },
+    {
+      "number": 22,
+      "id": "I_kwDONyiw_86wp6Mm",
+      "title": "Establish ciphersuites in implementation.",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/22",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "cathieyun"
+      ],
+      "labels": [],
+      "body": "## Cryptographic Component Combinations\n\nSimilarly to [Privacy Pass](https://datatracker.ietf.org/doc/html/rfc9497#name-ciphersuites), we must add a section in the spec and in the test vectors that ties together the different cryptographic components. I see the following components:\n\n- **The elliptic curve**: for instance, BLS12-381\n- **The hash function**: for instance, SHA-3 or TurboSHAKE\n- **The codec**: the hash_to_field mechanism, rejection sampling, or modular reduction for field elements\n\nIn the Proof of Concept implementation, this requires updating the test vectors to support multiple groups and elliptic curves.",
+      "createdAt": "2025-04-01T15:17:41Z",
+      "updatedAt": "2025-06-14T16:14:53Z",
+      "closedAt": "2025-06-14T16:14:52Z",
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "@cathieyun: this is fixed an currently available in https://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/ciphersuite.sage",
+          "createdAt": "2025-06-14T16:14:53Z",
+          "updatedAt": "2025-06-14T16:14:53Z"
+        }
+      ]
+    },
+    {
+      "number": 23,
+      "id": "I_kwDONyiw_86wqUL6",
+      "title": "Add template sections in Fiat-Shamir looking at other specifications",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/23",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Check out other specification, for instance\n\nhttps://datatracker.ietf.org/doc/html/draft-irtf-cfrg-voprf-21#name-iana-considerations-6\n\nand add sections that are clearly missing but relevant, for instance \"Security Considerations\", \"Post-Quantum Security\", \"Application Considerations\"",
+      "createdAt": "2025-04-01T15:56:30Z",
+      "updatedAt": "2025-06-14T16:16:29Z",
+      "closedAt": "2025-06-14T16:16:29Z",
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "done",
+          "createdAt": "2025-06-14T16:16:29Z",
+          "updatedAt": "2025-06-14T16:16:29Z"
+        }
+      ]
+    },
+    {
+      "number": 24,
+      "id": "I_kwDONyiw_86wtdnl",
+      "title": "Statement serialization",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/24",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "vishady721"
+      ],
+      "labels": [],
+      "body": "Currently, a sigma protocol is instantiated using an \"initialization vector\" (a label, a domain separator) of 32 bytes, and does not absorb the statement (the instance). \n\n\n## Instance \n\nTo prove soundness (and thus stronger notions of soundness), the instance must be put in the Fiat-Shamir transformation. This has been called \"strong FS\" in the literature, and the case of Schnorr proofs, these generally consist of the generators used -- in the case of Maurer proofs, of the morphism used. \n\nThe easy way out from this is to take inspiration from libsignal's statement generation process here:\nhttps://github.com/signalapp/libsignal/blob/main/rust/poksho/src/statement.rs#L44-L88\nand check in the **[latex specification](https://sigma.zkproof.org/tex-spec.pdf)** for references to scientific literature.\n\n## Domain Separator\n\nThe way in which these 32 bytes are generated is discretionary but a standard should take a stance here and produce guidelines on how they should be generated. \n\nFrom a theoretical security standpoint, the IV should incorporate: \n- a protocol identifier, \n- a session identifier.\n\nA way to describe how the user should pick a protocol identifier and a session identifier is desirable but not stricly needed, so for now this part can be perhaps be left to the user.\n",
+      "createdAt": "2025-04-01T22:33:48Z",
+      "updatedAt": "2025-06-14T15:47:16Z",
+      "closedAt": "2025-06-14T15:47:16Z",
+      "comments": []
+    },
+    {
+      "number": 25,
+      "id": "I_kwDONyiw_86xAXvk",
+      "title": "Add `short_proofs` support",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/25",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "In preimage morphism proofs you can also give proof outputs as `(challenge, response)` instead of `(commitment, response)`. ",
+      "createdAt": "2025-04-03T13:50:20Z",
+      "updatedAt": "2025-05-10T19:05:11Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Related: #32.\nMight be useful for this issue to have separate `serialize_commit` and `serialize_response` functions",
+          "createdAt": "2025-05-10T19:02:39Z",
+          "updatedAt": "2025-05-10T19:02:39Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Related: #5 ",
+          "createdAt": "2025-05-10T19:05:10Z",
+          "updatedAt": "2025-05-10T19:05:10Z"
+        }
+      ]
+    },
+    {
+      "number": 27,
+      "id": "I_kwDONyiw_86x2d6i",
+      "title": "Consider merging Fiat-Shamir spec into Sigma Protocol spec",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/27",
+      "state": "CLOSED",
+      "author": "cathieyun",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Given that the Fiat-Shamir spec is only used in the Sigma protocol spec, it seems like it would be simpler to combine the two and have the Fiat-Shamir definition as a sub-component of the Sigma protocol spec. (That way, we don't have to have too many layers of nested specs. For example, our spec dependencies for ARC would be: ARC -> Sigma -> F-S, and the dependences for BBS would be BBS-pseudonyms -> blinded-BBS -> Sigma -> F-S. It would be nice to remove one of those layers, but this is more of an editorial choice than a technical requirement.\n\nMerging the F-S definitions into the Sigma Protocol spec would also simplify the requirements for F-S, as it would no longer have to work in a multi-round setting. This may allow the F-S protocol to be simpler, or at least for its security requirements to be relaxed. ",
+      "createdAt": "2025-04-09T20:26:34Z",
+      "updatedAt": "2025-06-18T00:08:44Z",
+      "closedAt": "2025-06-18T00:08:44Z",
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "I think the layering is wrong:  the fiat-shamir transformation transforms an interactive protocol. Therefore, it should be ARC -> F-S -> Sigma, or am I missing something?\n\nConcerning the technical requirement, it seems that supporting multi round for generic proof systems is of interest by:  \n- @wind4greg for bulletproof support. they can rely on our linear relation statement and just implement a different interactive protocol,\n- the zkproofs community, among which we have the EF and NIST, who is interested in generic snarks,\n- Worldcoin, who is interested in more hash-based constructions.\n\n\nEven for things like sequential composition of sigma protocols (e.g. I present a credential and then just concatenate a range proof for a committed attribute) this seems beneficial for little to no cost. \n[Putting numbers here: multi-round with SHAKE128 costs [30 lines of Rust code](https://github.com/mmaker/sigma-rs/blob/main/src/duplex_sponge/shake.rs). In python it's about 10]\n\nFianlly,  abstraction of `absorb` / `squeeze` can clarify what is the actual Fiat-Shamir transformation doing (cf. \"C4. Other non-interactive transformations\").",
+          "createdAt": "2025-06-14T16:26:22Z",
+          "updatedAt": "2025-06-14T16:46:47Z"
+        },
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think of the ARC -> Sigma -> FS dependency to be reflective of the fact that \"the ARC spec needs to know what a Sigma proof looks like, but doesn't care about what's inside\", and then \"the Sigma proof needs to know how to do a F-S transformation\". But I'm okay punting this debate if it's not terribly useful :)\n\nI'm okay closing this issue, or marking it as low-priority (with the option to revisit it later, if it turns out that supporting multi round protocols for generic proof signatures does not actually get any traction). ",
+          "createdAt": "2025-06-18T00:07:33Z",
+          "updatedAt": "2025-06-18T00:07:33Z"
+        },
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I'll close this as a duplicate of https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/45, as with better documentation of where else a F-S transform definition would be useful outside of Sigma specs, I would be okay resting my case :)",
+          "createdAt": "2025-06-18T00:08:39Z",
+          "updatedAt": "2025-06-18T00:08:39Z"
+        }
+      ]
+    },
+    {
+      "number": 28,
+      "id": "I_kwDONyiw_86x9cMQ",
+      "title": "Add section evaluating the post-quantum guarantees of sigma protocols in the DL setting.",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/28",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "mmaker"
+      ],
+      "labels": [],
+      "body": "Add the following sections to the draft (blatantly stolen from the VOPRF spec)\n\n``` \n  7.  Security Considerations . . . . . . . . . . . . . . . . . . .  42\n     7.1.  Security Properties . . . . . . . . . . . . . . . . . . .  42\n     7.2.  Security Assumptions  . . . . . . . . . . . . . . . . . .  44\n```",
+      "createdAt": "2025-04-10T13:20:21Z",
+      "updatedAt": "2025-04-14T08:16:46Z",
+      "closedAt": "2025-04-14T08:10:29Z",
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Fixed in [7fedd62](https://github.com/mmaker/draft-zkproof-sigma-protocols/commit/7fedd6276cc2e0dcd2bd28710b8a71613953c114)",
+          "createdAt": "2025-04-14T08:10:29Z",
+          "updatedAt": "2025-04-14T08:10:29Z"
+        }
+      ]
+    },
+    {
+      "number": 30,
+      "id": "I_kwDONyiw_86yWlE6",
+      "title": "Add \"Security Considerations\" section",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/30",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "mmaker"
+      ],
+      "labels": [],
+      "body": "Fill in section \"Security Considerations\" currently empty. \n\nThis section is intended to guide the reader through the different soundness and privacy\nnotions for sigma protocols. In particular it should have a sub-section on: \n\n- Security Assumptions\n- Security Properties\n\nPlus an overview of common attacks on sigma protocols, some of which can be found in https://sigma.zkproof.org/history.\nAdd a note on replay attacks and the meaning of the `IV` when starting the protocol.\n\nIt should also mention the UC security guarantees, and cite previous works like: \n\n- https://eprint.iacr.org/2022/290\n\n",
+      "createdAt": "2025-04-14T08:16:33Z",
+      "updatedAt": "2025-05-10T13:51:34Z",
+      "closedAt": "2025-05-10T13:51:34Z",
+      "comments": []
+    },
+    {
+      "number": 31,
+      "id": "I_kwDONyiw_86zBCBm",
+      "title": "Correct citations for MPCitH approaches",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/31",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "editorial",
+        "easy"
+      ],
+      "body": "In the current spec we refer to ZKBoo as sigma protocol based on MPCitH. Is this the first appearance of the two? \nDo some bibliography work and review this part of the literature in the spec.",
+      "createdAt": "2025-04-17T20:30:51Z",
+      "updatedAt": "2025-07-07T05:45:44Z",
+      "closedAt": "2025-07-07T05:45:44Z",
+      "comments": []
+    },
+    {
+      "number": 32,
+      "id": "I_kwDONyiw_86zKsLT",
+      "title": "BBS and proof serialization",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/32",
+      "state": "OPEN",
+      "author": "BasileiosKal",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Hey all,\n\nThere seems to be an issue when trying to use the current drafts to implement [BBS Signatures](https://datatracker.ietf.org/doc/draft-irtf-cfrg-bbs-signatures/).\n\nIn the current draft, when serializing the proof, the challenge will be the first element, consistent with academic literature.\n\nFor the BBS, the challenge is at the end (see below for reasoning).\n\nWould hate to introduce breaking changes at this point in any of the drafts. Was wondering if the function for serialising the proof could be made more general, for example, as a ciphersuite constant (different curves would need their own serialization operations either way).\n\nThe current draft could define a default one to be used with the NIST curves and one of the BBS drafts could define a BLS12-381 suite with a proof serialization that would not break the current BBS draft.\n\n\n##\n\n### BBS challenge placement explanation\n\nA BBS proof is not just a Schnorr proof, but a set of points `(A1, A2, A3)` and then a Schnorr proof (`\\pi`). In the literature this was serialised as the points first and the proof after, so it would be `BBS_proof = (A1, A2, A3, \\pi)`.\n\nIf the Schnorr proof serialization convention was to be followed, the challenge would end up at the middle of the `BBS_proof`. This would make it harder to \u201cparse\u201d the challenge out, when multiple BBS proofs were generated in parallel (sharing the same challenge). A diversion from the literature was required and we decided to move the challenge at the end of the Schnorr proof.",
+      "createdAt": "2025-04-18T23:18:35Z",
+      "updatedAt": "2025-04-18T23:18:35Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 33,
+      "id": "I_kwDONyiw_861DNJO",
+      "title": "Remove mentions of operator overloading",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/33",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "editorial",
+        "easy"
+      ],
+      "body": "Feedback from Dennis Jackson: \n> I'm not sure the draft needs to be opinionated on whether to use operator overloading or not, it's a bit of an implementation detail. \n",
+      "createdAt": "2025-05-03T17:14:51Z",
+      "updatedAt": "2025-06-18T05:16:27Z",
+      "closedAt": "2025-06-18T05:16:27Z",
+      "comments": []
+    },
+    {
+      "number": 34,
+      "id": "I_kwDONyiw_861DNLw",
+      "title": "Add more information in security sections",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/34",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "mmaker",
+        "cathieyun"
+      ],
+      "labels": [
+        "editorial",
+        "easy"
+      ],
+      "body": "> Some text sprinkled around the user/implementor pitfalls in the security considerations helps people appreciate the importance of standardising a thing (e.g. proof reuse, constant-time, dealing with the mod bias via the extra bytes, etc). \n",
+      "createdAt": "2025-05-03T17:15:13Z",
+      "updatedAt": "2025-06-28T23:28:18Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 36,
+      "id": "I_kwDONyiw_861g2GN",
+      "title": "Fix re-use of hash state across proofs",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/36",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Currently the hash state of an (initialized) non-interactive proof is affected by the `prove` and `verify` functions.\nhttps://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/sigma_protocols.sage#L55\n\nIn the non-interactive proof we re-instantiate the hash state for each prove and verify, which doesn't make sense. \nhttps://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/poc/test_sigma_protocols.sage#L303\n\nWe should be copying the state upon proving time and proceed from there.",
+      "createdAt": "2025-05-07T09:10:45Z",
+      "updatedAt": "2025-05-17T09:47:05Z",
+      "closedAt": "2025-05-17T09:47:05Z",
+      "comments": []
+    },
+    {
+      "number": 37,
+      "id": "I_kwDONyiw_862CtQ6",
+      "title": "Editorial comment: fix typo.",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/37",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "mmaker",
+        "cathieyun"
+      ],
+      "labels": [],
+      "body": "From @wbl: \n\n> I think in 2.3 for the commitment you want to map the nonces in prover_commit, not the witness. \"generators\" appears exactly once, which is probably a typo.",
+      "createdAt": "2025-05-10T13:53:08Z",
+      "updatedAt": "2025-05-17T09:50:35Z",
+      "closedAt": "2025-05-17T09:50:35Z",
+      "comments": []
+    },
+    {
+      "number": 38,
+      "id": "I_kwDONyiw_862CtXE",
+      "title": "Editorial: set expectations correctly in intro",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/38",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "mmaker",
+        "cathieyun"
+      ],
+      "labels": [
+        "editorial",
+        "easy"
+      ],
+      "body": "From @wbl: \n\n> More broadly I think there introduction seems to promise a bit much.\n> It discusses OR proofs, t out of n, and ultimately a degree of\n> composibility (maybe), but I think a bit more needs to be said here to\n> make that work. If we just want to do it for linear equations over\n> prime order groups, fine, but then the intro should be revised to make\n> that clear. Ideally we'd include some degree of composibility via the\n> auxilliary data passed in or at least warnings about when and when not\n> to compose. ",
+      "createdAt": "2025-05-10T13:53:54Z",
+      "updatedAt": "2025-06-28T02:04:55Z",
+      "closedAt": "2025-06-28T02:04:55Z",
+      "comments": [
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This is a good point, we never explicitly state that proof composition (e.g. OR-composition) is out of scope for the spec - and if anything, the intro implies that it should be part of the spec, if we are supporting a zero-knowledge simulator.\n\nWe should decide if proof composition is actually in scope, and update the spec accordingly. If it's out of scope (which seems to be the case from other conversations) then we should remove these optional functions, for simplicity. But if it's in scope (which could also be plausible, given that the proof of concept does composition for AND and OR proofs?) we should add that to the spec. There's a bit of a mismatch right now.",
+          "createdAt": "2025-06-25T20:09:02Z",
+          "updatedAt": "2025-06-25T20:09:02Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "A few factual points here. \n\n- The initial scope did *explicitly exclude* OR proofs as you agreed on the text in FAQ.md . (I don't mean that I'm against them). \n- The simulator is there also to support short proofs. \n\nOR proofs are only an element in the list. I think we can close this issue by making sure the technical spec does not overpromise or mention any of these for now.\n\n",
+          "createdAt": "2025-06-28T02:04:55Z",
+          "updatedAt": "2025-06-28T02:04:55Z"
+        }
+      ]
+    },
+    {
+      "number": 39,
+      "id": "I_kwDONyiw_862CuIT",
+      "title": "Editorial: explain where elements are tested for being in the EC subgroup",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/39",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "mmaker",
+        "cathieyun"
+      ],
+      "labels": [],
+      "body": "From @wbl:\n\n> We might also need to tackle not-prime order points: verifying order is\n> expensive, but there are some tricks on BLS 12 to speed it up, but\n> when doing a batched proof cofactor clearing is comparatively cheap.\n\nThis is already discussed in the TeX specification -- perhaps one can just test that the instance is in the group, and not the commitment?",
+      "createdAt": "2025-05-10T13:56:59Z",
+      "updatedAt": "2025-07-24T05:59:50Z",
+      "closedAt": "2025-07-24T05:59:50Z",
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "@cathieyun this one is fun. If you check the instance, and know that it's in the curve, maybe don't have to check that the commitment is in the curve as well?",
+          "createdAt": "2025-06-14T16:47:56Z",
+          "updatedAt": "2025-06-14T16:47:56Z"
+        },
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I agree that you could skip the check that the commitment is on the curve, if you know the underlying instance is on the curve. However it seems like better practice to always check, to make it harder to \"shoot yourself in the foot\" or as a failsafe if you forget to check that the instance is on the curve. How expensive is the check that the commitment is on the curve? Unless we can show that it is prohibitive/impractical, I would recommend keeping the check that the commitment is on the curve, for security.",
+          "createdAt": "2025-06-25T20:21:04Z",
+          "updatedAt": "2025-06-25T20:21:04Z"
+        },
+        {
+          "author": "wbl",
+          "authorAssociation": "NONE",
+          "body": "The curve check is very cheap. The group check might not be.",
+          "createdAt": "2025-06-27T21:08:39Z",
+          "updatedAt": "2025-06-27T21:08:39Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "To add on that, following discussions with Ian:\n\n1. the prover should do its best at catching trivial relations. It should return an error. \n2. we should explicit how the instance is checked for being in the right space\n\n@wbl I agree group check can be expensive, and that this cost can be amortized in the case of repeated verifications.\nI also agree that verifying N proofs checking for subgroup validity as Cathie says will cost O(N * large_curve_operations) instead of O(N * subgroup_operations).  I'll comment for now this as \"optional\" (in the same way we do for verifying the proof after proving it), and consider the change sufficient.\n@cathieyun thanks for your recommendations. I'll let you close this issue if you agree with my take.",
+          "createdAt": "2025-06-30T22:44:30Z",
+          "updatedAt": "2025-07-06T00:46:29Z"
+        },
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Ok, sounds good - thanks for that edit. Agree with that take, to mark it as optional.",
+          "createdAt": "2025-07-24T05:59:50Z",
+          "updatedAt": "2025-07-24T05:59:50Z"
+        }
+      ]
+    },
+    {
+      "number": 43,
+      "id": "I_kwDONyiw_863uwA0",
+      "title": "NIST Feedback: C6. Miscellaneous editorial",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/43",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "editorial",
+        "easy"
+      ],
+      "body": "Typos: challange, commmit, Stadtler\n\n- [x] Define acronyms: SHO, VRF, ...\n\n- [x] Define terms, e.g., batchable, ...\n\n- [x] Ref [NISTCurves]: if wanting to cite DSS, consider updating from FIPS 186-4 (2013) to FIPS 186-5 (2023); consider citing SP 800-186 (2023) as a reference for the P-* elliptic curves (such as P-384).\n\n- [x] The expression \"A commitment, sometimes also called nonce\" is a bit confusing. Isn't nonce also being used to denote the (seed of) the discrete-log of the \"commitment\". It might be clearer to distinguish between secret nonce and public nonce.\n\n- [x] Section 2.4: why is the nonce algorithm shown after the challenge algorithm (if the nonce is introduced before the challenge)?\n\n- [x] Unclear the utility of declaring \"simulate_response\", without more guidance on how it would actually be used.\n\n- [x] The draft uses \"Equations\" to specify the \"constraints\". Does that mean that range constraints (e.g., based on inequalities) are not allowed? Consider clarifying the relation between \"constraints\" and \"equations\".\n\n- [x] Consider adding textual explanation of the syntax of each function, e.g., where the output length of SHAKE128 is specified.",
+      "createdAt": "2025-05-22T08:17:31Z",
+      "updatedAt": "2025-06-28T02:35:44Z",
+      "closedAt": "2025-06-28T02:35:44Z",
+      "comments": [
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I'm wondering, what was the change that addressed this issue?\n> Unclear the utility of declaring \"simulate_response\", without more guidance on how it would actually be used.\n\nIMO it's still unclear what the purpose of \"simulate_response\" is, or how it is used (or even if it should be in scope for the spec), which I brought up in the comment here:\nhttps://github.com/mmaker/draft-zkproof-sigma-protocols/issues/38\nI am okay with expanding the scope to include proof composition, but if so we should define this more. Otherwise if that is out of scope, we should remove the proof composition functions altogether. Right now we are in a confusing in-between space.",
+          "createdAt": "2025-06-25T22:00:10Z",
+          "updatedAt": "2025-06-25T22:00:10Z"
+        },
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Marking this entry as \"done\", as I don't see this expression in the spec anymore and all references to nonces are explicitly referring to secret nonces.\n> The expression \"A commitment, sometimes also called nonce\" is a bit confusing. Isn't nonce also being used to denote the (seed of) the discrete-log of the \"commitment\". It might be clearer to distinguish between secret nonce and public nonce.",
+          "createdAt": "2025-06-26T01:49:16Z",
+          "updatedAt": "2025-06-26T01:49:16Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Making this entry as \"done\", since it's described in the codec section of the Fiat-Shamir document\n> Consider adding textual explanation of the syntax of each function, e.g., where the output length of SHAKE128 is specified.\n\n",
+          "createdAt": "2025-06-28T02:08:21Z",
+          "updatedAt": "2025-06-28T02:08:21Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Making this entry as \"done\", since it's not correct: \n> The draft uses \"Equations\" to specify the \"constraints\". Does that mean that range constraints (e.g., based on inequalities) are not allowed? Consider clarifying the relation between \"constraints\" and \"equations\".\n\nRange constraints can be implemented via standard linearization techniques. It's true however that, for proving a preimage of a linear relation, one is not strictly proving \"inqualities\". This part of scoping is well defined in FAQ.md and in the call for adoption email.",
+          "createdAt": "2025-06-28T02:15:22Z",
+          "updatedAt": "2025-06-28T02:15:22Z"
+        }
+      ]
+    },
+    {
+      "number": 44,
+      "id": "I_kwDONyiw_863vF1X",
+      "title": "NIST Feedback: Hash function (if specifying the Fiat-Shamir transformation in this spec)",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/44",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "editorial",
+        "easy"
+      ],
+      "body": "> \n> - 1. Consider initially explaining the required properties of the (cryptographic) hash function used by FS transformation.\nMention the requirement of the random oracle as we start talking about Fiat-Shamir.\n\n\n\nThen, make more clear that the API design can be made agnostic with respect to the hash function. Some hash function examples are below:\n\n> - 3. If the intention is to allow a single hash function (i.e., XOF), then (compared with SHAKE128):\n> (a) Even though the draft already considers domain separation for the hash function,) might it make more sense to use cSHAKE128 (customizable XOF, see SP 800-185), e.g., with S = \"Fiat-Shamir\", to ensure that the hash function is different from the one used in different applications?\n> (b) might it make more sense to use SHAKE256 or cSHAKE256, to allow up to 256 bits of security [see FIPS 202 Table 4] for several security properties (still depending on the specified output length, and in case other curves are allowed, such as P-521).\n> \n> - 4. Other hash functions?: Might there be applications that would benefit from using \"light(er)weight\" hash functions / XOFs, such as Ascon-based (See SP 800-232, with Ascon-Hash256 and Ascon-[C]XOF128)?\n> \n> - 5. There are conceivable scenarios where one could use a purposefully expensive hash function (akin to a key-derivation function with many hashing iterations), as a way of slightly reducing the proof size while retaining a given level of soundness. If those cases are deemed pertinent in the future, would one allow those hash functions via an update to this spec, or in a separate spec about hash functions compatible with FS?\n> ",
+      "createdAt": "2025-05-22T08:48:46Z",
+      "updatedAt": "2025-06-26T00:28:49Z",
+      "closedAt": "2025-06-26T00:28:49Z",
+      "comments": [
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think there's some confusion (maybe leftover text) due to the fact that the Sigma spec still has references to hash functions. If I understand the division between Sigma/Fiat-Shamir correctly, this should not be the case and the Fiat-Shamir spec should be the one making all decisions on the hash functions. Therefore if we are following that split correctly in the writing of the spec, the NIST feedback should be addressed because there would be no confusion around the API design being agnostic of the hash function.",
+          "createdAt": "2025-06-25T20:28:09Z",
+          "updatedAt": "2025-06-25T20:28:09Z"
+        }
+      ]
+    },
+    {
+      "number": 45,
+      "id": "I_kwDONyiw_863vIZl",
+      "title": "NIST Feedback: C4. Other non-interactive transformations",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/45",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "editorial",
+        "easy"
+      ],
+      "body": "> The Fiat-Shamir transformation (although being the most popular) is not the only possibility for converting a Sigma protocol into a non-interactive ZKP. For example, using an equivocable commitment (e.g., see [ia.cr/2014/710](http://ia.cr/2014/710)) instead of a hash function may facilitate obtaining zero-knowledge of the non-transferable kind, i.e., proofs that are not publicly verifiable). Thus, consider whether it may be beneficial to adjust the title to directly refer to the Fiat-Shamir transformation. (An alternative would be to leave the current spec be about sigma protocols, and do another [related] spec about the FS transformation.)\n\nCreate a paragraph that mentions briefly what are types of Fiat--Shamir transformations are possible.",
+      "createdAt": "2025-05-22T08:52:09Z",
+      "updatedAt": "2025-06-27T22:39:57Z",
+      "closedAt": "2025-06-27T22:39:57Z",
+      "comments": [
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I'm a bit confused by this feedback, since this is the current status of the sigma spec:\n> An alternative would be to leave the current spec be about sigma protocols, and do another [related] spec about the FS transformation.\n\nThe related spec for the FS transformation is available here:\nhttps://mmaker.github.io/draft-zkproof-sigma-protocols/draft-orru-zkproof-fiat-shamir.html\n\nThis feedback may be arising from the same confusion as what prompted other feedback items, such as https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/44, which I addressed with https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/44#issuecomment-3006051267. Hopefully that confusion is resolved by being clearer about the relationship between the sigma spec and FS transformation spec.",
+          "createdAt": "2025-06-26T01:24:31Z",
+          "updatedAt": "2025-06-26T01:25:24Z"
+        },
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "We can add a note that the sigma protocol spec defines sigma protocols with a FS transformation, and add a section of other ways that one could make an interactive protocol non-interactive (but make it clear that these are outside the scope of the spec).",
+          "createdAt": "2025-06-26T01:32:29Z",
+          "updatedAt": "2025-06-26T01:32:29Z"
+        }
+      ]
+    },
+    {
+      "number": 46,
+      "id": "I_kwDONyiw_863vJF2",
+      "title": "NIST Feedback: C3. Zero-knowledge",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/46",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "editorial",
+        "easy"
+      ],
+      "body": "When talking about zero-knowledge, write in a separate sentence that the transformation will make the proof transferable.\n\n>  For better awareness of privacy properties, consider clarifying the cases in which the proofs become transferable (publicly verifiable, namely when using a Fiat-Shamir transformation) or remain deniable (e.g., if interactive, with a honest verifier, and without transferable message authenticity).",
+      "createdAt": "2025-05-22T08:53:03Z",
+      "updatedAt": "2025-06-26T00:28:28Z",
+      "closedAt": "2025-06-26T00:28:28Z",
+      "comments": []
+    },
+    {
+      "number": 47,
+      "id": "I_kwDONyiw_863vVxi",
+      "title": "NIST Feedback: C2. Title versus content/scope",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/47",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "editorial",
+        "easy"
+      ],
+      "body": "For the quoted sentences, refrain from calling \"sigma protocols\" non-interactive\n\n> The draft seems to be conflating \"Sigma Protocols\" (which can be [are?] interactive) with a Sigma-inspired non-interactive (NI) ZKPoK obtained using the Fiat-Shamir (FS) transformation. Note that the draft says:\n> \"Sigma protocols, a [...] *non-interactive* zero-knowledge proof of knowledge\"\n> \"Any sigma protocols must define [...] A challenge, computed using the *Fiat-Shamir transformation* using a hash function.\"\n> \n> Concern: This title might induce ambiguity in the future when referred to in the scope of other specifications/discussions about (i) interactive sigma protocols, or (ii) sigma-protocol-based NIZKP[oK]s that use a transformation different from FS?\n> ",
+      "createdAt": "2025-05-22T09:11:35Z",
+      "updatedAt": "2025-06-25T17:14:40Z",
+      "closedAt": "2025-06-25T17:14:40Z",
+      "comments": [
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Adding more context from the NIST email:\n\n> Suggestion: \n> if the goal is indeed to focus on a Sigma+FS-based NIZKPoK, then consider revising the title to be more suggestive of the scope/focus.\n> if the goal is to specify Sigma protocols as a 3-move interaction, then the title seems okay, but then the content could cover more thoroughly the interactive case. The transformation into a non-interactive proof/argument of knowledge could then either (i) be an explained option or (ii) be left to a separate specification.\n\n",
+          "createdAt": "2025-06-20T21:59:30Z",
+          "updatedAt": "2025-06-20T21:59:30Z"
+        }
+      ]
+    },
+    {
+      "number": 51,
+      "id": "I_kwDONyiw_867icw9",
+      "title": "Address comments from call for adoption",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/issues/51",
+      "state": "CLOSED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-06-14T16:54:44Z",
+      "updatedAt": "2025-07-24T06:00:24Z",
+      "closedAt": "2025-07-24T06:00:24Z",
+      "comments": [
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Addressed the comments for the call for adoption!",
+          "createdAt": "2025-07-24T06:00:24Z",
+          "updatedAt": "2025-07-24T06:00:24Z"
+        }
+      ]
+    }
+  ],
+  "pulls": [
+    {
+      "number": 6,
+      "id": "PR_kwDONyiw_86NWhMS",
+      "title": "Isolate Scalar struct from Group",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/6",
+      "state": "MERGED",
+      "author": "ChihChengLiang",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "We attempt to fix #2 with this PR.\r\n\r\nTest\r\n```\r\ncd poc\r\nmake\r\nsage test_zkp.sage \r\n```\r\n\r\n",
+      "createdAt": "2025-03-04T17:44:23Z",
+      "updatedAt": "2025-03-11T09:27:38Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "fe63fc453aec2fe652ff8fed42d9b96836875a5b",
+      "headRepository": "ChihChengLiang/spfs",
+      "headRefName": "scalar-struct",
+      "headRefOid": "4c5853633f81f9fbc232ada7074f1aa1a0c8b4c5",
+      "closedAt": "2025-03-11T09:27:38Z",
+      "mergedAt": "2025-03-11T09:27:38Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "e0f905e5304209282639a5c65f3d51a5e056fe99"
+      },
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "nice job, but there's still some things that are not handled: \r\n\r\n- `hash_to_scalar` is part of the description https://github.com/ChihChengLiang/spfs/blob/scalar-struct/poc/groups.sage#L190  \r\n- the change needs to propagate to the elliptic curve implementations\r\nIn particular, https://github.com/ChihChengLiang/spfs/blob/scalar-struct/poc/groups.sage#L246 scalar serialization for NIST curves is still part of `NISTGroup`. \r\nSame for https://github.com/ChihChengLiang/spfs/blob/scalar-struct/poc/groups.sage#L287. ",
+          "createdAt": "2025-03-05T09:59:01Z",
+          "updatedAt": "2025-03-05T09:59:01Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "@cathieyun most changes here should propagate back to ARC, where \r\n1. the scalar interfaces are mixed with the group interfaces\r\n2. constants are mixed with runtime variables.",
+          "createdAt": "2025-03-11T09:27:32Z",
+          "updatedAt": "2025-03-11T09:27:32Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDONyiw_86ekViP",
+          "commit": {
+            "abbreviatedOid": "c5e69da"
+          },
+          "author": "ChihChengLiang",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "I commented on the decision to use composition (wrapping GF) rather than inheritance (subclass GF)",
+          "createdAt": "2025-03-05T08:30:21Z",
+          "updatedAt": "2025-03-05T08:32:12Z",
+          "comments": [
+            {
+              "originalPosition": 7,
+              "body": "Eventually I gave up the inheritance approach due to the complexity.\r\nGF is not a simple class. It is created using a [UniqueFactory](https://doc.sagemath.org/html/en/reference//structure/sage/structure/factory.html#sage.structure.factory.UniqueFactory). To initialize it properly, we need __new__ instead of __init__, which causing a series of new complexity.\r\n\r\n\r\n",
+              "createdAt": "2025-03-05T08:30:21Z",
+              "updatedAt": "2025-03-05T08:32:12Z"
+            },
+            {
+              "originalPosition": 12,
+              "body": "We use the `__getattr__` to get all the GF properties and methods.",
+              "createdAt": "2025-03-05T08:30:49Z",
+              "updatedAt": "2025-03-05T08:32:12Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "id": "PR_kwDONyiw_86NZM5A",
+      "title": "poc work (draft)",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/7",
+      "state": "MERGED",
+      "author": "cathieyun",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-03-05T00:46:33Z",
+      "updatedAt": "2025-03-12T07:34:35Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "250935630ea8f7e70366d786ef9a970fc902e3ea",
+      "headRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "headRefName": "cathie/poc-fixups",
+      "headRefOid": "19f988cc5b0b1fa79fce3785c86273ac3c39e73a",
+      "closedAt": "2025-03-05T03:35:30Z",
+      "mergedAt": "2025-03-05T03:35:30Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "cb3328747b1325e326eff78b29dc02902767525a"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 11,
+      "id": "PR_kwDONyiw_86Nr1ir",
+      "title": "Assemble proof test vectors (WIP)",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/11",
+      "state": "MERGED",
+      "author": "cathieyun",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Changes:\r\n- Update `zkp_test` to add serialized proofs to a test vector dict\r\n- Write the test vectors to files (.json and .txt, though the .txt is currently ignored because of the .gitignore)\r\n- Update Makefile to reflect new workflows for `make test` and `make vectors`\r\n- Remove no-longer-relevant ARC files\r\n- Update contributors",
+      "createdAt": "2025-03-06T19:36:54Z",
+      "updatedAt": "2025-03-11T09:42:34Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "e0f905e5304209282639a5c65f3d51a5e056fe99",
+      "headRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "headRefName": "cathie/testvectors",
+      "headRefOid": "19c878ecabf6c1ef7b1a81263ab0073494c10a79",
+      "closedAt": "2025-03-11T09:42:34Z",
+      "mergedAt": "2025-03-11T09:42:34Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "8c6c1ef59e6f1425edeb6f40cc8a5df1c52a4dc5"
+      },
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Thank you so much Cathie! \r\nSome notes:  \r\n- The groups are instantiated at compile time, which seems useless and changes the API between what should be in the spec and what is in the POC. Ultimately, this will lead to confusion because of function signature mismatch. A better approach here I think would be to have a class factory and a ciphersuite dictionary that instantiates the ciphersuite for the sigma protocol.\r\n- I think the name \"ZKP\" is overly general and misleading, we should move everything into `sigma_protocols` or `SP`.\r\n- authorship on the Fiat--Shamir document is a bit of an over-reach (that part has not been touched, and even worse this PR introduced errors there).\r\n\r\n\r\nI am merging this PR because we need to move fast, but these parts  will have to be changed.",
+          "createdAt": "2025-03-11T07:22:16Z",
+          "updatedAt": "2025-03-11T09:42:27Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 13,
+      "id": "PR_kwDONyiw_86QtSjn",
+      "title": "FS spec comments",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/13",
+      "state": "CLOSED",
+      "author": "vishady721",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-03-30T23:44:05Z",
+      "updatedAt": "2025-03-31T00:25:15Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "3ac87f13e0bc4edb73c20cfa2d4ed960803ea94d",
+      "headRepository": "vishady721/draft-zkproof-sigma-protocols",
+      "headRefName": "main",
+      "headRefOid": "c3688ca57281ea45513872498e7e424c1cba2de5",
+      "closedAt": "2025-03-31T00:25:15Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 14,
+      "id": "PR_kwDONyiw_86QtYuA",
+      "title": "FS/SP spec comments",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/14",
+      "state": "MERGED",
+      "author": "vishady721",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-03-31T00:25:59Z",
+      "updatedAt": "2025-04-01T15:07:37Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "3ac87f13e0bc4edb73c20cfa2d4ed960803ea94d",
+      "headRepository": "vishady721/draft-zkproof-sigma-protocols",
+      "headRefName": "main",
+      "headRefOid": "bffd0960ac94f9f87abd3953fc8182c685bc8e71",
+      "closedAt": "2025-04-01T15:07:37Z",
+      "mergedAt": "2025-04-01T15:07:36Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "648c2dbe0aaf3d7267b7c7314a5348faeea8c395"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 26,
+      "id": "PR_kwDONyiw_86R1XUa",
+      "title": "Added z_selection ",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/26",
+      "state": "MERGED",
+      "author": "vishady721",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-04-08T18:33:41Z",
+      "updatedAt": "2025-04-08T19:52:49Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "4c94fd94162023a45cbb47c3ffbe6e4905b148d1",
+      "headRepository": "vishady721/draft-zkproof-sigma-protocols",
+      "headRefName": "main",
+      "headRefOid": "533bb6ee9e05b69d117baa40ae315310e8aef1e1",
+      "closedAt": "2025-04-08T19:52:48Z",
+      "mergedAt": "2025-04-08T19:52:48Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "478bc278f68444c003d83ec81a11f1a11068ffed"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 29,
+      "id": "PR_kwDONyiw_86SYQyD",
+      "title": "AND composition example",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/29",
+      "state": "MERGED",
+      "author": "vishady721",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "NOTE: there seems to be a bug in scalar multiplication for GroupP384, i.e. (G * x * y) != ((G * x) * y). Changed the test to use P256 instead.",
+      "createdAt": "2025-04-13T03:40:28Z",
+      "updatedAt": "2025-06-14T12:33:11Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "5efa56367362d201334f8c2abd39aeb6a2628bbf",
+      "headRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "headRefName": "vishady/AND-composition",
+      "headRefOid": "09103832a0186dc8db2128d6e1973c5e1432ef28",
+      "closedAt": "2025-04-17T20:27:54Z",
+      "mergedAt": "2025-04-17T20:27:54Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "80ce25fbebf0d7ba30c36b69d59c6d6d30720c2f"
+      },
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "thank you so much!",
+          "createdAt": "2025-04-17T20:28:04Z",
+          "updatedAt": "2025-04-17T20:28:04Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 35,
+      "id": "PR_kwDONyiw_86U3lD_",
+      "title": "Test vector + scaffolding for or composition",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/35",
+      "state": "MERGED",
+      "author": "vishady721",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-05-05T00:44:58Z",
+      "updatedAt": "2025-06-14T12:33:06Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "2b78efed3d9b032770d29ad8dda216c693cf7a73",
+      "headRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "headRefName": "vishady/OR-composition",
+      "headRefOid": "41a5bb61318cc00254949890c2a067ea620fddfc",
+      "closedAt": "2025-05-10T18:25:48Z",
+      "mergedAt": "2025-05-10T18:25:48Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "cf9806929f8c8bf04338e60b20bfcafc0228e6eb"
+      },
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Hi @vishady721 ! \r\nI tried to fix some inconsistencies with the function signature of the API, and the serialization function. \r\nMore specifically, the serialization function must return bytes, and not data structures such as lists or tuples. \r\n\r\nI have unfortunately not managed to complete the function and there's still a small bug in the message length. \r\nCan you please have a look and take it from here? It should be clear what I'm trying to do. \r\nFeel free to revert the commitment is you want to start from scratch, but the bottom line is: keep the template functions signature",
+          "createdAt": "2025-05-07T08:53:29Z",
+          "updatedAt": "2025-05-07T08:55:16Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "Note for later: the implementation should reject and not compile if the same witness is used in two branches of the or proof. Some notes on different ways to implement OR from a discussion with Ian Goldberg: \r\n\r\n```example OR statement: \r\n\r\n    attr1 == attr2 OR attr1 == attr3\r\n    attr1 == attr4 + attr5\r\n\r\nsilly way: \r\n\r\n    attr1 == attr4 + attr5\r\n    attr1 == attr2\r\n    OR \r\n    attr1 == attr3\r\n    attr1 == attr4 + attr5\r\n\r\nbetter way: \r\n\r\n    instance:\r\n    X1 = r1*A + a1*(A-3A) = morphism(),  \r\n    X2 = r2*A + a2*B\r\n    ..\r\n\r\n    commit:\r\n    SigmaProtocol(X1, X4, X5){ \r\n    a1'' == attr4 + attr5 \r\n    \r\n    morphism(r1, a1) = X1, morphism(r2, a1) = X2 \r\n    OR\r\n    morphism(r1', a1') = X1, morphism(r3, a1') = X3\r\n    }\r\n\r\nanother way: \r\n\r\n    (attr1 - attr2)(attr1 - attr3) == 0\r\n    attr1 == attr4 + attr5\r\n```",
+          "createdAt": "2025-05-07T16:28:09Z",
+          "updatedAt": "2025-05-07T16:28:09Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDONyiw_86oegF3",
+          "commit": {
+            "abbreviatedOid": "41a5bb6"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-08T23:05:14Z",
+          "updatedAt": "2025-05-08T23:06:18Z",
+          "comments": [
+            {
+              "originalPosition": 139,
+              "body": "I would expect `deserialize_batchable` to be the inverse of `serialize_batchable`, and that (by correctness) its output verifies. Can you pack again `challenges` with `responses`?",
+              "createdAt": "2025-05-08T23:05:15Z",
+              "updatedAt": "2025-05-08T23:06:18Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 40,
+      "id": "PR_kwDONyiw_86VtV13",
+      "title": "Vishady/spec changes",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/40",
+      "state": "MERGED",
+      "author": "vishady721",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-05-10T18:42:00Z",
+      "updatedAt": "2025-06-14T12:33:09Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "d7b0879f89613bdbaa2da1de9b5ef1b6c6999771",
+      "headRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "headRefName": "vishady/spec-changes",
+      "headRefOid": "b5723e8f8e75879ac0f2a4e7618d798184f88c9a",
+      "closedAt": "2025-05-10T18:43:32Z",
+      "mergedAt": "2025-05-10T18:43:32Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "83e16b70ad0d85cde2e4e4a88d952bd140cd0f62"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 41,
+      "id": "PR_kwDONyiw_86WVO7q",
+      "title": "docs(spec): - clarify that prover_commit maps nonces, not witness - c\u2026",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/41",
+      "state": "MERGED",
+      "author": "Chausseaumoine",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "- update the prover commitment step to correctly use nonces rather than witness\r\n- update the associate hashing procedure to use group_elements that is defined in the document as the rhs of the proof statement\r\n\r\nCloses #37",
+      "createdAt": "2025-05-15T13:41:51Z",
+      "updatedAt": "2025-05-17T09:50:34Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "622fad939d433490e0f28deed846a6c8f53b2e97",
+      "headRepository": "Chausseaumoine/draft-zkproof-sigma-protocols",
+      "headRefName": "gouriou/IEFTspecs",
+      "headRefOid": "c6afc08fa2a3f05fd0419b4a8023fdecadd0a4c7",
+      "closedAt": "2025-05-17T09:50:34Z",
+      "mergedAt": "2025-05-17T09:50:34Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "8194e690951bf00fff69234bb42fa6216e010b83"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 42,
+      "id": "PR_kwDONyiw_86WcQ0y",
+      "title": "refactor(fiat-shamir): clone hash state in prove/verify instead of resetting",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/42",
+      "state": "MERGED",
+      "author": "Chausseaumoine",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This prevents mutation of the base transcript state in `NISigmaProtocol`.\r\nNow, `prove()` and `verify()` operate on a cloned `hash_state`, preserving\r\ntranscript determinism across multiple uses.\r\n\r\nAlso adds `.clone()` method to `KeccakDuplexSponge` using `copy.deepcopy`.\r\n\r\nFixes #36 ",
+      "createdAt": "2025-05-16T08:53:00Z",
+      "updatedAt": "2025-05-17T09:47:04Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "622fad939d433490e0f28deed846a6c8f53b2e97",
+      "headRepository": "Chausseaumoine/draft-zkproof-sigma-protocols",
+      "headRefName": "gouriou/fix-transcript-clone",
+      "headRefOid": "e2977076dfd6bd432a8e1ee51baca478fb31ccdc",
+      "closedAt": "2025-05-17T09:47:04Z",
+      "mergedAt": "2025-05-17T09:47:04Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "6320bade38682215a06f0bd86cc64c93cf7d4001"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDONyiw_86pxDLe",
+          "commit": {
+            "abbreviatedOid": "dad7dcd"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "mostly good thank you! just one minor change to be integrated.",
+          "createdAt": "2025-05-17T09:42:22Z",
+          "updatedAt": "2025-05-17T09:42:45Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "can we call this scalars instead?",
+              "createdAt": "2025-05-17T09:42:22Z",
+              "updatedAt": "2025-05-17T09:42:46Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 48,
+      "id": "PR_kwDONyiw_86ZnBPx",
+      "title": "24 statement serialization",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/48",
+      "state": "MERGED",
+      "author": "vishady721",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "A draft of what statement serialization could look like!!",
+      "createdAt": "2025-06-09T01:40:44Z",
+      "updatedAt": "2025-06-28T02:36:22Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "4bbc93182bda4713c3b5db2680a766dbfabcf6b6",
+      "headRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "headRefName": "24-statement-serialiation",
+      "headRefOid": "6e2142f02a36853ab9e90d757232ddeb477bef64",
+      "closedAt": "2025-06-14T15:47:15Z",
+      "mergedAt": "2025-06-14T15:47:15Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "6b258431fd26f564300ba599c774156b8b801f25"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 49,
+      "id": "PR_kwDONyiw_86aiPVd",
+      "title": "fix(sigma-protocols): remove mentions of operator overloading. ",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/49",
+      "state": "MERGED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #33.",
+      "createdAt": "2025-06-14T15:02:56Z",
+      "updatedAt": "2025-06-28T02:36:24Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "d9bc49bceaa9caff7045e4c00bc3ba2167536c06",
+      "headRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "headRefName": "fix/33",
+      "headRefOid": "0b5b5992c84e727c1e0d6e0f3069c30dd1a57bdb",
+      "closedAt": "2025-06-18T05:16:26Z",
+      "mergedAt": "2025-06-18T05:16:26Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "11aba8279483805523bbdbe4d41c754fb74243dc"
+      },
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "@cathieyun we describe group and field operations using `add`, `mul`, etc., but then we use `+`, `*`, etc. \r\nIs this phrasing OK for you, and do you think it addresses the feedback we got? ",
+          "createdAt": "2025-06-14T16:10:36Z",
+          "updatedAt": "2025-06-14T16:10:36Z"
+        },
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This seems fine, thanks for updating. LGTM.",
+          "createdAt": "2025-06-17T23:58:11Z",
+          "updatedAt": "2025-06-17T23:58:11Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 50,
+      "id": "PR_kwDONyiw_86aif5L",
+      "title": "feat: add short_proofs.",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/50",
+      "state": "OPEN",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #25 ",
+      "createdAt": "2025-06-14T16:49:17Z",
+      "updatedAt": "2025-08-09T01:38:55Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "52f3d59e926e7edcdf47b24213436c4b4169ae65",
+      "headRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "headRefName": "feat/short-proofs",
+      "headRefOid": "9ffcf865ccda397b60f4b9fb6c2f329cd77791be",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "@cathieyun  do you think proofs of the form `challenge, response` should be in the next revision?",
+          "createdAt": "2025-06-14T16:50:46Z",
+          "updatedAt": "2025-06-14T16:50:46Z"
+        },
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Checking my understanding - the short proofs are not interoperable with the normal proofs, and would only be verifiable through the \"short proof verification\" function right? If so, maybe it would be better to have a \"short proof\" vs \"normal proof\" wrapper types so they do not get mixed up with each other, or prepend something to the serialization noting the proof type. Otherwise given a (non-type-specified) proof, it may be hard to know what type it is an how to correctly verify it.",
+          "createdAt": "2025-06-17T23:57:14Z",
+          "updatedAt": "2025-06-17T23:57:14Z"
+        },
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "That's a great point, thank you! I'll update the request following your suggestion.",
+          "createdAt": "2025-06-24T14:59:01Z",
+          "updatedAt": "2025-06-24T14:59:23Z"
+        },
+        {
+          "author": "cathieyun",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Are there updates to this PR following the suggestion (some kind of differentiator between normal and short proofs)? Asking because I'm not sure if I missed any changes due to the force-pushing to the `main` branch.",
+          "createdAt": "2025-06-26T01:45:40Z",
+          "updatedAt": "2025-06-26T01:45:40Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDONyiw_86ujRBN",
+          "commit": {
+            "abbreviatedOid": "9ffcf86"
+          },
+          "author": "copilot-pull-request-reviewer",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "## Pull Request Overview\n\nThis PR adds support for a short challenge-response proof format for sigma protocols. Key changes include:  \n- Introducing a new test function to verify the challenge-response format.  \n- Adding abstract methods for challenge serialization and deserialization in the sigma protocols base class.  \n- Implementing alternative proving and verification methods (prove_short and verify_short) in the NISigmaProtocol class.\n\n### Reviewed Changes\n\nCopilot reviewed 3 out of 3 changed files in this pull request and generated 2 comments.\n\n| File                              | Description                                                           |\n| --------------------------------- | --------------------------------------------------------------------- |\n| poc/test_sigma_protocols.sage     | Adds a new test function for the short challenge-response format.      |\n| poc/sigma_protocols.sage          | Declares abstract methods for challenge serialization/deserialization.  |\n| poc/fiat_shamir.sage              | Implements prove_short and verify_short methods for challenge-response. |\n\n\n\n",
+          "createdAt": "2025-06-14T16:50:03Z",
+          "updatedAt": "2025-06-14T16:50:03Z",
+          "comments": [
+            {
+              "originalPosition": 39,
+              "body": "[nitpick] Consider using a logging framework or relying on test framework output instead of directly printing to stdout to keep test outputs clean and easier to automate.\n```suggestion\n    logging.info(\"Challenge-response format test passed!\")\n```",
+              "createdAt": "2025-06-14T16:50:03Z",
+              "updatedAt": "2025-06-14T16:50:04Z"
+            },
+            {
+              "originalPosition": 42,
+              "body": "The slicing logic in verify_short assumes a fixed-length serialized challenge. It would be beneficial to document this assumption or add error handling to ensure that the proof length matches the expected format.\n```suggestion\n        challenge_len = self.sp.instance.Domain.scalar_byte_length()\n        response_len = self.sp.instance.response_bytes_len\n        expected_proof_len = challenge_len + response_len\n\n        if len(proof) != expected_proof_len:\n            raise ValueError(f\"Invalid proof length: expected {expected_proof_len} bytes, got {len(proof)} bytes.\")\n```",
+              "createdAt": "2025-06-14T16:50:03Z",
+              "updatedAt": "2025-06-14T16:50:04Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 52,
+      "id": "PR_kwDONyiw_86arg0L",
+      "title": "fix(keccak): correct KeccakF1600 implementation and align DuplexSponge with spec",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/52",
+      "state": "MERGED",
+      "author": "nougzarm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "- fix: resolve issues in KeccakF1600 permutation implementation\r\n- fix: update DuplexSponge methods to comply with Construction 3.2 from https://eprint.iacr.org/2025/536.pdf",
+      "createdAt": "2025-06-16T09:45:00Z",
+      "updatedAt": "2025-06-16T13:41:26Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "6b258431fd26f564300ba599c774156b8b801f25",
+      "headRepository": "nougzarm/draft-zkproof-sigma-protocols",
+      "headRefName": "sponge_refactor",
+      "headRefOid": "6c6b84596c2f189a44e3eca71d207c51b81961f3",
+      "closedAt": "2025-06-16T13:41:26Z",
+      "mergedAt": "2025-06-16T13:41:26Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "6d970151b17545281c19cbd44b53518e6426af75"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDONyiw_86uuo_3",
+          "commit": {
+            "abbreviatedOid": "d38c6e8"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "CHANGES_REQUESTED",
+          "body": "shouldn't this require also changing https://github.com/mmaker/draft-zkproof-sigma-protocols/blob/main/draft-orru-zkproof-fiat-shamir.md#squeeze ?",
+          "createdAt": "2025-06-16T10:07:59Z",
+          "updatedAt": "2025-06-16T10:07:59Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDONyiw_86uuyI_",
+          "commit": {
+            "abbreviatedOid": "de04834"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2025-06-16T10:18:06Z",
+          "updatedAt": "2025-06-16T10:30:29Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "_sage_const_32?",
+              "createdAt": "2025-06-16T10:18:07Z",
+              "updatedAt": "2025-06-16T10:30:29Z"
+            },
+            {
+              "originalPosition": 61,
+              "body": "can you do this in chunks? I understand that the academic paper does it one by one, but here you're wasting clocks",
+              "createdAt": "2025-06-16T10:19:07Z",
+              "updatedAt": "2025-06-16T10:30:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86uxbvW",
+          "commit": {
+            "abbreviatedOid": "6c6b845"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-06-16T13:41:06Z",
+          "updatedAt": "2025-06-16T13:41:06Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 53,
+      "id": "PR_kwDONyiw_86bdEWt",
+      "title": "fix(keccak): make squeeze() spec-compliant and add unit tests",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/53",
+      "state": "MERGED",
+      "author": "nougzarm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-06-20T17:37:45Z",
+      "updatedAt": "2025-06-23T22:57:21Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "11aba8279483805523bbdbe4d41c754fb74243dc",
+      "headRepository": "nougzarm/draft-zkproof-sigma-protocols",
+      "headRefName": "main",
+      "headRefOid": "3e5c0be4c8223e8a365f35ec70cd73baed7936be",
+      "closedAt": "2025-06-23T22:57:21Z",
+      "mergedAt": "2025-06-23T22:57:21Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "50bced374d883ce0281317b911b34a43c16d3c8c"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 54,
+      "id": "PR_kwDONyiw_86bfH-y",
+      "title": "Rename sigma protocols to proofs",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/54",
+      "state": "CLOSED",
+      "author": "cathieyun",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "To address the NIST feedback (https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/47), and also to improve clarity, renaming from \"Sigma Protocols\" to \"Sigma Proofs\".\r\n\r\nI didn't rename \"sigma protocols\" throughout the core of the spec because at some point, the spec language is actually referring to the _protocol_ instead of the final _proof_. Happy to do a closer pass to differentiate between the two. This is also a very rough suggestion, can bikeshed this more if this rename will cause more confusion and ambiguity than it solves.\r\n\r\n\r\n",
+      "createdAt": "2025-06-21T00:43:52Z",
+      "updatedAt": "2025-06-25T17:14:57Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "0a5afa8b296504ff3ab186cce1ed0878e015df47",
+      "headRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "headRefName": "rename-sigma-protocol",
+      "headRefOid": "737501d74ab15912b38b68e72f477242592cfd49",
+      "closedAt": "2025-06-25T17:14:57Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "I'm not sure if the wording \"Sigma Proof\" has ever been used in cryptography.\r\nI can be persuaded of the title given the CFRG feedback but I am against changing the formal definition as it can potentially lead to more useless naming discussions with other cryptographers",
+          "createdAt": "2025-06-24T01:18:53Z",
+          "updatedAt": "2025-06-24T01:19:22Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 55,
+      "id": "PR_kwDONyiw_86cH07f",
+      "title": "Remove outdated references to hash functions from sigma spec",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/55",
+      "state": "MERGED",
+      "author": "cathieyun",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Addresses https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/44 by removing unnecessary references to hash functions. These should all be defined at the Fiat-Shamir spec level, so are not relevant at the Sigma protocol spec level.\r\n\r\nI'd like to double check that we can remove the section `Serializing the statement for the Fiat-Shamir transformation`. It does not seem like this is used anywhere in the Sigma protocol spec, so it probably does not belong, but want to make sure.\r\n\r\n",
+      "createdAt": "2025-06-25T20:34:29Z",
+      "updatedAt": "2025-06-26T01:17:56Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "c5709140273172c16da73823810882e6f275d469",
+      "headRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "headRefName": "hash-update",
+      "headRefOid": "8615e857e891710213b87de7002464ea1b831efb",
+      "closedAt": "2025-06-26T00:28:48Z",
+      "mergedAt": "2025-06-26T00:28:48Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "560b163974241f2b2c4b76907c27a32f02f61f67"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 56,
+      "id": "PR_kwDONyiw_86cH9Cg",
+      "title": "Add privacy section to sigma proof spec",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/56",
+      "state": "MERGED",
+      "author": "cathieyun",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Addresses https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/46",
+      "createdAt": "2025-06-25T20:50:54Z",
+      "updatedAt": "2025-06-26T01:18:10Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "c5709140273172c16da73823810882e6f275d469",
+      "headRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "headRefName": "zero-knowledge",
+      "headRefOid": "a8c49506fdbe63ca0bddd885bdce65a271c1b770",
+      "closedAt": "2025-06-26T00:28:27Z",
+      "mergedAt": "2025-06-26T00:28:27Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "13ec5deeff23a63c45ed04dd290176ef45a4eaf0"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 57,
+      "id": "PR_kwDONyiw_86cJnMz",
+      "title": "Mention equivocable commitments in discussion of deniability",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/57",
+      "state": "MERGED",
+      "author": "cathieyun",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Addresses (part of) the concern in https://github.com/mmaker/draft-zkproof-sigma-protocols/issues/45.\r\n\r\nThough I think the majority of the feedback arises from confusion of the relationship between the sigma protocol spec and the Fiat-Shamir spec (or a lack of knowledge of the existence of the Fiat-Shamir spec?), this PR addresses the feedback to mention other ways to construct sigma protocols other than through the Fiat-Shamir transform, and mentions equivocable commitments as another way to achieve deniability.",
+      "createdAt": "2025-06-26T01:42:44Z",
+      "updatedAt": "2025-06-27T22:39:57Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "560b163974241f2b2c4b76907c27a32f02f61f67",
+      "headRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "headRefName": "NI-transformations",
+      "headRefOid": "dcb7d1dda7a7de59b4e95c2c38db86de54f8daf3",
+      "closedAt": "2025-06-27T22:39:57Z",
+      "mergedAt": "2025-06-27T22:39:56Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "19725fb44883434ae8f5e05d22c7f66b615e8d70"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 58,
+      "id": "PR_kwDONyiw_86cMyBN",
+      "title": "Editorial changes to FS spec",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/58",
+      "state": "MERGED",
+      "author": "WizardOfMenlo",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-06-26T09:11:30Z",
+      "updatedAt": "2025-06-27T22:39:40Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "560b163974241f2b2c4b76907c27a32f02f61f67",
+      "headRepository": null,
+      "headRefName": "main",
+      "headRefOid": "2c7a64e4ba26cf92d5372a2447b5d3ae920f668f",
+      "closedAt": "2025-06-27T22:39:40Z",
+      "mergedAt": "2025-06-27T22:39:40Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "f137691c4e5669fc79e702f52f56c6682ace9b38"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDONyiw_86w6ZKt",
+          "commit": {
+            "abbreviatedOid": "ac65de3"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-06-27T22:29:05Z",
+          "updatedAt": "2025-06-27T22:29:05Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 59,
+      "id": "PR_kwDONyiw_86cOYEi",
+      "title": "Pass over Sigma protocols draft and address Issue #31",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/59",
+      "state": "MERGED",
+      "author": "martin-ochoa",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "General pass over draft:\r\n\r\n- Minor typos \r\n- Fixed order of secp256r1 (before there was the prime of the base field)\r\n- Addressed literature review for post-quantum soundness\r\n  - ZKBoo indeed appears to be the first application of MPC-in-the-head for Sigma protocols\r\n  - One could argue that there are earlier applications of lattices for some specific sigma protocols (i.e. Lyubashevsky has various papers cited by Attema et al. in this direction), but the Attema paper seems the first to be general purpose.\r\n  - Added Stern93 for an example of code-based approaches which are also quite popular within post-quantum solutions ",
+      "createdAt": "2025-06-26T12:05:59Z",
+      "updatedAt": "2025-06-28T01:30:49Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "560b163974241f2b2c4b76907c27a32f02f61f67",
+      "headRepository": "martin-ochoa/draft-zkproof-sigma-protocols",
+      "headRefName": "literature-pass-issue31",
+      "headRefOid": "9edb1530a901e887a748224bd04ee8398e03be5f",
+      "closedAt": "2025-06-28T01:30:49Z",
+      "mergedAt": "2025-06-28T01:30:49Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "61f5ca82464291f695bf7b7d431f3e58b600f791"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 60,
+      "id": "PR_kwDONyiw_86dDkAF",
+      "title": "Editorial changes to FS spec",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/60",
+      "state": "CLOSED",
+      "author": "WizardOfMenlo",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Important to check:\r\n\r\n- The duplex sponge API in 5.2.1 did not use the IV in any way, I have added it now. \r\n- In Section 4, the instance is never included in the FS. Is this by design because it should be included in the IV or is this an oversight?\r\n- What did we want here? These functions MUST raise an exception if the integer over which they We consider the function bytes_to_in ",
+      "createdAt": "2025-07-02T10:04:22Z",
+      "updatedAt": "2025-07-06T15:38:11Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "970a5fa8d0c13fc6bd67920c822064c00ad33e51",
+      "headRepository": "WizardOfMenlo/draft-zkproof-sigma-protocols",
+      "headRefName": "giacomo/new",
+      "headRefOid": "1b25b56c906d263ef36c8f8703954dc985e1443c",
+      "closedAt": "2025-07-06T15:38:11Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 61,
+      "id": "PR_kwDONyiw_86dkiON",
+      "title": "Vishady/match test vectors",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/61",
+      "state": "MERGED",
+      "author": "mmaker",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-05T17:19:28Z",
+      "updatedAt": "2025-07-05T21:47:24Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "970a5fa8d0c13fc6bd67920c822064c00ad33e51",
+      "headRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "headRefName": "vishady/match-test-vectors",
+      "headRefOid": "16e0b497b76b6ef3e57f6479997d1c0438aa78ae",
+      "closedAt": "2025-07-05T21:47:24Z",
+      "mergedAt": "2025-07-05T21:47:24Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "41dd5e46bb70cba750a4ea7170503d1e29c272b4"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 62,
+      "id": "PR_kwDONyiw_86dknkO",
+      "title": "Updated the test infrastructure to ensure that generated test vectors match the expected values from the specification",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/62",
+      "state": "CLOSED",
+      "author": "nougzarm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-05T17:45:54Z",
+      "updatedAt": "2025-07-05T21:45:07Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "970a5fa8d0c13fc6bd67920c822064c00ad33e51",
+      "headRepository": "nougzarm/draft-zkproof-sigma-protocols",
+      "headRefName": "main",
+      "headRefOid": "3ea586ba181dd7b856ca05f0cede82cecaee2ccd",
+      "closedAt": "2025-07-05T21:45:07Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 63,
+      "id": "PR_kwDONyiw_86dqsMV",
+      "title": "Vishady/match test vectors",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/63",
+      "state": "MERGED",
+      "author": "vishady721",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-07T01:03:15Z",
+      "updatedAt": "2025-07-07T22:14:09Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "4faed5061a36264afae4b2562f617096325bb6c8",
+      "headRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "headRefName": "vishady/match-test-vectors",
+      "headRefOid": "87cf11a7e1f99bebdbd9d714f2d224ad47f86a26",
+      "closedAt": "2025-07-07T22:14:09Z",
+      "mergedAt": "2025-07-07T22:14:08Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "62444ac6d030b5f33e984ebe4491f17946724f5f"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDONyiw_86yVKTy",
+          "commit": {
+            "abbreviatedOid": "3fba777"
+          },
+          "author": "vishady721",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T01:05:04Z",
+          "updatedAt": "2025-07-07T01:05:05Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "not sure if we like this name",
+              "createdAt": "2025-07-07T01:05:05Z",
+              "updatedAt": "2025-07-07T01:05:05Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yVKkz",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "vishady721",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T01:06:15Z",
+          "updatedAt": "2025-07-07T01:06:15Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "same as above, not sure if we like this name",
+              "createdAt": "2025-07-07T01:06:15Z",
+              "updatedAt": "2025-07-07T01:06:15Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yVKpn",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "vishady721",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T01:06:33Z",
+          "updatedAt": "2025-07-07T01:06:34Z",
+          "comments": [
+            {
+              "originalPosition": 7,
+              "body": "did this to match the ordering in which variables are assigned indices in rust",
+              "createdAt": "2025-07-07T01:06:34Z",
+              "updatedAt": "2025-07-07T01:06:34Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yVKwD",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "vishady721",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T01:07:04Z",
+          "updatedAt": "2025-07-07T01:07:05Z",
+          "comments": [
+            {
+              "originalPosition": 129,
+              "body": "just for now : )",
+              "createdAt": "2025-07-07T01:07:05Z",
+              "updatedAt": "2025-07-07T01:07:05Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yVK0_",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "vishady721",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T01:07:27Z",
+          "updatedAt": "2025-07-07T01:07:27Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "not sure if context = session_id, wasn't sure what to keep here",
+              "createdAt": "2025-07-07T01:07:27Z",
+              "updatedAt": "2025-07-07T01:07:27Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yVK4y",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "vishady721",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T01:07:44Z",
+          "updatedAt": "2025-07-07T01:07:45Z",
+          "comments": [
+            {
+              "originalPosition": 28,
+              "body": "likewise, i assumed statement = instance label?",
+              "createdAt": "2025-07-07T01:07:44Z",
+              "updatedAt": "2025-07-07T01:07:45Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yhNcn",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T19:25:31Z",
+          "updatedAt": "2025-07-07T19:25:31Z",
+          "comments": [
+            {
+              "originalPosition": 28,
+              "body": "correct! Will rephrase for consistency.",
+              "createdAt": "2025-07-07T19:25:31Z",
+              "updatedAt": "2025-07-07T19:25:47Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yhNml",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T19:25:49Z",
+          "updatedAt": "2025-07-07T19:25:49Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "The \"Context\" was inherited by @cathieyun's implementation, it's supposed to be the IV (the \"domain separator\") that we must generate from 3 things: \r\n- protocol identifier\r\n- session identifier \r\n- instance\r\n\r\nI'll take care of adjusting this, thank you so much for now.",
+              "createdAt": "2025-07-07T19:25:49Z",
+              "updatedAt": "2025-07-07T19:25:49Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yhOXk",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T19:27:18Z",
+          "updatedAt": "2025-07-07T19:27:19Z",
+          "comments": [
+            {
+              "originalPosition": 129,
+              "body": "`b'draft-zkproof-fiat-shamir'` might be more elegant, was utf-8 on purpose to be more verbose?",
+              "createdAt": "2025-07-07T19:27:18Z",
+              "updatedAt": "2025-07-07T19:27:19Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yhOt9",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T19:27:59Z",
+          "updatedAt": "2025-07-07T19:27:59Z",
+          "comments": [
+            {
+              "originalPosition": 7,
+              "body": "great thanks. I think the naming in rust is less descriptive, but will take care of making sure they're consistent thanks.",
+              "createdAt": "2025-07-07T19:27:59Z",
+              "updatedAt": "2025-07-07T19:27:59Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDONyiw_86yhO-w",
+          "commit": {
+            "abbreviatedOid": "01792d5"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T19:28:31Z",
+          "updatedAt": "2025-07-07T19:28:31Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "I don't and I think we should just have this be the new `test_sigma_protocols.sage`, but it's really useful for this review. thanks.",
+              "createdAt": "2025-07-07T19:28:31Z",
+              "updatedAt": "2025-07-07T19:28:31Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 64,
+      "id": "PR_kwDONyiw_86d7flI",
+      "title": "Fix get_iv_from_identifiers() method of KeccakDuplexSponge",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/64",
+      "state": "OPEN",
+      "author": "nougzarm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-08T11:46:30Z",
+      "updatedAt": "2025-08-09T01:38:55Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "52f3d59e926e7edcdf47b24213436c4b4169ae65",
+      "headRepository": "nougzarm/draft-zkproof-sigma-protocols",
+      "headRefName": "main",
+      "headRefOid": "7ab9b2b7867e0abe53183c1920acdef29eeab5bf",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDONyiw_86yqqNA",
+          "commit": {
+            "abbreviatedOid": "7ab9b2b"
+          },
+          "author": "nougzarm",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-08T12:55:10Z",
+          "updatedAt": "2025-07-08T12:55:10Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "init should instead be a KeccakDuplexSponge initialized via length_to_bytes(0) right? and instead be called tmp",
+              "createdAt": "2025-07-08T12:55:10Z",
+              "updatedAt": "2025-07-08T12:55:10Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 65,
+      "id": "PR_kwDONyiw_86h6DMj",
+      "title": "refactor: move all the curve related stuff to their own directory",
+      "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/65",
+      "state": "MERGED",
+      "author": "WizardOfMenlo",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-08-03T22:28:27Z",
+      "updatedAt": "2025-08-07T03:50:16Z",
+      "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
+      "baseRefName": "main",
+      "baseRefOid": "4bb1b041d328456bb3e1452ca91f1c15148a0ad3",
+      "headRepository": "WizardOfMenlo/draft-zkproof-sigma-protocols",
+      "headRefName": "giacomo/refactor",
+      "headRefOid": "a5880b53688d3c54b199dd55b27305ebf406b647",
+      "closedAt": "2025-08-07T03:50:16Z",
+      "mergedAt": "2025-08-07T03:50:16Z",
+      "mergedBy": "mmaker",
+      "mergeCommit": {
+        "oid": "a031116b21c0b11a0f35028ade4d00058118d091"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDONyiw_864e13j",
+          "commit": {
+            "abbreviatedOid": "a5880b5"
+          },
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "impeccable",
+          "createdAt": "2025-08-07T03:50:02Z",
+          "updatedAt": "2025-08-07T03:50:02Z",
+          "comments": []
+        }
+      ]
+    }
+  ]
+}
