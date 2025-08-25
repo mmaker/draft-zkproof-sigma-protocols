@@ -15,7 +15,7 @@ class NISigmaProtocol:
     """
     Protocol: SigmaProtocol = None
     Codec: Codec = None
-    Hash: 'DuplexSpongeInterface' = None
+    Hash: DuplexSpongeInterface = None
 
     def __init__(self, iv, instance):
         self.hash_state = self.Hash(iv)
