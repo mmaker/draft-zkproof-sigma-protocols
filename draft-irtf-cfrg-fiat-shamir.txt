@@ -4,8 +4,8 @@
 
 Crypto Forum                                                     M. Orrù
 Internet-Draft                                                      CNRS
-Intended status: Informational                             9 August 2025
-Expires: 10 February 2026
+Intended status: Informational                            25 August 2025
+Expires: 26 February 2026
 
 
                        Fiat-Shamir Transformation
@@ -62,7 +62,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 February 2026.
+   This Internet-Draft will expire on 26 February 2026.
 
 Copyright Notice
 
