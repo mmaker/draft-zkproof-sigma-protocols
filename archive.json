@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-08-10T01:40:17.279292+00:00",
+  "timestamp": "2025-08-26T01:17:06.790688+00:00",
   "repo": "mmaker/draft-irtf-cfrg-sigma-protocols",
   "labels": [
     {
@@ -2168,25 +2168,33 @@
       "id": "PR_kwDONyiw_86d7flI",
       "title": "Fix get_iv_from_identifiers() method of KeccakDuplexSponge",
       "url": "https://github.com/mmaker/draft-irtf-cfrg-sigma-protocols/pull/64",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "nougzarm",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2025-07-08T11:46:30Z",
-      "updatedAt": "2025-08-09T01:38:55Z",
+      "updatedAt": "2025-08-24T22:06:59Z",
       "baseRepository": "mmaker/draft-irtf-cfrg-sigma-protocols",
       "baseRefName": "main",
       "baseRefOid": "52f3d59e926e7edcdf47b24213436c4b4169ae65",
       "headRepository": "nougzarm/draft-zkproof-sigma-protocols",
       "headRefName": "main",
       "headRefOid": "7ab9b2b7867e0abe53183c1920acdef29eeab5bf",
-      "closedAt": null,
+      "closedAt": "2025-08-24T22:06:59Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "mmaker",
+          "authorAssociation": "OWNER",
+          "body": "@nougzarm this PR has no context or explaination of what's supposedly fixing. I'm closing it for now",
+          "createdAt": "2025-08-24T22:06:59Z",
+          "updatedAt": "2025-08-24T22:06:59Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDONyiw_86yqqNA",
