@@ -1,6 +1,6 @@
 from sagelib.test_drng import TestDRNG
 from sagelib.sigma_protocols import LinearRelation, SigmaProtocol, SchnorrProof
-from sagelib.fiat_shamir import NISigmaProtocol
+from sagelib.fiat_shamir import NIZK
 from sagelib.codec import P256Codec
 from sagelib.duplex_sponge import KeccakDuplexSponge
 from sagelib import groups
@@ -79,7 +79,7 @@ class P256AndCodec(P256Codec):
         return super().prover_message(hash_state, flat_elements)
 
 
-class NIAndProof(NISigmaProtocol):
+class NIAndProof(NIZK):
     Protocol = AndProof
     Codec = P256AndCodec
     Hash = KeccakDuplexSponge
@@ -222,7 +222,7 @@ class P256OrCodec(P256Codec):
         return super().verifier_challenge(hash_state)
 
 
-class NIOrProof(NISigmaProtocol):
+class NIOrProof(NIZK):
     Protocol = OrProof
     Codec = P256OrCodec
     Hash = KeccakDuplexSponge

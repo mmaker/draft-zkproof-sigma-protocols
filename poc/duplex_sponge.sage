@@ -25,6 +25,26 @@ class DuplexSpongeInterface(ABC):
         raise NotImplementedError
 
 
+class SHAKE128(DuplexSpongeInterface):
+    """
+    The SHAKE128 implementation of the duplex sponge interface
+    using python's standard library.
+    """
+    def __init__(self, iv: bytes):
+        assert len(iv) == 64
+        # Only the initial 64 bytes of the first block are used,
+        # the remaining ones are reserved for future use.
+        initial_block = iv + b'\00' * (168-64)
+        self.hash_state = hashlib.shake_128()
+        self.hash_state.update(initial_block)
+
+    def absorb(self, x: bytes):
+        self.hash_state.update(x)
+
+    def squeeze(self, length: int) -> bytes:
+        return self.hash_state.copy().digest(length)
+
+
 class KeccakPermutationState:
     # rate
     R = 136
@@ -32,9 +52,9 @@ class KeccakPermutationState:
     N = 136 + 64
 
     def __init__(self, iv: bytes):
-        assert len(iv) == 32
+        assert len(iv) == 64
         self.state = bytearray(200)
-        self.state[self.R: self.R + 32] = iv
+        self.state[self.R: self.R + 64] = iv
         self.p = Keccak(1600)
 
     def __getitem__(self, i):
@@ -72,7 +92,7 @@ class DuplexSponge(DuplexSpongeInterface):
     permutation_state = None
 
     def __init__(self, iv: bytes):
-        assert len(iv) == 32
+        assert len(iv) == 64
         self.absorb_index = 0
         self.squeeze_index = self.permutation_state.R
         self.rate = self.permutation_state.R
@@ -116,38 +136,10 @@ class KeccakDuplexSponge(DuplexSponge):
         self.permutation_state = KeccakPermutationState(iv)
         super().__init__(iv)
 
-    @classmethod
-    def get_iv_from_identifiers(cls, protocol_id: bytes, session_id: bytes, instance_label: bytes):
-        # I2OSP function: Integer to Octet String Primitive
-        def I2OSP(x, length):
-            return int(x).to_bytes(length, 'big')
-
-        hash_state = cls(bytes([0] * 32))
-        hash_state.absorb(I2OSP(len(protocol_id), 4))
-        hash_state.absorb(protocol_id)
-        hash_state.absorb(I2OSP(len(session_id), 4))
-        hash_state.absorb(session_id)
-        hash_state.absorb(I2OSP(len(instance_label), 4))
-        hash_state.absorb(instance_label)
-        iv = hash_state.squeeze(32)
-        return iv
-
-class SHAKE128(DuplexSpongeInterface):
-    def __init__(self, iv: bytes):
-        assert len(iv) == 32
-        self.hash_state = hashlib.shake_128()
-        self.hash_state.update(iv)
-
-    def absorb(self, x: bytes):
-        self.hash_state.update(x)
-
-    def squeeze(self, length: int) -> bytes:
-        return self.hash_state.copy().digest(length)
-
 
 if __name__ == "__main__":
     # Example usage
-    iv = b'\0' * 32  # Initialization vector
+    iv = b'\0' * 64  # Initialization vector
     sponge = SHAKE128(iv)
     sponge.absorb(b'hello!')
     output = sponge.squeeze(64)

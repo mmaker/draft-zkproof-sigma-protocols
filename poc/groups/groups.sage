@@ -158,7 +158,10 @@ class NISTCurveScalar(Scalar):
 
     @classmethod
     def _deserialize(cls, encoded):
-        return OS2IP(encoded)
+        decoded = OS2IP(encoded)
+        if not (0 <= decoded < cls.order):
+            raise ValueError(f"Invalid scalar encoding: {encoded}")
+        return decoded
 
 
 class GroupNISTCurve(Group):
@@ -194,7 +197,6 @@ class GroupNISTCurve(Group):
         byte = 2 if sgn == 0 else 3
         return I2OSP(byte, 1) + I2OSP(x, cls.field_bytes_length)
 
-   # this is using point compression
     @classmethod
     def _deserialize(cls, encoded):
         # 0x02 | 0x03 || x
@@ -203,7 +205,7 @@ class GroupNISTCurve(Group):
         assert (pve or nve)
         assert (len(encoded) % 2 != 0)
         element_length = (len(encoded) - 1) / 2
-        x = OS2IP(encoded[1:])
+        x = cls.ScalarField._deserialize(encoded[1:])
         y2 = x^3 + cls.a*x + cls.b
         y = y2.sqrt()
         parity = 0 if pve else 1
@@ -329,7 +331,10 @@ class BLS12_381_Fr(Scalar):
 
     @classmethod
     def _deserialize(cls, encoded):
-        return OS2IP(encoded) % cls.order
+        decoded = OS2IP(encoded)
+        if not (0 <= decoded < cls.order):
+            raise ValueError(f"Invalid scalar encoding: {encoded}")
+        return decoded
 
 
 class BLS12_381_G1(Group):
@@ -448,6 +453,8 @@ class BLS12_381_G1(Group):
             # Convert from bytes to integers
             x = int.from_bytes(x_string, byteorder='big')
             y = int.from_bytes(y_string, byteorder='big')
+            if not (0 <= x < cls.Fq.order() and 0 <= y < cls.Fq.order()):
+                raise ValueError("Invalid point coordinates")
 
             # Create and validate the point
             try:
@@ -458,6 +465,8 @@ class BLS12_381_G1(Group):
 
         # Steps 6-8: Handle compressed point format (C_bit == 1)
         x = int.from_bytes(s_copy, byteorder='big')
+        if not (0 <= x < cls.Fq.order()):
+            raise ValueError("Invalid point coordinates")
 
         # Calculate y^2 = x^3 + 4 in GF(p)
         Fq = cls.Fq
